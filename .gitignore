@@ -8,7 +8,7 @@
 
 # Test Third-Party Javascript Libraries #
 src/**/html/**/lib/*
-
+src/**/html/app/data/*
 # Others #
 
 **.eclipse

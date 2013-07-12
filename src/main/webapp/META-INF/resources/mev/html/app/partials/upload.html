@@ -1,0 +1,56 @@
+<html>
+  <head>
+    <style>
+			#fileup
+			{   
+				background-color:#FFFBF8;
+				border-style:solid;
+				width:300px;
+				border-radius:8px;
+				border-width:1px;
+				padding:5px;
+				font-size:13px;
+			}
+			#progressbar
+      {
+				background-color:white;
+        position:relative;
+        width:200px;
+        height:10px;
+        border:1px;
+        border-style:solid;
+        border-radius: 3px 3px 3px 3px;
+      }
+			#percent
+      {
+        position:absolute;
+        display:inline-block;
+        top:3px;
+        left:48%;
+      }		
+      #bar
+      {
+        background-color: #B4F5B4;
+        border-radius: 3px 3px 3px 3px;
+        height: 10px;
+        width: 0;
+      }
+			input, button
+			{
+				margin:5px;
+				font-size:13px;
+			}
+    </style>
+  </head>
+  <body>
+    <div id="fileup" ng-controller="controllerUpload">
+			<input id="file" type="file" name="upload" />
+			<button ng-click="sendFile(0)">Submit Files</button>
+			<div id="progressbar">
+				<div id="bar"></div>
+				<div id="percent"></div>
+			</div>
+      <div id="output">{{output}}</div>
+    </div> 
+  </body>
+</html>

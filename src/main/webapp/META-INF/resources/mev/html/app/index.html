@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en" ng-app="myApp">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebMev: Online Bioinformatics Data Presentation</title>
+  <link rel="stylesheet" href="css/app.css"/>
+  <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="lib/bootstrap/css/bootstrap-responsive.css"/>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <div class="navbar-inner">
+      <a class="brand" href="#">WebMev</a>
+      <ul class="nav">
+        <li><a href="#/analyze">Analyze</a></li>
+        <li><a href="#/features">Features</a></li>
+        <li><a href="#/news">News</a></li>
+        <li><a href="#/about">About</a></li>
+        <li><a href="#/help">Help</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- View -->
+  <div ng-view></div>
+
+  <div><span app-version></span></div>
+
+  <!-- In production use:
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+  -->
+  <!--Bootstrap -->
+  <script src="lib/bootstrap/js/bootstrap.min.js"></script>
+  <!--D3-->
+  <script src="lib/d3/d3.js"></script>
+  
+  <!--Angular-->
+  <script src="lib/angular/angular.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/controllers.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/directives.js"></script>
+</body>
+</html>
