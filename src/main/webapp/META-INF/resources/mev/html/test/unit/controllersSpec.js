@@ -6,6 +6,60 @@ describe('myApp controllers', function(){
 	
   beforeEach(module('myApp.controllers'));
   
+  describe('AnalyzeCtrl', function() {
+
+    var $rootScope, createController, $httpBackend;
+
+    beforeEach(inject(function($injector) {
+
+      $httpBackend = $injector.get('$httpBackend');
+
+      $rootScope = $injector.get('$rootScope');
+
+      var $controller = $injector.get('$controller');
+      
+      $httpBackend.whenGET('data/visualization_data.json')
+          .respond({"test":0
+          });
+
+      $httpBackend.whenGET('data/upload_data.json')
+          .respond({"test":0
+          });
+
+      createController = function() {
+        $controller('AnalyzeCtrl', {'$scope': $rootScope});
+      };
+
+    }));
+    
+    afterEach(function() {
+		
+      $httpBackend.verifyNoOutstandingExpectation();
+      $httpBackend.verifyNoOutstandingRequest();
+      
+    });
+
+    it("should load visualization data from get request", function() {
+       
+       $httpBackend.expectGET('data/visualization_data.json');
+       var controller = createController();
+       $httpBackend.flush();
+       
+       expect($rootScope.visualizationdata.test).toBe(0);
+             
+    });
+
+    it("should load user's stored data information from get request", function() {
+       
+       $httpBackend.expectGET('data/upload_data.json');
+       var controller = createController();
+       $httpBackend.flush();
+
+       expect($rootScope.uploaddata.test).toBe(0);
+    });
+
+  });
+
   describe('HeatmapCtrl', function() {
     
     var $rootScope, createController, $httpBackend;
@@ -15,7 +69,6 @@ describe('myApp controllers', function(){
       $httpBackend = $injector.get('$httpBackend');
       $rootScope = $injector.get('$rootScope');
       var $controller = $injector.get('$controller');
-
 
       $httpBackend.whenGET('data/subs/undefined-0.json')
           .respond({
