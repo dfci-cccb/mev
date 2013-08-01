@@ -1,118 +1,43 @@
 <div class="row">
-	<div class="span6">
-		<table class="table table-striped">
 
-			<thead>
-				<th>Name</th>
-				<th>Symbol</th>
-				<th>Description</th>
-				<th>Ensemble ID</th>
-				<th>Pathways</th>
-				<th>Options</th>
-			</thead>
-
-			<tbody>
-				<tr ng-repeat="gene in genesCurrentPage">
-					<td>{{gene.name}}</td>
-					<td>{{gene.symbol}}</td>
-					<td>{{gene.description}}</td>
-					<td>{{gene.ensembleId}}</td>
-					<td>{{gene.pathways}}</td>
-					<td><i class={{gene.option}}></i></td>
-				</tr>
-			</tbody>
-		</table>
-		<div class="pagination">
-			<ul>
-				<li><a href="#">Prev</a></li>
-				<li ng-repeat="page in nearbyPages" >
-					<a href={{page.link}}><p>{{page.number}}</p></a>
-				</li>
-				<li><a href="#">Next</a></li>
-			</ul>
-		</div>
-	</div>
-	<div class="span4">
+  <div class="span3">
+	  <div class="row">
+	    <div class="panel panel-primary">
+		  <div class="panel-heading"><h3 class="panel-title">Options</h3></div>
+          <button class="btn">Filter</button>
+          <button class="btn">Clear All</button>
+          <button class="btn">Select all</button>
+          <button class="btn">Save</button>
+        </div>
+	  </div>
+      <div ng-repeat="field in fields">
 		<div class="row">
-			<p>Search for a gene in your dataset</p>
-			<form class="form-search">
-				<div class="input-prepend">
-					<span class="add-on"><i class="icon-search"></i></span>
-					<input type="text" class="span2" placeholder="Eg. BRCA1">
-				</div>
-				<button type="submit" class="btn">Search</button>
-			</form>
+		  <div class="filter-Selector"
+             inputfield="field" 
+             pushToParamsIn="pushToParams()" 
+             pullFromParamsIn="pullFromParams(key)"
+             clearFunction="">
+          </div>
 		</div>
-		<div class="row">
-			<form>
-				<p>Or paste a comma separated list of genes to add below</p>
-				<textarea rows="4"></textarea>
-				<button type="submit" class="btn">Submit</button>
-			</form>
-		</div>
-		<div class="row">
-			<table class="table table-striped">
+      </div>
+  </div>
 
-				<thead>
-					<th>Name</th>
-					<th>Symbol</th>
-					<th>Description</th>
-					<th>Ensemble ID</th>
-					<th>Pathways</th>
-					<th>Options</th>
-				</thead>
+  <div class="span8">
+    <!-- Data Table-->
+    <table class='table'>
+      <thead>
+        <tr>
+          <th ng-repeat="header in fields">{{header.name}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="row in tuples">
+            <td ng-repeat="cell in fields">
+              {{row[cell.reference]}}
+            </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-				<tbody>
-					<tr ng-repeat="gene in genesSearched">
-						<td>{{gene.name}}</td>
-						<td>{{gene.symbol}}</td>
-						<td>{{gene.description}}</td>
-						<td>{{gene.ensembleId}}</td>
-						<td>{{gene.pathways}}</td>
-						<td><i class={{gene.option}}></i></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
-
-</div>
-
-<div class="row">
-	<div class="span6">
-		<table class="table table-striped">
-
-			<thead>
-				<th>Name</th>
-				<th>Symbol</th>
-				<th>Description</th>
-				<th>Ensemble ID</th>
-				<th>Pathways</th>
-				<th>Options</th>
-			</thead>
-
-			<tbody>
-				<tr ng-repeat="gene in genesMarked">
-					<td>{{gene.name}}</td>
-					<td>{{gene.symbol}}</td>
-					<td>{{gene.description}}</td>
-					<td>{{gene.ensembleId}}</td>
-					<td>{{gene.pathways}}</td>
-					<td><i class={{gene.option}}></i></td>
-				</tr>
-			</tbody>
-		</table>
-
-	</div>
-	<div class="span4">
-		<div class="row">
-			<button class="btn btn-block btn-primary" type="button">Visualize</button>
-		</div>
-		<div class="row">
-			<button class="btn btn-block" type="button">Save</button>
-		</div>
-		<div class="row">
-			<button class="btn btn-block" type="button">Clear</button>
-		</div>
-	</div>
 </div>
