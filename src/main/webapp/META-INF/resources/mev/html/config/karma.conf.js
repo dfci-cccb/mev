@@ -3,7 +3,7 @@ basePath = '../';
 files = [
   JASMINE,
   JASMINE_ADAPTER,
-  'app/lib/angular/angular.min.js',
+  'app/lib/angular-sed-master/app/angular/angular.min.js',
   'app/lib/angular/angular-*.js',
   'test/lib/angular/angular-mocks.js',
   '../js/*.js',
