@@ -123,6 +123,7 @@ describe('myApp controllers', function(){
     });
     
     it('should not add dupicate rows to the marked rows object', function() {
+
 	   $httpBackend.expectGET('data/subs/undefined-0.json');
        var controller = createController();
        $httpBackend.flush();
@@ -250,50 +251,111 @@ describe('myApp controllers', function(){
       $rootScope = $injector.get('$rootScope');
       var $controller = $injector.get('$controller');
       
-      $httpBackend.whenPOST('data/undefined/marks', 'blank').respond(201, '');
-      
-      $httpBackend.whenGET('data/undefined/marks').respond({test: 'test'});
-      $httpBackend.whenGET('data/undefined-2').respond({genes: 'test'});
-      $httpBackend.whenGET('data/undefined-1')
-                  .respond(
-                     {genes:[
-
-                       {
-                         name:"test1",
-                         symbol:"TEST1",
-                         description:"This is the test1",
-                         ensembleId: "TEST1ID",
-                         pathways: "Test, Test, test"
-                       },
-                       {
-                         name:"test2",
-                         symbol:"TEST2",
-                         description:"This is the test2",
-                         ensembleId: "TEST2ID",
-                         pathways: "Test2, Test2, test2"
-                       } 
-
-                     ],
-                     maxPage: 2,
-                     nearbyPages: [
-                        {
-                          number: 1,
-                          link: "testdataset-1"
-					    },
-					    {
-                          number: 2,
-                          link: "testdataset-2"
-					    },
-					  ]
-                    });
-                  
-
-
       createController = function() {
 		  
           $controller('GeneSelectCtrl', {'$scope': $rootScope});
           
       };
+      $httpBackend.whenGET('data/geneset?ensembleid=GFzu1&format=json&page=1')
+          .respond({
+			 	"fields": [
+			        {
+			    	    "name": "Name",
+		    	    	"reference": "name",
+		    	    	"info": {
+			    	        "type": "nominal"
+			    	    }
+			        },
+			        {
+                        "name": "Ensemble ID",
+                        "reference": "ensembleid",
+                        "info": {
+			    	        "type": "nominal"
+			    	    }
+                    }
+			    ],
+			    "tuples": [
+                    {
+                        "name": "BGD2",
+                        "ensembleid": "GFzu1"
+                    }
+                ],
+                "page_id": 1,
+                "total_pages": 2 
+		  });
+      
+      $httpBackend.whenGET('data/geneset?format=json&page=2')
+          .respond({
+
+              
+			"fields": [
+			    {
+				    "name": "Name",
+			    	"reference": "name",
+			    	"info": {
+			    	    "type": "nominal"
+			    	}
+			    },
+			    {
+                    "name": "Ensemble ID",
+                    "reference": "ensembleid",
+                    "info": {
+			    	    "type": "nominal"
+			    	}
+                }
+			],
+			"tuples": [
+	    		{
+                    "name": "BGD3",
+                    "ensembleid": "GFD1"
+                },
+                {
+                    "name": "BGD4",
+                    "ensembleid": "GFD1"
+                }
+            ],
+            "page_id": 2,
+            "total_pages": 2
+            
+          });
+          
+      $httpBackend.whenGET('data/geneset?format=json&page=1&testkey2=testvalue2')
+          .respond({});
+          
+      $httpBackend.whenGET('data/geneset?format=json&page=1')
+          .respond({
+
+              
+			"fields": [
+			    {
+				    "name": "Name",
+			    	"reference": "name",
+			    	"info": {
+			    	    "type": "nominal"
+			    	}
+			    },
+			    {
+                    "name": "Ensemble ID",
+                    "reference": "ensembleid",
+                    "info": {
+			    	    "type": "nominal"
+			    	}
+                }
+			],
+			"tuples": [
+	    		{
+                    "name": "BGD1",
+                    "ensembleid": "GFD1"
+                },
+                {
+                    "name": "BGD2",
+                    "ensembleid": "GFzu1"
+                }
+            ],
+            "page_id": 1,
+            "total_pages": 2
+            
+          });
 
     }));
 
@@ -305,105 +367,156 @@ describe('myApp controllers', function(){
     });
 
     
-    it('should send a request to download the first page of data and update vars', function() {
-       
-       $httpBackend.expectGET('data/undefined-1');
-       var controller = createController();
-       $httpBackend.flush();
-
-       expect($rootScope.genesCurrentPage.length).toBe(2);
-       expect($rootScope.pageMax).toBe(2);
-       expect($rootScope.currentPage).toBe(1);
-       expect($rootScope.nearbyPages.length).toBe(2);
-       
+    it('should send a request to download the initial page of data and update vars', function() {
+		
+		$httpBackend.expectGET('data/geneset?format=json&page=1');
+        var controller = createController();
+        $httpBackend.flush();
+        
+        expect($rootScope.fields[0]["name"]).toBe("Name");
+        expect($rootScope.currentpage).toBe(1)
+        
     });
     
-    it('should update marked genes when genesMarked is called', function () {
+    it('should overwrite new get params when push to params on a field is updated', function() {
+		var controller = createController();
+        $httpBackend.flush();
+        
+        $rootScope.pushToParams("testkey", "testvalue");
+        $rootScope.pushToParams("testkey", "testvalue2");
+        
+        expect($rootScope.getPageParams["testkey"]).toBe("testvalue2");
+	});
+
+    it('should not make a request for a page that is not available', function() {
+
+        var controller = createController();
+        $httpBackend.flush();
+        
+        $rootScope.getPage("3");
+        expect($rootScope.currentpage).toBe(1);
+
+    });
+    
+    it('should update marked genes when genes are marked by user', function () {
       
-      var controller = createController();
-      $httpBackend.flush();
-      
-      $httpBackend.expectGET('data/undefined/marks').respond({test: 'test'});
-      $rootScope.getMarks();
-      $httpBackend.flush();
-      
-      expect($rootScope.genesMarked.test).toBe('test');
-  
+        var controller = createController();
+        $httpBackend.flush();
+        
+        $rootScope.markRow("BGD1");
+        expect($rootScope.markedRows.indexOf("BGD1")).not.toBe(-1);
+
+    });
+    
+    it('should clear filter values from filter options in getpageparams when purge is called', function () {
+		var controller = createController();
+        $httpBackend.flush();
+        
+        $rootScope.pushToParams("testkey", "testvalue");
+        $rootScope.pushToParams("testkey2", "testvalue2");
+        $rootScope.pushToParams("testkey3", "testvalue3");
+        $rootScope.purgeParams()
+        
+        expect($rootScope.getPageParams["testkey"]).toBeUndefined();
+        expect($rootScope.getPageParams["testkey2"]).toBeUndefined();
+        expect($rootScope.getPageParams["testkey3"]).toBeUndefined();
+	});
+
+    it('should update marked genes when user asks to remove genes is called', function() {
+
+        var controller = createController();
+        $httpBackend.flush();
+        
+        $rootScope.markRow("BGD1");
+        $rootScope.markRow("BGD2");
+        $rootScope.removeRow("BGD1");
+        expect($rootScope.markedRows.indexOf("BGD1")).toBe(-1);
+        
+    });
+    
+    it('should update genes list when filter is applied', function() {
+
+        var controller = createController();
+        $httpBackend.flush();
+        
+        $httpBackend.expectGET('data/geneset?ensembleid=GFzu1&format=json&page=1');
+        $rootScope.getPageParams["ensembleid"] = "GFzu1";
+        $rootScope.getPage(1);
+        $httpBackend.flush();
+        
+        expect($rootScope.tuples[0]["name"]).toBe("BGD2");
+        expect($rootScope.tuples.length).toBe(1);
+        
     });
 	
-    it('should update genesSearched when searchGene is called', function() {
-        var controller = createController();
-        $httpBackend.flush();
-        
-        $httpBackend.expectGET('data/undefined/q=test').respond({test: 'test'});
-        $rootScope.searchGene('test');
-        $httpBackend.flush();
-        
-        expect($rootScope.genesSearched.test).toBe('test');
-    });
-    
-    it('should page up and page down when respective functions are called', function() {
+    it('should return nothing when filter request is sent and no objects are received', function() {
 		
         var controller = createController();
         $httpBackend.flush();
-        
-        expect($rootScope.currentPage).toBe(1);
-        $httpBackend.expectGET('data/undefined-2').respond({genes: 'test'});
-        $rootScope.pageUp();
-        $httpBackend.flush();
-        
-        expect($rootScope.currentPage).toBe(2);
-        
-        $httpBackend.expectGET('data/undefined-1').respond({genes: 'test'});
-        $rootScope.pageDown();
-        $httpBackend.flush();
-        
-        expect($rootScope.currentPage).toBe(1);
-        
-    });
-    
-    it('should not update page up when currently on page 1', function() {
-		
-        var controller = createController();
-        $httpBackend.flush();
-        
-        expect($rootScope.currentPage).toBe(1);
-        
-        $rootScope.pageDown();
-        
-        expect($rootScope.currentPage).toBe(1);
-        
-    });
-    
-    it('should not update page down when currently on max page', function() {
-		
-        var controller = createController();
-        $httpBackend.flush();
-        
-        expect($rootScope.currentPage).toBe(1);
-        $httpBackend.expectGET('data/undefined-2').respond({genes: 'test'});
-        $rootScope.pageUp();
-        $httpBackend.flush();
-        
-        expect($rootScope.currentPage).toBe(2);
-        $rootScope.pageUp();
-        
-        expect($rootScope.currentPage).toBe(2);
-    });
-    
-    it('should update genesMarked when addMark is called', function() {
 
+    });
+    
+    it('should page up when user requests', function() {
+		
         var controller = createController();
         $httpBackend.flush();
         
-
-        $httpBackend.expectPOST('data/undefined/marks', 'blank').respond(201, '');
-        $rootScope.addMark('blank');
-        
-        $httpBackend.expectGET('data/undefined/marks').respond({test: 'test'});
+        $httpBackend.expectGET('data/geneset?format=json&page=2');
+        $rootScope.getPage("2");
         $httpBackend.flush();
         
-        expect($rootScope.genesMarked.test).toBe('test');
+        expect($rootScope.currentpage).toBe(2);
+    
+    });
+    
+    it('should call getPage with correct parameters', function() {
+		
+        var controller = createController();
+        $httpBackend.flush();
+        
+        $rootScope.pushToParams("testkey", "testvalue");
+        $rootScope.pushToParams("testkey2", "testvalue2");
+        $rootScope.pullFromParams("testkey");
+        $httpBackend.expectGET('data/geneset?format=json&page=1&testkey2=testvalue2')
+        $rootScope.getPage("1")
+        $httpBackend.flush();
+    
+    });
+    
+    it('should add keys to request object when add keys function is called', function() {
+		
+        var controller = createController();
+        $httpBackend.flush();
+        
+        $rootScope.pushToParams("testkey", "testvalue");
+        expect($rootScope.getPageParams["testkey"]).not.toBeUndefined;
+    });
+    
+    it('should remove keys to request object when remove keys function is called', function() {
+		
+        var controller = createController();
+        $httpBackend.flush();
+        
+        $rootScope.pushToParams("testkey", "testvalue");
+        $rootScope.pushToParams("testkey2", "testvalue2");
+        $rootScope.pullFromParams("testkey");
+        expect($rootScope.getPageParams["testkey"]).toBeUndefined;
+        
+    });
+
+    it('should page down when user requests', function() {
+		
+        var controller = createController();
+        $httpBackend.flush();
+        
+        $rootScope.getPage("2");
+        $httpBackend.flush();
+        $rootScope.getPage("1");
+        $httpBackend.flush();
+        
+        expect($rootScope.currentpage).toBe(1);
+    
+
     });
     
   });
