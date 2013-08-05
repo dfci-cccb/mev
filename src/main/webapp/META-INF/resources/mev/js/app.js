@@ -6,34 +6,34 @@ angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives', 
   config(['$routeProvider', function($routeProvider) {
 	  
 	$routeProvider.when('/home', {
-		templateUrl: 'partials/home-view.html' // '/views/partials/analyze'
+		templateUrl: '/views/partials/home'
 		});
 		
 	$routeProvider.when('/about', {
-		templateUrl: 'partials/about-view.html'});
+		templateUrl: '/views/partials/about'});
 		
 	$routeProvider.when('/analyze', {
-		templateUrl: 'partials/analyze-view.html', 
+		templateUrl: '/views/partials/analyze', 
 		controller: 'AnalyzeCtrl'});
 		
 	$routeProvider.when('/features', {
-		templateUrl: 'partials/features-view.html'});
+		templateUrl: '/views/partials/features'});
 		
 	$routeProvider.when('/news', {
-		templateUrl: 'partials/news-view.html'});
+		templateUrl: '/views/partials/news'});
 		
 	$routeProvider.when('/help', {
-		templateUrl: 'partials/help-view.html'});
+		templateUrl: '/views/partials/help'});
 		
 	$routeProvider.when('/tutorial', {
-		templateUrl: 'partials/tutorial-view.html'});
+		templateUrl: '/views/partials/tutorial'});
 
 	$routeProvider.when('/heatmap/:matrixLocation', {
-		templateUrl: 'partials/heatmap-view.html', 
+		templateUrl: '/views/partials/heatmap', 
 		controller: 'HeatmapCtrl'});
 		
 	$routeProvider.when('/geneselect/:dataset', {
-		templateUrl: 'partials/genelib-view.html', 
+		templateUrl: '/views/partials/genelib', 
 		controller: 'GeneSelectCtrl'});
 		
     $routeProvider.otherwise({redirectTo: '/home'});
