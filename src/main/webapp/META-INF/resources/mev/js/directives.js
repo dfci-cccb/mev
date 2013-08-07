@@ -214,7 +214,7 @@ angular.module('myApp.directives', [])
 						.on('mouseout', function() { d3.select('#tooltip').remove(); })
 						.on('click', function(d) {	
 							scope.$apply( function() {
-								scope.pushtomarked({input:d.row});
+								scope.pushtomarked({inputindecies:d.row, inputdimension:"row"});
 							});							
 						});
 						

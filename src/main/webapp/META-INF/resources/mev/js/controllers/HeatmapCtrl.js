@@ -1,86 +1,164 @@
 ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($scope, $routeParams, $http) {
 
-    $scope.matrixLocation = $routeParams.matrixLocation;
-    $scope.markedRows = [];
-    $scope.vizcolor = "red";
-    $scope.colors = ["red", "blue"];
-    $scope.hoverdata = 0;
-    $scope.view = "";
-    
-    $scope.updateColor = function(newcolor) {
-		if ($scope.colors.indexOf(newcolor) != -1) {
-			$scope.vizcolor = newcolor;
+	$scope.matrixlocation = $routeParams.matrixLocation;
+	$scope.heatmapcells = [];
+	$scope.heatmapcolumns = [];
+	$scope.heatmaprows = [];
+	$scope.heatmapcolumnannotations = [];
+	$scope.heatmaprowannotations = [];
+	$scope.transformeddata = [];
+	$scope.selectedrows = [];
+	$scope.inputname = [];
+	$scope.inputgroup = [];
+	$scope.curstartrow = 0;
+	$scope.curendrow = 0;
+	$scope.curstartcol = 39;
+	$scope.curendcol = 39;
+	
+	$scope.pageUp = function() {
+		
+		++$scope.curstartrow;
+		++$scope.curendrow;
+		$scope.pullPage();
+		
+	}
+	
+	$scope.pageDown = function() {
+		
+		--$scope.curstartrow;
+		--$scope.curendrow;
+		$scope.pullPage();
+		
+	}
+	
+	$scope.pageLeft = function() {
+		
+		--$scope.curstartcol;
+		--$scope.curendcol;
+		$scope.pullPage();
+		
+	}
+	
+	$scope.pageRight = function() {
+		
+		++$scope.curstartcol;
+		++$scope.curendcol;
+		$scope.pullPage();
+		
+	}
+	
+	
+	$scope.transformData = function() {
+		for (index = 0; index < $scope.heatmapcells.values.length; index++) {
+			inputobj = {
+				value: $scope.heatmapcells.values[index],
+				row: $scope.heatmaprows[Math.floor(index/$scope.heatmapcolumns.length)],
+				col: $scope.heatmapcolumns[index%$scope.heatmapcolumns.length]
+			}
+			$scope.transformeddata.push(inputobj);
 		}
+	};
+	
+	$scope.markRow = function(inputindecies, inputdimension) {
+
+		$http({
+			method:"PUT",
+			url:"heatmap/"+$scope.matrixlocation+"/selection/" + inputdimension,
+			params: {
+				format:"json",
+				name: $scope.inputname,
+				color: $scope.inputgroup,
+				indecies: inputindecies
+			}
+		})
+		.success( function(data) {
+			return;
+		});
+
 	}
 	
-	$scope.clearAllRows = function() {
-		$scope.markedRows = [];
-	}
-	
-	$scope.requestPage = function(page) {
-		if (page <= $scope.maxpage && page >= 0) {
-			$http.get({
-				method:"GET", 
-				url: 'heatmap/' + $scope.matrixLocation + '/data',
-				params: $scope.getPageParams,
+	//pull page function
+	$scope.pullPage = function() {
+
+		if (!scope.matrixlocation) {
+			return;
+		}
+
+		$http({
+			method:"GET",
+			url:"heatmap/"+$scope.matrixlocation+"/data",
+			params: {
+				format:"json",
+				startRow:curstartrow,
+				endRow:curendrow,
+				startColumn:curstartcol,
+				endColumn:curendcol
+			}
+		})
+		.success( function(data) {
+			$scope.heatmapcells = data;
+		});
+		
+		$http({
+			method:"GET",
+			url:"heatmap/"+$scope.matrixlocation+"/annotation/column",
+			params: {
+				format:"json"
+			}
+		})
+		.success( function(data) {
+			$scope.heatmapcolumnannotations = data;
+		});
+		
+		$http({
+			method:"GET",
+			url:"heatmap/"+$scope.matrixlocation+"/annotation/row",
+			params: {
+				format:"json"
+			}
+		})
+		.success( function(data) {
+			$scope.heatmaprowannotations = data;
+		});
+
+		var heatmapcolshold = [];
+		for (var eachcol=curstartcol; eachcol<curendcol; eachcol++) {
+			$http({
+				method:"GET",
+				url:"heatmap/"+$scope.matrixlocation+"/annotation/column/" +eachcol+ "/" + $scope.heatmapcolumnannotations[0],
+				params: {
+					format:"json"
+				}
 			})
-             .success(function (returnobject) {
-                $scope.heatmapdata = returnobject.data;
-                $scope.view = 'page';
-                $scope.currentpage = page;
-                $scope.maxpage = returnobject.pages.length - 1;
-                $scope.allpages = returnobject.pages;
-                $scope.viztitle = returnobject.title;
-	         });
+			.success( function(data) {
+				heatmapcolshold.push(data);
+			});
 		}
-	}
+		$scope.heatmapcolumns = heatmapcolshold;
+		
+		var heatmaprowshold = [];
+		for (var eachrow=curstartrow; eachrow<curendrow; eachrow++) {
+			$http({
+				method:"GET",
+				url:"heatmap/"+$scope.matrixlocation+"/annotation/row/" +eachrow+ "/" + $scope.heatmaprownotations[0],
+				params: {
+					format:"json",
+					index:eachrow
+				}
+			})
+			.success( function(data) {
+				heatmaprowshold.push(data);
+			});
+		}
+		$scope.heatmaprows = heatmaprowshold;
+
+	};
 	
-    $scope.storeRow = function(inputrow) {
-		var possibleindex = $scope.markedRows.indexOf(inputrow);
-		if (possibleindex == -1) {
-			$scope.markedRows.push(inputrow);
-		}	
-	}
+	//Initial call for values
 	
-	$scope.removeRow = function(outputrow) {
-		var outputrowindex = $scope.markedRows.indexOf(outputrow);
-		if (outputrowindex != -1) {
-			$scope.markedRows.splice(outputrowindex, 1);
-		}	
-	}
+	$scope.pullPage()
+	$scope.transformData();
 	
-    $scope.requestAll = function() {
-	
-        $http.get('data/subs/' + $scope.matrixLocation + '-0.json')
-             .success(function (returnobject) {
-                $scope.heatmapdata = returnobject.data;
-                $scope.view = 'all';
-                $scope.currentpage = 0;
-                $scope.maxpage = returnobject.pages.length - 1;
-                $scope.allpages = returnobject.pages;
-                $scope.viztitle = returnobject.title;
-	         });
-	}
-	
-	$scope.requestAll();
+}]);
 
 
-  }]);
-  
-  ctrl.controller('AnalyzeCtrl', ['$scope', '$http', function($scope, $http) {
-    
-    //Get visualization json
-    $http.get('data/visualization_data.json').
-    
-	success(function (data) {
-        $scope.visualizationdata = data;
-	});
-	  
-	$http.get('data/upload_data.json').
-		  success(function (data) {
-			  $scope.uploaddata = data;
-		  });
-      
-	}]);
-	
-  
