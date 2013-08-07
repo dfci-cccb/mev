@@ -49,7 +49,7 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 	
 	
 	$scope.transformData = function() {
-		for (index = 0; index < $scope.heatmapcells.values.length; index++) {
+		for (var index = 0; index < $scope.heatmapcells.values.length; index++) {
 			inputobj = {
 				value: $scope.heatmapcells.values[index],
 				row: $scope.heatmaprows[Math.floor(index/$scope.heatmapcolumns.length)],
@@ -80,7 +80,7 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 	//pull page function
 	$scope.pullPage = function() {
 
-		if (!scope.matrixlocation) {
+		if (!$scope.matrixlocation) {
 			return;
 		}
 
@@ -89,10 +89,10 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 			url:"heatmap/"+$scope.matrixlocation+"/data",
 			params: {
 				format:"json",
-				startRow:curstartrow,
-				endRow:curendrow,
-				startColumn:curstartcol,
-				endColumn:curendcol
+				startRow:$scope.curstartrow,
+				endRow:$scope.curendrow,
+				startColumn:$scope.curstartcol,
+				endColumn:$scope.curendcol
 			}
 		})
 		.success( function(data) {
@@ -122,7 +122,7 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 		});
 
 		var heatmapcolshold = [];
-		for (var eachcol=curstartcol; eachcol<curendcol; eachcol++) {
+		for (var eachcol=$scope.curstartcol; eachcol<$scope.curendcol; eachcol++) {
 			$http({
 				method:"GET",
 				url:"heatmap/"+$scope.matrixlocation+"/annotation/column/" +eachcol+ "/" + $scope.heatmapcolumnannotations[0],
@@ -137,7 +137,7 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 		$scope.heatmapcolumns = heatmapcolshold;
 		
 		var heatmaprowshold = [];
-		for (var eachrow=curstartrow; eachrow<curendrow; eachrow++) {
+		for (var eachrow=$scope.curstartrow; eachrow<$scope.curendrow; eachrow++) {
 			$http({
 				method:"GET",
 				url:"heatmap/"+$scope.matrixlocation+"/annotation/row/" +eachrow+ "/" + $scope.heatmaprownotations[0],
