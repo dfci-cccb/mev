@@ -10,14 +10,14 @@
 <div class="container">
 	<div class="row">
 		<div class="span6">
-			<div id="fileup" ng-controller="UploadCtrl">
+			<div id="fileup">
 				<input id="file" type="file" name="upload" />
 				<button ng-click="sendFile(0)">Submit Files</button>
 				<div id="progressbar">
 					<div id="bar"></div>
 					<div id="percent"></div>
 				</div>
-				<div id="output">{{output}}</div>
+				<div id="output"></div>
 			</div> 
 		</div>
 		<!--End First Column -->
@@ -27,47 +27,17 @@
 				<table class="table table-striped table-bordered">
 					<thead>
 						<th>Name</th>
-						<th>Type</th>
-						<th>Status</th>
-						<th>Date</th>
 						<th>Options</th>
 					</thead>
 					<tbody>
-						<tr ng-repeat="visualization in visualizationdata">
-						  <td>{{visualization.name}}</td>
-						  <td>{{visualization.type}}</td>
-						  <td><i class={{visualization.status_icon}}></i> {{visualization.status}}</td>
-						  <td>{{visualization.date}}</td>
-						  <td><a href={{visualization.options_link}}><i class={{visualization.options_icon}}></i></a></td>
+						<tr ng-repeat="visualization in heatmaplist">
+						  <td>{{visualization}}</td>
+						  <td><a href="#/heatmap/{{visualization}}"><i class="icon-play"></i></a></td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
-			<!-- End Visualization Row -->
-			<div class="row">
-				<p class="lead">Data</p>
-				<table class="table table-striped table-bordered">
-					<thead>
-						<th>Name</th>
-						<th>Type</th>
-						<th>Size</th>
-						<th>Status</th>
-						<th>Date</th>
-						<th>Options</th>
-					</thead>
-					<tbody>
-						<tr ng-repeat="upload in uploaddata">
-						  <td>{{upload.name}}</td>
-						  <td>{{upload.type}}</td>
-						  <td>{{upload.size}}</td>
-						  <td><i class={{upload.status_icon}}></i> {{upload.status}}</td>
-						  <td>{{upload.date}}</td>
-						  <td><a href={{upload.options_link}}><i class={{upload.options_icon}}></i></a></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<!-- End Data Row -->
+			<!-- End Visualization Row -->			<!-- End Data Row -->
 		</div>
 		<!--End Second Column -->
 	</div>

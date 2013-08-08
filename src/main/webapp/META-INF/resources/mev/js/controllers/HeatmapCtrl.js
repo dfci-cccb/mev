@@ -1,15 +1,6 @@
 ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($scope, $routeParams, $http) {
 
 	$scope.matrixlocation = $routeParams.matrixLocation;
-	$scope.heatmapcells = [];
-	$scope.heatmapcolumns = [];
-	$scope.heatmaprows = [];
-	$scope.heatmapcolumnannotations = [];
-	$scope.heatmaprowannotations = [];
-	$scope.transformeddata = [];
-	$scope.selectedrows = [];
-	$scope.inputname = [];
-	$scope.inputgroup = [];
 	$scope.curstartrow = 0;
 	$scope.curendrow = 0;
 	$scope.curstartcol = 39;
@@ -49,8 +40,13 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 	
 	
 	$scope.transformData = function() {
+		
+		if (!$scope.heatmapcells) {
+			return;
+		}
+		console.log($scope.heatmapcells);
 		for (var index = 0; index < $scope.heatmapcells.values.length; index++) {
-			inputobj = {
+			var inputobj = {
 				value: $scope.heatmapcells.values[index],
 				row: $scope.heatmaprows[Math.floor(index/$scope.heatmapcolumns.length)],
 				col: $scope.heatmapcolumns[index%$scope.heatmapcolumns.length]
@@ -97,6 +93,7 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 		})
 		.success( function(data) {
 			$scope.heatmapcells = data;
+			console.log(data);
 		});
 		
 		$http({
@@ -150,14 +147,16 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 				heatmaprowshold.push(data);
 			});
 		}
+		
 		$scope.heatmaprows = heatmaprowshold;
-
+		$scope.transformData();
+		
 	};
 	
 	//Initial call for values
 	
 	$scope.pullPage()
-	$scope.transformData();
+	
 	
 }]);
 
