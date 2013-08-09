@@ -16,7 +16,8 @@ angular.module('myApp.directives', [])
 			inputfield: "=",
 			pushToParamsIn: "&",
 			pullFromParamsIn: "&",
-			clearFunction: "&"
+			clearFunction: "&",
+			inputcolor: "="
 		},
 		template: "<div class='holder'></div>",
 		link: function (scope,element, attrs) {
@@ -194,7 +195,7 @@ angular.module('myApp.directives', [])
 							"x": function(d, i) { return cellXPosition(d.col); },
 							"y": function(d, i) { return cellYPosition(d.row); },
 							"fill": function(d) {
-								return "rgb(" + redColorControl(d.value, scope.inputcolor) + "," + greenColorControl(d.value, scope.inputcolor) + ","+ blueColorControl(d.value, scope.inputcolor)+")";
+								return "rgb(" + redColorControl(d.value, "red") + "," + greenColorControl(d.value, "red") + ","+ blueColorControl(d.value, "red")+")";
 								
 							},
 							"value": function(d) { return d.value; },
