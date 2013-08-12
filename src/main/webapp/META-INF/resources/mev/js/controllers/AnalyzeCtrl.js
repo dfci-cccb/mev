@@ -48,6 +48,10 @@ ctrl.controller('AnalyzeCtrl', ['$scope', '$routeParams', '$http', function($sco
 					bar.style.width = "100%";
 					percent.innerHTML = "100%";
 					
+				} else if (xhr.readyState == 4 && xhr.status != 200) {
+				
+					alert(xhr.status + ": " + xhr.statusText);
+				
 				};
 			};
 			//Send the uploaded file.
