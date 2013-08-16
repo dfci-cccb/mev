@@ -27,7 +27,11 @@ ctrl.controller('AnalyzeCtrl', ['$scope', '$routeParams', '$http', function($sco
 			var formdata = new FormData; //Dynamically create a new form
 			formdata.append('filedata', upfile); //Append file object to the form
 			formdata.append('format', 'tsv');
-			formdata.append('name', 'tsv');
+			if ($scope.uploadName == undefined) {
+				formdata.append('name', "geneset");
+			} else {
+				formdata.append('name', $scope.uploadName);
+			}
 			$scope.output = "Uploading..."; //Alert user that uploading has begun
 			//AJAX code
 			var xhr = new XMLHttpRequest();
@@ -47,6 +51,7 @@ ctrl.controller('AnalyzeCtrl', ['$scope', '$routeParams', '$http', function($sco
 					});
 					bar.style.width = "100%";
 					percent.innerHTML = "100%";
+					$scope.uploadName = undefined;
 					
 				} else if (xhr.readyState == 4 && xhr.status != 200) {
 				

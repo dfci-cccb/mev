@@ -12,10 +12,13 @@
 		<div class="span6">
 			<div id="fileup">
 				<input id="file" type="file" name="upload" />
-				<button ng-click="sendFile(0)">Submit Files</button>
-				<div id="progressbar">
-					<div id="bar"></div>
-					<div id="percent"></div>
+				<input type="text" ng-model="uploadName" />
+				<div class="row">
+					<button ng-click="sendFile(0)">Submit Files</button>
+					<div id="progressbar">
+						<div id="bar"></div>
+						<div id="percent"></div>
+					</div>
 				</div>
 				<div id="output"></div>
 			</div> 
