@@ -5,6 +5,8 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 	$scope.curendrow = 39;
 	$scope.curstartcol = 0;
 	$scope.curendcol = 39;
+	var firstpull = true;
+	var pullallow = true;
 	
 	$scope.pageUp = function() {
 		
@@ -47,9 +49,26 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 	}
 	
 	$scope.transformData = function() {
+		
+		if (!pullallow) {
+			return;
+		}
+		
 		if (!$scope.heatmapcells || !$scope.heatmaprows || !$scope.heatmapcolumns) {
 			return;
 		}
+		
+		if (firstpull) {
+			if ($scope.heatmapcells.length < 1600) {
+				pullallow = false;
+			}
+		} else {
+			if ($scope.heatmapcells.length < 1600) {
+				
+				return;
+			}
+		}
+
 		$scope.transformeddata = {data:[]};
 		
 		for (var index = 0; index < $scope.heatmapcells.length; ++index) {
@@ -65,6 +84,8 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 		
 		$scope.transformeddata.columnlabels = $scope.heatmapcolumns.map(function(d) { return d.value;});
 		$scope.transformeddata.rowlabels = $scope.heatmaprows.map(function(d) { return d.value;});
+		
+		firstpull = false;
 
 	};
 	
@@ -92,6 +113,10 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 		if (!$scope.matrixlocation) {
 			return;
 		}
+		
+		$scope.heatmapcells = null;
+		$scope.heatmaprows = null;
+		$scope.heatmapcolumns = null;
 
 		$http({
 			method:"GET",

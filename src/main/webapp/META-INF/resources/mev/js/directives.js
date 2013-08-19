@@ -91,17 +91,24 @@ angular.module('myApp.directives', [])
 		},
 		link: function (scope, element, attrs) {
 			
-				var visparams = {
-					width : 600,
-					height : 700,
-					columnlabelgutter : 80,
-					rowlabelgutter : 80,
-				};
-				
-				var vis = d3.select(element[0])
-					.append("svg")
-					.attr("width", visparams.width )
-					.attr("height", visparams.height);
+			var visparams = {
+				width : 600,
+				height : 700,
+				columnlabelgutter : 80,
+				rowlabelgutter : 80,
+			};
+			
+			var vis = d3.select(element[0])
+				.append("svg")
+				.attr("width", visparams.width )
+				.attr("height", visparams.height)
+				.append("g")
+					.call(d3.behavior.zoom().scaleExtent([1, 10]).on("zoom", zoom))
+				.append("g");
+			
+			function zoom() {
+				vis.attr("transform", "translate(" + d3.event.translate + ")scale(" +d3.event.scale + ")");
+			}
 			
 			scope.$watch('inputdata', function(newdata, olddata) {
 							
@@ -180,6 +187,37 @@ angular.module('myApp.directives', [])
 				var cellYPosition = d3.scale.ordinal()
 						.domain(newdata.rowlabels)
 						.rangeRoundBands([visparams.columnlabelgutter, visparams.height]);
+						
+				var xAxis = vis.append("g").selectAll("text")
+						.data(newdata.columnlabels)
+						.enter()
+						.append("text")
+						.text(function(d){
+							return d;
+						})
+						.attr("font-size", cellXPosition.rangeBand())
+						.attr("transform", "rotate(-90)")
+						.attr("x", function(d) {
+							return (- visparams.columnlabelgutter );
+						})
+						.attr("y", function(d) {
+							return cellXPosition(d) + cellXPosition.rangeBand()
+						});
+						
+				var yAxis = vis.append("g").selectAll("text")
+						.data(newdata.rowlabels)
+						.enter()
+						.append("text")
+						.text(function(d){
+							return d;
+						})
+						.attr("font-size", cellYPosition.rangeBand())
+						.attr("x", function(d) {
+							return 1;
+						})
+						.attr("y", function(d) {
+							return cellYPosition(d) + cellYPosition.rangeBand()
+						});
 
 				var squares = vis.selectAll("rect")
 						.data(newdata.data)
@@ -202,28 +240,13 @@ angular.module('myApp.directives', [])
 							"index": function(d, i) { return i; },
 							"row": function(d, i) { return d.row; },
 							"column": function(d, i) { return d.col; }
-						})
-						.on('mouseover', function(d) {
-							vis.append("text")
-								.attr({
-									"id": "tooltip",
-									"x": cellXPosition(d.col),
-									"y": cellYPosition(d.row) + 40,
-								})
-								.text("Gene: " + d.row + " Point: " + d.col + "\n Value: " + d.value);
-						})
-						.on('mouseout', function() { d3.select('#tooltip').remove(); })
-						.on('click', function(d) {	
-							scope.$apply( function() {
-								scope.pushtomarked({inputindecies:d.row, inputdimension:"row"});
-							});							
 						});
 						
-				var xAxis = d3.svg.axis().scale(cellXPosition).orient("bottom");
-				var yAxis = d3.svg.axis().scale(cellYPosition).orient("left");
+				//var xAxis = d3.svg.axis().scale(cellXPosition).orient("bottom");
+				//var yAxis = d3.svg.axis().scale(cellYPosition).orient("left");
 				
-				vis.append('g').attr("transform", "translate(0,"+ (visparams.rowlabelgutter - 20) +")").call(xAxis);
-				vis.append('g').attr("transform", "translate(" + (visparams.columnlabelgutter) +",0)").call(yAxis);
+				//vis.append('g').attr("transform", "translate(0,"+ (visparams.rowlabelgutter - 20) +")").call(xAxis);
+				//vis.append('g').attr("transform", "translate(" + (visparams.columnlabelgutter) +",0)").call(yAxis);
 				
 				scope.changeColor = function(newcolor) {
 				
