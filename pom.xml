@@ -156,7 +156,7 @@
             </aggregation>
             <aggregation>
               <insertNewLine>true</insertNewLine>
-              <output>${project.build.directory}/${project.build.finalName}/META-INF/resources/mev/js/directives_REMOVE_THIS_SUFFIX.js</output>
+              <output>${project.build.directory}/${project.build.finalName}/META-INF/resources/mev/js/directives.js</output>
               <inputDir>${basedir}/src/main/webapp/META-INF/resources/mev/js/directives</inputDir>
               <includes>
                 <include>${basedir}/LICENSE.txt</include>
