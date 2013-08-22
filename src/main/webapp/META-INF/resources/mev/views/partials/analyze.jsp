@@ -11,16 +11,27 @@
 	<div class="row">
 		<div class="span6">
 			<div id="fileup">
-				<input id="file" type="file" name="upload" />
-				<input type="text" ng-model="uploadName" />
-				<div class="row">
-					<button ng-click="sendFile(0)">Submit Files</button>
-					<div id="progressbar">
-						<div id="bar"></div>
-						<div id="percent"></div>
+				
+				<div class="span3">
+				
+					<div class="row">
+						<input id="file" type="file" name="upload" />
 					</div>
+					
+					<div class="row">
+						<div class="progress progress-striped active" id="progbox" style="visibility: hidden;">
+							<div class="bar" id="progbar"></div>
+							
+						</div>
+					</div>
+					
+					<div class="row">
+						<button ng-click="sendFile(0)">Submit Files</button>
+						<div id="output"></div>
+					</div>
+					
 				</div>
-				<div id="output"></div>
+				
 			</div> 
 		</div>
 		<!--End First Column -->
@@ -33,7 +44,7 @@
 						<th>Options</th>
 					</thead>
 					<tbody>
-						<tr ng-repeat="visualization in heatmaplist">
+						<tr id="{{visualization}}" ng-repeat="visualization in heatmaplist">
 						  <td>{{visualization}}</td>
 						  <td><a href="#/heatmap/{{visualization}}"><i class="icon-play"></i></a></td>
 						</tr>

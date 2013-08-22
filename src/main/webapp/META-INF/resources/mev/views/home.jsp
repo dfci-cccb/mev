@@ -1,7 +1,7 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <!doctype html>
-<html lang="en" ng-app="myApp">
+<html lang="en" ng-app="myApp" ng-controller="GlobalCtrl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,7 +43,7 @@
   <nav class="effeckt-off-screen-nav" id="effeckt-off-screen-nav">
     <h4>
 	  Menu
-      <a href="" id="effeckt-off-screen-nav-close" class="effeckt-off-screen-nav-close">×</a>
+      <a href="" id="effeckt-off-screen-nav-close" class="effeckt-off-screen-nav-close"><i class="icon-resize-small icon-white"></i></a>
     </h4>
 
     <ul>
@@ -52,6 +52,11 @@
       <li><a href="#/news"><spring:message code="home.news"/></a></li>
       <li><a href="#/about"><spring:message code="home.about"/></a></li>
       <li><a href="#/help"><spring:message code="home.help"/></a></li>
+    </ul>
+    
+    <h4> Uploads </h4>
+    <ul>
+      <li ng-repeat="visualization in menuheatmaplist"><a href="#/heatmap/{{visualization}}">{{visualization}}</a></li>
     </ul>
   </nav>
 
