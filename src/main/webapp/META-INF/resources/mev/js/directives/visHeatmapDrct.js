@@ -114,7 +114,13 @@ drct.directive('visHeatmap', [function() {
 						.text(function(d){
 							return d;
 						})
-						.attr("font-size", cellXPosition.rangeBand())
+						.attr("font-size", function() {
+							if (cellXPosition.rangeBand() >= 12) {
+								return 12
+							} else {
+								return cellXPosition.rangeBand()
+							}
+						})
 						.attr("transform", "rotate(-90)")
 						.attr("x", function(d) {
 							return (- visparams.columnlabelgutter );
@@ -130,7 +136,13 @@ drct.directive('visHeatmap', [function() {
 						.text(function(d){
 							return d;
 						})
-						.attr("font-size", cellYPosition.rangeBand())
+						.attr("font-size", function() {
+							if (cellYPosition.rangeBand() >= 12) {
+								return 12
+							} else {
+								return cellYPosition.rangeBand()
+							}
+						})
 						.attr("x", function(d) {
 							return 1;
 						})
@@ -161,12 +173,6 @@ drct.directive('visHeatmap', [function() {
 							"column": function(d, i) { return d.col; }
 						});
 						
-				//var xAxis = d3.svg.axis().scale(cellXPosition).orient("bottom");
-				//var yAxis = d3.svg.axis().scale(cellYPosition).orient("left");
-				
-				//vis.append('g').attr("transform", "translate(0,"+ (visparams.rowlabelgutter - 20) +")").call(xAxis);
-				//vis.append('g').attr("transform", "translate(" + (visparams.columnlabelgutter) +",0)").call(yAxis);
-				
 				scope.changeColor = function(newcolor) {
 				
 					vis.selectAll('rect')
