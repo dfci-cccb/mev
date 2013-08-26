@@ -6,21 +6,30 @@ drct.directive('visHeatmap', [function() {
 		scope: {
 			inputdata:"=",
 			inputcolor:"=",
+			showlabels: "=",
+			width: "=",
+			height: "=",
+			marginleft: "=",
+			marginright: "=",
+			margintop: "=",
+			marginbottom: "=",
 			pushtomarked:"&"
 		},
 		link: function (scope, element, attrs) {
 			
-			var visparams = {
-				width : 600,
-				height : 700,
-				columnlabelgutter : 80,
-				rowlabelgutter : 80,
-			};
-			
+			var margin = {
+					left: scope.marginleft,
+					right: scope.marginright,
+					top: scope.margintop,
+					bottom: scope.marginbottom
+				},
+				width = scope.width - margin.left - margin.right,
+				height = scope.height - margin.top - margin.bottom;
+				
 			var vis = d3.select(element[0])
 				.append("svg")
-				.attr("width", visparams.width )
-				.attr("height", visparams.height)
+				.attr("width", width + margin.left + margin.right)
+				.attr("height", height + margin.top + margin.bottom)
 				.append("g")
 					.call(d3.behavior.zoom().scaleExtent([1, 10]).on("zoom", zoom))
 				.append("g");
@@ -36,28 +45,30 @@ drct.directive('visHeatmap', [function() {
 				if (!newdata) {
 					return;
 				}
-				    
-				var values = newdata.data.map(function(x){return x.value});
 				
 				var threshold = 150;
 				
-				var colorScaleForward = function(j) {	 
+				var colorScaleForward = function(j) {
+					
 					var value = d3.scale.linear()
-						.domain([d3.min(values), d3.max(values)])
+						.domain(d3.extent(newdata.data, function(x){return x.value} ))
 						.rangeRound([0, 255]);
+					
 					var output = 0;
+					
 					if (value(j) >= threshold ) {
 						var layer2 = d3.scale.linear()
 							.domain([125,255])
 							.rangeRound([0,255]);
 						output = layer2(value(j));  	
 					}
+					
 					return output;
 				};
 
 				var colorScaleReverse = function(j) {	 
 					var value = d3.scale.linear()
-						.domain([d3.min(values), d3.max(values)])
+						.domain(d3.extent(newdata.data, function(x){return x.value} ))
 						.rangeRound([255, 0]);
 					var output = 0;
 					if ( value(j) >= threshold ) {
@@ -101,13 +112,15 @@ drct.directive('visHeatmap', [function() {
 				
 				var cellXPosition = d3.scale.ordinal()
 						.domain(newdata.columnlabels)
-						.rangeRoundBands([visparams.rowlabelgutter, visparams.width]);
+						.rangeRoundBands([margin.left, margin.left + width]);
 								
 				var cellYPosition = d3.scale.ordinal()
 						.domain(newdata.rowlabels)
-						.rangeRoundBands([visparams.columnlabelgutter, visparams.height]);
-						
-				var xAxis = vis.append("g").selectAll("text")
+						.rangeRoundBands([margin.top, margin.top + height]);
+				
+				if (scope.showlabels) {
+				
+					vis.append("g").attr("class", "xAxis").selectAll("text")
 						.data(newdata.columnlabels)
 						.enter()
 						.append("text")
@@ -123,13 +136,13 @@ drct.directive('visHeatmap', [function() {
 						})
 						.attr("transform", "rotate(-90)")
 						.attr("x", function(d) {
-							return (- visparams.columnlabelgutter );
+							return ( - (margin.top) );
 						})
 						.attr("y", function(d) {
 							return cellXPosition(d) + cellXPosition.rangeBand()
 						});
 						
-				var yAxis = vis.append("g").selectAll("text")
+					vis.append("g").attr("class", "yAxis").selectAll("text")
 						.data(newdata.rowlabels)
 						.enter()
 						.append("text")
@@ -144,58 +157,54 @@ drct.directive('visHeatmap', [function() {
 							}
 						})
 						.attr("x", function(d) {
-							return 1;
+							return margin.left + width + cellXPosition.rangeBand();
 						})
 						.attr("y", function(d) {
 							return cellYPosition(d) + cellYPosition.rangeBand()
 						});
-
-				var squares = vis.selectAll("rect")
-						.data(newdata.data)
-						.enter()
-						.append("rect")
-						.attr({
-							"height": function(d){
-								return .98*(cellYPosition(newdata.rowlabels[1]) - cellYPosition(newdata.rowlabels[0]));
-							},
-							"width": function(d){
-								return .98*(cellXPosition(newdata.columnlabels[1]) - cellXPosition(newdata.columnlabels[0]));
-							},
-							"x": function(d, i) { return cellXPosition(d.col); },
-							"y": function(d, i) { return cellYPosition(d.row); },
-							"fill": function(d) {
-								return "rgb(" + redColorControl(d.value, "red") + "," + greenColorControl(d.value, "red") + ","+ blueColorControl(d.value, "red")+")";
-								
-							},
-							"value": function(d) { return d.value; },
-							"index": function(d, i) { return i; },
-							"row": function(d, i) { return d.row; },
-							"column": function(d, i) { return d.col; }
-						});
-						
-				scope.changeColor = function(newcolor) {
+					
+				}
 				
+				vis.selectAll("rect")
+					.data(newdata.data)
+					.enter()
+					.append("rect")
+					.attr({
+						"class": "heatmapcells",
+						"height": function(d){
+							return .98*(cellYPosition(newdata.rowlabels[1]) - cellYPosition(newdata.rowlabels[0]));
+						},
+						"width": function(d){
+							return .98*(cellXPosition(newdata.columnlabels[1]) - cellXPosition(newdata.columnlabels[0]));
+						},
+						"x": function(d, i) { return cellXPosition(d.col); },
+						"y": function(d, i) { return cellYPosition(d.row); },
+						"fill": function(d) {
+							return "rgb(" + redColorControl(d.value, "red") + "," + greenColorControl(d.value, "red") + ","+ blueColorControl(d.value, "red")+")";
+							
+						},
+						"value": function(d) { return d.value; },
+						"index": function(d, i) { return i; },
+						"row": function(d, i) { return d.row; },
+						"column": function(d, i) { return d.col; }
+					});
+
+			});
+			
+			scope.$watch('inputcolor', function(newdata, olddata) {
+
+				if (newdata == olddata | !newdata) {
+					return;
+				} else if (vis) {
+					
 					vis.selectAll('rect')
 						.transition()
 						.duration(500)
 						.attr({
 							"fill": function(d) {
-								return "rgb(" + redColorControl(d.value, newcolor) + "," + greenColorControl(d.value, newcolor) + ","+ blueColorControl(d.value, newcolor)+")";
+								return "rgb(" + redColorControl(d.value, scope.inputcolor) + "," + greenColorControl(d.value, scope.inputcolor) + ","+ blueColorControl(d.value, scope.inputcolor)+")";
 							}
 						});
-				};
-			});
-			
-			scope.$watch('inputcolor', function(newdata, olddata) {
-
-				if (newdata == olddata) {
-					return;
-				} 
-				if (!newdata) {
-				    return;	
-				}
-				else {
-					scope.changeColor(newdata)
 				}
 				
 				

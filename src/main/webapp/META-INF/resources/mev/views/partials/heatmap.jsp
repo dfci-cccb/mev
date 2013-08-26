@@ -5,6 +5,13 @@
 		    <vis-Heatmap 
 				inputdata="transformeddata"
 				inputcolor="red"
+				showlabels="true"
+				width="600"
+				height="700"
+				marginleft="80"
+				marginright="80"
+				margintop="80"
+				marginbottom="80"
 				pushtomarked="markRow(inputindecies, inputdimension)">
 			</vis-Heatmap>
 
