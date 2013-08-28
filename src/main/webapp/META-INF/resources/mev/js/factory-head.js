@@ -1,28 +1,45 @@
 
 var fctry =  angular.module('myApp.factories', [])
 
-fctry.factory('HeatmapListFctry', [ function() { 
+fctry.factory('GETHeatmapFctry', ["$q", function($q) { 
 	
-	var output = $http({
-		method:"GET",
-		url:"heatmap/",
-		params: {
-			format:"json"
-		}
-	})
-	.success( function(data, status, headers, config) {
-		return data;
-	})
-	.error( function(data,status,headers,config){
-		return null;
-	});
+	var output = function() {
 	
-	return output;
+		var deferred = $q.defer();
+		
+		$http({
+			method:"GET",
+			url:"heatmap/",
+			params: {
+				format:"json"
+			}
+		})
+		.success( function(data, status, headers, config) {
+			deferred.resolve({
+				data: data,
+				status: status,
+				headers: headers,
+				config: config
+			});
+		})
+		.error( function(data,status,headers,config){
+			deferred.reject({
+				data: data,
+				status: status,
+				headers: headers,
+				config: config
+			});
+		});
+		
+		return deferred;
+		
+	};
 	
+	return output();
 	
 }]);
 
-fctry.factory('HeatmapDataFctry', [ function() { 
+fctry.factory('GETHeatmapDataFctry', [ function() { 
 
 	var output = function(matrixlocation, curstartrow, curendrow, curstartcol, curendcol) {
 
@@ -99,6 +116,6 @@ fctry.factory('HeatmapDataFctry', [ function() {
 		
 	};
 	
-	return output;
+	return output();
 	
 }]);
