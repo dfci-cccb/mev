@@ -1,4 +1,4 @@
-ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($scope, $routeParams, $http) {
+ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', "ExposedHTTPRequestFctry", function($scope, $routeParams, $http, ExposedHTTPRequestFctry) {
 
 	$scope.matrixlocation = $routeParams.matrixLocation;
 	$scope.curstartrow = 0;
@@ -107,6 +107,90 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 
 	}
 	
+	$scope.pullPage = function() {
+		
+		if (!$scope.matrixlocation) {
+			return;
+		}
+
+		$scope.heatmapcells = null;
+		$scope.heatmaprows = null;
+		$scope.heatmapcolumns = null;
+
+		ExposedHTTPRequestFctry({
+			method: "GET", 
+			url: "heatmap/"+$scope.matrixlocation+"/data", 
+			params:{
+				format:"json", 
+				startRow:$scope.curstartrow,
+				endRow:$scope.curendrow,
+				startColumn:$scope.curstartcol,
+				endColumn:$scope.curendcol
+			}
+		})
+		.then(function(response){
+			$scope.heatmapcells = response.data.values;
+		})
+		.then(function(){
+			
+			ExposedHTTPRequestFctry({
+				method:"GET", 
+				url:"heatmap/"+$scope.matrixlocation+"/annotation/column",
+				params:{format:"json"}
+			})
+			.then(function(response){
+				
+				$scope.heatmapcolumnannotations = response.data;
+				
+				return data[0];
+				
+			})
+			.then(function(column){
+				
+				ExposedHTTPRequestFctry({
+					method: "GET", 
+					url:"heatmap/" + $scope.matrixlocation + "/annotation/column/" + $scope.curstartcol + "-" + $scope.curendcol + "/" + column, 
+					params: {format:"json"}
+				}).then(function(response){
+					$scope.heatmapcolumns = response.data;
+				})
+			
+			});
+		})
+		.then(function() {
+			
+			ExposedHTTPRequestFctry({
+				method:"GET",
+				url:"heatmap/"+$scope.matrixlocation+"/annotation/row",
+				params: {
+					format:"json"
+				}
+			})
+			.then( function(response) {
+			
+				$scope.heatmaprowannotations = response.data;
+				var heatmaprowshold = [];
+				
+				ExposedHTTPRequestFctry({
+						method:"GET",
+						url:"heatmap/"+$scope.matrixlocation+"/annotation/row/" + $scope.curstartrow + "-" + $scope.curendrow + "/" + response.data[0],
+						params: {
+							format:"json"
+						}
+				})
+				.then(function(response) {
+						$scope.heatmaprows = response.data;
+				});
+				
+			});
+			
+		})
+		.then(function() {
+			$scope,transformData();
+		})
+		
+		
+	};
 	//pull page function
 	$scope.pullPage = function() {
 

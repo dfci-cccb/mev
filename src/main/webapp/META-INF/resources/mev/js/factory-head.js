@@ -1,11 +1,53 @@
 
-var fctry =  angular.module('myApp.factories', [])
+var fctry =  angular.module('myApp.factories', []);
 
-fctry.factory('GETHeatmapFctry', ["$q", function($q) { 
+fctry.factory('ExposedHTTPRequestFctry', ['$q', '$http', '$scope', function($q, $http, $scope){
+	
+	var output = function(params) {
+	
+		var deffered = $q.defer();
+		
+		$http(params)
+		.success( function(data, status, headers, config) {
+			
+			$scope.$apply( function(){
+			
+				deferred.resolve({
+					data: data,
+					status: status,
+					headers: headers,
+					config: config
+				});
+
+				
+			});
+						
+		})
+		.error( function(data,status,headers,config){
+			
+			$scope.$apply(function(){
+			
+				deferred.reject({
+					data: data,
+					status: status,
+					headers: headers,
+					config: config
+				});
+				
+			});
+			
+			
+		});
+		
+		return deferred.promise;
+		
+	}
+	
+}]);
+
+fctry.factory('GETHeatmapFctry', ["$q", "$http", "ExposedHTTPRequestFctry", function($q, $http, ExposedHTTPRequestFctry) { 
 	
 	var output = function() {
-	
-		var deferred = $q.defer();
 		
 		$http({
 			method:"GET",
@@ -15,34 +57,40 @@ fctry.factory('GETHeatmapFctry', ["$q", function($q) {
 			}
 		})
 		.success( function(data, status, headers, config) {
+			
 			deferred.resolve({
 				data: data,
 				status: status,
 				headers: headers,
 				config: config
 			});
+			
 		})
 		.error( function(data,status,headers,config){
+			
 			deferred.reject({
 				data: data,
 				status: status,
 				headers: headers,
 				config: config
 			});
+			
 		});
 		
 		return deferred;
 		
 	};
 	
-	return output();
+	return output;
 	
 }]);
 
-fctry.factory('GETHeatmapDataFctry', [ function() { 
+fctry.factory('GETHeatmapDataCellsFctry', ["$q", "$http", function($q, $http) { 
 
 	var output = function(matrixlocation, curstartrow, curendrow, curstartcol, curendcol) {
-
+		
+		var deferred = $q.defer();
+	
 		$http({
 			method:"GET",
 			url:"heatmap/"+matrixlocation+"/data",
@@ -54,68 +102,30 @@ fctry.factory('GETHeatmapDataFctry', [ function() {
 				endColumn:curendcol
 			}
 		})
-		.success( function(data) {
-			$scope.heatmapcells = data.values;
-			$scope.transformData();
-		});
-		
-		$http({
-			method:"GET",
-			url:"heatmap/"+$scope.matrixlocation+"/annotation/column",
-			params: {
-				format:"json"
-			}
-		})
-		.success( function(data) {
-		
-			$scope.heatmapcolumnannotations = data;
-				
-			$http({
-				method:"GET",
-				url:"heatmap/" + $scope.matrixlocation + "/annotation/column/" + $scope.curstartcol + "-" + $scope.curendcol + "/" + data[0],
-				params: {
-					format:"json"
-				}
-			})
-			.success( function(columnData) {
-				$scope.heatmapcolumns = columnData;
-				$scope.transformData();
+		.success( function(data, status, headers, config) {
+			
+			deferred.resolve({
+				data: data,
+				status: status,
+				headers: headers,
+				config: config
 			});
-
 			
-		});
-		
-		$http({
-			method:"GET",
-			url:"heatmap/"+$scope.matrixlocation+"/annotation/row",
-			params: {
-				format:"json"
-			}
 		})
-		.success( function(data) {
-		
-			$scope.heatmaprowannotations = data;
-			var heatmaprowshold = [];
+		.error( function(data,status,headers,config){
 			
-			$http({
-					method:"GET",
-					url:"heatmap/"+$scope.matrixlocation+"/annotation/row/" + $scope.curstartrow + "-" + $scope.curendrow + "/" + data[0],
-					params: {
-						format:"json"
-					}
-			})
-			.success( function(rowData) {
-					$scope.heatmaprows = rowData;
-					$scope.transformData();
+			deferred.reject({
+				data: data,
+				status: status,
+				headers: headers,
+				config: config
 			});
 			
 		});
-		
-			
-
-		
-	};
 	
-	return output();
+		return deferred;
+	}
+	
+	return output;
 	
 }]);
