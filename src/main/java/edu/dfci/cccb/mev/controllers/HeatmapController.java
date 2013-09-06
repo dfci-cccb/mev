@@ -50,6 +50,7 @@ import edu.dfci.cccb.mev.domain.InvalidDimensionException;
 import edu.dfci.cccb.mev.domain.MatrixAnnotation;
 import edu.dfci.cccb.mev.domain.MatrixData;
 import edu.dfci.cccb.mev.domain.MatrixSelection;
+import edu.dfci.cccb.mev.domain.MatrixSummary;
 
 /**
  * @author levk
@@ -72,8 +73,29 @@ public class HeatmapController {
     return heatmaps.list ();
   }
 
+  @RequestMapping (value = "/{id}/summary")
+  @ResponseBody
+  public MatrixSummary summary (@PathVariable ("id") String id) throws HeatmapNotFoundException {
+    return heatmaps.get (id).getSummary ();
+  }
+  
+  @RequestMapping (value = "/{id}/data/[{startRow:[0-9]+}:{endRow:[0-9]+},{startColumn:[0-9]+}:{endColumn:[0-9]+}]")
+  @ResponseBody
+  public MatrixData data (@PathVariable ("id") String id,
+                          @PathVariable ("startRow") int startRow,
+                          @PathVariable ("endRow") int endRow,
+                          @PathVariable ("startColumn") int startColumn,
+                          @PathVariable ("endColumn") int endColumn) throws HeatmapNotFoundException {
+    if (log.isDebugEnabled ())
+      log.debug ("Serving request for data for heatmap "
+                 + id + " starting row " + startRow + " ending row " + endRow + " startingColumn " + startColumn
+                 + " ending column " + endColumn);
+    return heatmaps.get (id).getData (startRow, endRow, startColumn, endColumn);
+  }
+  
   @RequestMapping (value = "/{id}/data", method = GET)
   @ResponseBody
+  @Deprecated // To be removed after 10/1/2013
   public MatrixData data (@PathVariable ("id") String id,
                           @RequestParam (value = "startRow", required = false) Integer startRow,
                           @RequestParam (value = "endRow", required = false) Integer endRow,

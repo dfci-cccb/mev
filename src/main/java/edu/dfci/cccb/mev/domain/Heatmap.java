@@ -16,12 +16,12 @@ package edu.dfci.cccb.mev.domain;
 
 import static edu.dfci.cccb.mev.domain.MatrixAnnotation.Meta.CATEGORICAL;
 import static edu.dfci.cccb.mev.domain.MatrixAnnotation.Meta.QUANTITATIVE;
+import static edu.dfci.cccb.mev.domain.MatrixData.EMPTY_MATRIX_DATA;
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.util.Arrays.asList;
 import static org.supercsv.prefs.CsvPreference.TAB_PREFERENCE;
-import static edu.dfci.cccb.mev.domain.MatrixData.EMPTY_MATRIX_DATA;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -49,6 +49,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealMatrixPreservingVisitor;
 import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvListReader;
@@ -96,6 +97,50 @@ public class Heatmap implements Closeable {
     endColumn = max (endColumn, startColumn);
     endColumn = min (endColumn, data.getColumnDimension () - 1);
     return new MatrixData (data.getSubMatrix (startRow, endRow, startColumn, endColumn));
+  }
+
+  /**
+   * Gets matrix summary
+   * @return
+   */
+  public MatrixSummary getSummary () {
+    @Accessors (fluent = true)
+    class MinMaxVisitor implements RealMatrixPreservingVisitor {
+
+      private @Getter double min = Double.MAX_VALUE;
+      private @Getter double max = Double.MIN_VALUE;
+
+      /* (non-Javadoc)
+       * @see
+       * org.apache.commons.math3.linear.RealMatrixPreservingVisitor#start(int,
+       * int, int, int, int, int) */
+      @Override
+      public void start (int rows, int columns, int startRow, int endRow, int startColumn, int endColumn) {}
+
+      /* (non-Javadoc)
+       * @see
+       * org.apache.commons.math3.linear.RealMatrixPreservingVisitor#visit(int,
+       * int, double) */
+      @Override
+      public void visit (int row, int column, double value) {
+        if (min > value)
+          min = value;
+        if (max < value)
+          max = value;
+      }
+
+      /* (non-Javadoc)
+       * @see org.apache.commons.math3.linear.RealMatrixPreservingVisitor#end() */
+      @Override
+      public double end () {
+        return 0;
+      }
+    }
+
+    MinMaxVisitor visitor = new MinMaxVisitor ();
+
+    data.walkInOptimizedOrder (visitor);
+    return new MatrixSummary (data.getRowDimension (), data.getColumnDimension (), visitor.max (), visitor.min ());
   }
 
   /**
