@@ -17,7 +17,6 @@ package edu.dfci.cccb.mev.domain;
 import static edu.dfci.cccb.mev.domain.MatrixAnnotation.Meta.CATEGORICAL;
 import static edu.dfci.cccb.mev.domain.MatrixAnnotation.Meta.QUANTITATIVE;
 import static edu.dfci.cccb.mev.domain.MatrixData.EMPTY_MATRIX_DATA;
-import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.util.Arrays.asList;
@@ -41,8 +40,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.Synchronized;
 import lombok.ToString;
 import lombok.experimental.Accessors;
@@ -65,6 +64,7 @@ import us.levk.math.linear.HugeRealMatrix;
 public class Heatmap implements Closeable {
 
   private RealMatrix data;
+  private @Getter MatrixSummary summary;
   private List<Map<String, ?>> rowAnnotations = new ArrayList<Map<String, ?>> ();
   private List<Map<String, ?>> columnAnnotations = new ArrayList<Map<String, ?>> ();
   private List<Map<String, Map<String, String>>> rowSelections = new SelectionHolderList ();
@@ -97,50 +97,6 @@ public class Heatmap implements Closeable {
     endColumn = max (endColumn, startColumn);
     endColumn = min (endColumn, data.getColumnDimension () - 1);
     return new MatrixData (data.getSubMatrix (startRow, endRow, startColumn, endColumn));
-  }
-
-  /**
-   * Gets matrix summary
-   * @return
-   */
-  public MatrixSummary getSummary () {
-    @Accessors (fluent = true)
-    class MinMaxVisitor implements RealMatrixPreservingVisitor {
-
-      private @Getter double min = Double.MAX_VALUE;
-      private @Getter double max = Double.MIN_VALUE;
-
-      /* (non-Javadoc)
-       * @see
-       * org.apache.commons.math3.linear.RealMatrixPreservingVisitor#start(int,
-       * int, int, int, int, int) */
-      @Override
-      public void start (int rows, int columns, int startRow, int endRow, int startColumn, int endColumn) {}
-
-      /* (non-Javadoc)
-       * @see
-       * org.apache.commons.math3.linear.RealMatrixPreservingVisitor#visit(int,
-       * int, double) */
-      @Override
-      public void visit (int row, int column, double value) {
-        if (min > value)
-          min = value;
-        if (max < value)
-          max = value;
-      }
-
-      /* (non-Javadoc)
-       * @see org.apache.commons.math3.linear.RealMatrixPreservingVisitor#end() */
-      @Override
-      public double end () {
-        return 0;
-      }
-    }
-
-    MinMaxVisitor visitor = new MinMaxVisitor ();
-
-    data.walkInOptimizedOrder (visitor);
-    return new MatrixSummary (data.getRowDimension (), data.getColumnDimension (), visitor.max (), visitor.min ());
   }
 
   /**
@@ -295,7 +251,7 @@ public class Heatmap implements Closeable {
 
       @Override
       public int size () {
-        return MAX_VALUE;
+        return Integer.MAX_VALUE;
       }
     };
 
@@ -323,13 +279,6 @@ public class Heatmap implements Closeable {
         }.initialize (fields[index]));
       }
 
-      @RequiredArgsConstructor
-      class IOExceptionHolder extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        private final @Getter IOException wrapped;
-      };
-
       HugeRealMatrix data = null;
       try (final CsvListReader csvReader = new CsvListReader (reader, TAB_PREFERENCE)) {
         data = new HugeRealMatrix (new Iterator<Double> () {
@@ -350,36 +299,86 @@ public class Heatmap implements Closeable {
           }
 
           @Override
+          @SneakyThrows (IOException.class)
           public boolean hasNext () {
             if (current != null && current.hasNext ())
               return true;
-            try {
-              final List<Object> row = csvReader.read (processors);
-              if (row == null)
-                return false;
-              rowAnnotations.add (new HashMap<String, String> () {
-                private static final long serialVersionUID = 1L;
+            final List<Object> row = csvReader.read (processors);
+            if (row == null)
+              return false;
+            rowAnnotations.add (new HashMap<String, String> () {
+              private static final long serialVersionUID = 1L;
 
-                {
-                  for (int index = 0; index < lastRowAnnotationIndex; index++)
-                    put (rowAnnotationTypes.get (index), row.get (index).toString ());
-                }
-              });
-              current = row.subList (lastRowAnnotationIndex, row.size ()).iterator ();
-              return true;
-            } catch (IOException e) {
-              throw new IOExceptionHolder (e);
-            }
+              {
+                for (int index = 0; index < lastRowAnnotationIndex; index++)
+                  put (rowAnnotationTypes.get (index), row.get (index).toString ());
+              }
+            });
+            current = row.subList (lastRowAnnotationIndex, row.size ()).iterator ();
+            return true;
           }
         }, index - lastRowAnnotationIndex);
         Heatmap result = new Heatmap ();
         result.data = data;
+        result.summary = new MatrixSummary (data.getRowDimension (),
+                                            data.getColumnDimension (),
+                                            data.walkInOptimizedOrder (new RealMatrixPreservingVisitor () {
+
+                                              private double max;
+
+                                              @Override
+                                              public void visit (int row, int column, double value) {
+                                                if (max < value)
+                                                  max = value;
+                                              }
+
+                                              @Override
+                                              public void start (int rows,
+                                                                 int columns,
+                                                                 int startRow,
+                                                                 int endRow,
+                                                                 int startColumn,
+                                                                 int endColumn) {
+                                                max = -Double.MAX_VALUE;
+                                              }
+
+                                              @Override
+                                              public double end () {
+                                                return max;
+                                              }
+                                            }),
+                                            data.walkInOptimizedOrder (new RealMatrixPreservingVisitor () {
+
+                                              private double min;
+
+                                              @Override
+                                              public void visit (int row, int column, double value) {
+                                                if (min > value)
+                                                  min = value;
+                                              }
+
+                                              @Override
+                                              public void start (int rows,
+                                                                 int columns,
+                                                                 int startRow,
+                                                                 int endRow,
+                                                                 int startColumn,
+                                                                 int endColumn) {
+                                                min = Double.MAX_VALUE;
+                                              }
+
+                                              @Override
+                                              public double end () {
+                                                return min;
+                                              }
+                                            }));
         result.rowAnnotations = rowAnnotations;
         result.columnAnnotations = columnAnnotations;
         return result;
-      } catch (IOExceptionHolder e) {
-        data.close ();
-        throw e.wrapped ();
+      } catch (RuntimeException | Error e) {
+        if (data != null)
+          data.close ();
+        throw e;
       }
     }
   }
