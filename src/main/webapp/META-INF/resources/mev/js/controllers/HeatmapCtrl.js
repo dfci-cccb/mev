@@ -1,4 +1,4 @@
-ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($scope, $routeParams, $http) {
+ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', "ExposedHTTPRequestFctry", function($scope, $routeParams, $http, ExposedHTTPRequestFctry) {
 
 	$scope.matrixlocation = $routeParams.matrixLocation;
 	$scope.curstartrow = 0;
@@ -107,87 +107,84 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 
 	}
 	
-	//pull page function
 	$scope.pullPage = function() {
-
+		
 		if (!$scope.matrixlocation) {
 			return;
 		}
-		
+
 		$scope.heatmapcells = null;
 		$scope.heatmaprows = null;
 		$scope.heatmapcolumns = null;
 
-		$http({
-			method:"GET",
-			url:"heatmap/"+$scope.matrixlocation+"/data",
-			params: {
-				format:"json",
-				startRow:$scope.curstartrow,
-				endRow:$scope.curendrow,
-				startColumn:$scope.curstartcol,
-				endColumn:$scope.curendcol
-			}
-		})
-		.success( function(data) {
-			$scope.heatmapcells = data.values;
-			$scope.transformData();
-		});
-		
-		$http({
-			method:"GET",
-			url:"heatmap/"+$scope.matrixlocation+"/annotation/column",
-			params: {
+		ExposedHTTPRequestFctry({
+			method: "GET", 
+			url: "heatmap/"+$scope.matrixlocation+"/data/[" + $scope.curstartrow + ":" + $scope.curendrow + "," + $scope.curstartcol + ":" + $scope.curendcol + "]", 
+			params:{
 				format:"json"
 			}
 		})
-		.success( function(data) {
-		
-			$scope.heatmapcolumnannotations = data;
+		.then(function(response){
+			$scope.heatmapcells = response.data.values;
+		})
+		.then(function(){
+			
+			ExposedHTTPRequestFctry({
+				method:"GET", 
+				url:"heatmap/"+$scope.matrixlocation+"/annotation/column",
+				params:{format:"json"}
+			})
+			.then(function(response){
 				
-			$http({
+				$scope.heatmapcolumnannotations = response.data;
+				
+				return data[0];
+				
+			})
+			.then(function(column){
+				
+				ExposedHTTPRequestFctry({
+					method: "GET", 
+					url:"heatmap/" + $scope.matrixlocation + "/annotation/column/" + $scope.curstartcol + "-" + $scope.curendcol + "/" + column, 
+					params: {format:"json"}
+				}).then(function(response){
+					$scope.heatmapcolumns = response.data;
+				})
+			
+			});
+		})
+		.then(function() {
+			
+			ExposedHTTPRequestFctry({
 				method:"GET",
-				url:"heatmap/" + $scope.matrixlocation + "/annotation/column/" + $scope.curstartcol + "-" + $scope.curendcol + "/" + data[0],
+				url:"heatmap/"+$scope.matrixlocation+"/annotation/row",
 				params: {
 					format:"json"
 				}
 			})
-			.success( function(columnData) {
-				$scope.heatmapcolumns = columnData;
-				$scope.transformData();
-			});
-
+			.then( function(response) {
 			
-		});
-		
-		$http({
-			method:"GET",
-			url:"heatmap/"+$scope.matrixlocation+"/annotation/row",
-			params: {
-				format:"json"
-			}
+				$scope.heatmaprowannotations = response.data;
+				var heatmaprowshold = [];
+				
+				ExposedHTTPRequestFctry({
+						method:"GET",
+						url:"heatmap/"+$scope.matrixlocation+"/annotation/row/" + $scope.curstartrow + "-" + $scope.curendrow + "/" + response.data[0],
+						params: {
+							format:"json"
+						}
+				})
+				.then(function(response) {
+						$scope.heatmaprows = response.data;
+				});
+				
+			});
+			
 		})
-		.success( function(data) {
+		.then(function() {
+			$scope,transformData();
+		})
 		
-			$scope.heatmaprowannotations = data;
-			var heatmaprowshold = [];
-			
-			$http({
-					method:"GET",
-					url:"heatmap/"+$scope.matrixlocation+"/annotation/row/" + $scope.curstartrow + "-" + $scope.curendrow + "/" + data[0],
-					params: {
-						format:"json"
-					}
-			})
-			.success( function(rowData) {
-					$scope.heatmaprows = rowData;
-					$scope.transformData();
-			});
-			
-		});
-		
-			
-
 		
 	};
 	
