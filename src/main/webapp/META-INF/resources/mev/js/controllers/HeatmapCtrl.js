@@ -119,13 +119,9 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', "ExposedHTTPR
 
 		ExposedHTTPRequestFctry({
 			method: "GET", 
-			url: "heatmap/"+$scope.matrixlocation+"/data", 
+			url: "heatmap/"+$scope.matrixlocation+"/data/[" + $scope.curstartrow + ":" + $scope.curendrow + "," + $scope.curstartcol + ":" + $scope.curendcol + "]", 
 			params:{
-				format:"json", 
-				startRow:$scope.curstartrow,
-				endRow:$scope.curendrow,
-				startColumn:$scope.curstartcol,
-				endColumn:$scope.curendcol
+				format:"json"
 			}
 		})
 		.then(function(response){
@@ -189,89 +185,6 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', "ExposedHTTPR
 			$scope,transformData();
 		})
 		
-		
-	};
-	//pull page function
-	$scope.pullPage = function() {
-
-		if (!$scope.matrixlocation) {
-			return;
-		}
-		
-		$scope.heatmapcells = null;
-		$scope.heatmaprows = null;
-		$scope.heatmapcolumns = null;
-
-		$http({
-			method:"GET",
-			url:"heatmap/"+$scope.matrixlocation+"/data",
-			params: {
-				format:"json",
-				startRow:$scope.curstartrow,
-				endRow:$scope.curendrow,
-				startColumn:$scope.curstartcol,
-				endColumn:$scope.curendcol
-			}
-		})
-		.success( function(data) {
-			$scope.heatmapcells = data.values;
-			$scope.transformData();
-		});
-		
-		$http({
-			method:"GET",
-			url:"heatmap/"+$scope.matrixlocation+"/annotation/column",
-			params: {
-				format:"json"
-			}
-		})
-		.success( function(data) {
-		
-			$scope.heatmapcolumnannotations = data;
-				
-			$http({
-				method:"GET",
-				url:"heatmap/" + $scope.matrixlocation + "/annotation/column/" + $scope.curstartcol + "-" + $scope.curendcol + "/" + data[0],
-				params: {
-					format:"json"
-				}
-			})
-			.success( function(columnData) {
-				$scope.heatmapcolumns = columnData;
-				$scope.transformData();
-			});
-
-			
-		});
-		
-		$http({
-			method:"GET",
-			url:"heatmap/"+$scope.matrixlocation+"/annotation/row",
-			params: {
-				format:"json"
-			}
-		})
-		.success( function(data) {
-		
-			$scope.heatmaprowannotations = data;
-			var heatmaprowshold = [];
-			
-			$http({
-					method:"GET",
-					url:"heatmap/"+$scope.matrixlocation+"/annotation/row/" + $scope.curstartrow + "-" + $scope.curendrow + "/" + data[0],
-					params: {
-						format:"json"
-					}
-			})
-			.success( function(rowData) {
-					$scope.heatmaprows = rowData;
-					$scope.transformData();
-			});
-			
-		});
-		
-			
-
 		
 	};
 	
