@@ -175,6 +175,16 @@
                 <include>**/*.js</include>
               </includes>
             </aggregation>
+            <aggregation>
+              <insertNewLine>true</insertNewLine>
+              <output>${project.build.directory}/${project.build.finalName}/META-INF/resources/mev/js/factories.js</output>
+              <inputDir>${basedir}/src/main/webapp/META-INF/resources/mev/js/factories</inputDir>
+              <includes>
+                <include>${basedir}/LICENSE.txt</include>
+                <include>../factory-head.js</include>
+                <include>**/*.js</include>
+              </includes>
+            </aggregation>
           </aggregations>
         </configuration>
         <executions>
@@ -397,17 +407,10 @@
 
     <!-- Servlet API -->
 
-    <!--  dependency>
+    <dependency>
       <groupId>javax</groupId>
       <artifactId>javaee-web-api</artifactId>
       <version>6.0</version>
-      <scope>provided</scope>
-    </dependency-->
-
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>3.0.1</version>
       <scope>provided</scope>
     </dependency>
 
