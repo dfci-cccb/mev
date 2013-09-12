@@ -15,7 +15,7 @@
 				<div class="span3">
 				
 					<div class="row">
-						<input id="file" type="file" name="upload" />
+						<input id="file" type="file" multiple name="upload" />
 					</div>
 					
 					<div class="row">
