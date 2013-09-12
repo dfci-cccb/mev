@@ -20,6 +20,7 @@ import static edu.dfci.cccb.mev.domain.MatrixData.EMPTY_MATRIX_DATA;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.util.Arrays.asList;
+import static java.util.UUID.randomUUID;
 import static org.supercsv.prefs.CsvPreference.TAB_PREFERENCE;
 
 import java.io.BufferedReader;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.UUID;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -63,10 +65,12 @@ import us.levk.math.linear.HugeRealMatrix;
 @Log4j
 public class Heatmap implements Closeable {
 
+  private final UUID universalId = randomUUID ();
+
   private RealMatrix data;
   private @Getter MatrixSummary summary;
-  private List<Map<String, ?>> rowAnnotations = new ArrayList<Map<String, ?>> ();
-  private List<Map<String, ?>> columnAnnotations = new ArrayList<Map<String, ?>> ();
+  private List<Map<String, ?>> rowAnnotations;
+  private List<Map<String, ?>> columnAnnotations;
   private List<Map<String, Map<String, String>>> rowSelections = new SelectionHolderList ();
   private List<Map<String, Map<String, String>>> columnSelections = new SelectionHolderList ();
 

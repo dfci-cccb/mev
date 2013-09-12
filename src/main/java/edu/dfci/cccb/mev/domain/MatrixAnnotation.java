@@ -36,7 +36,8 @@ import lombok.experimental.ExtensionMethod;
 @EqualsAndHashCode
 public class MatrixAnnotation <T> {
 
-  private @Getter @JsonView final String type;
+  @Deprecated private @Getter @JsonView final String type; // to be deleted on 10/13/2013
+  private @Getter @JsonView final String attribute;
   private @Getter @JsonView final T value;
   private @Getter @JsonView final Meta meta;
   private @Getter @JsonView final Collection<? extends T> range;
@@ -54,8 +55,9 @@ public class MatrixAnnotation <T> {
     }
   }
 
-  public MatrixAnnotation (String type, T value, Meta meta, Collection<? extends T> range) {
-    this.type = type;
+  public MatrixAnnotation (String attribute, T value, Meta meta, Collection<? extends T> range) {
+    this.type = attribute;
+    this.attribute = attribute;
     this.value = value;
     this.meta = meta;
     this.range = range.unmodifiableCollection ();
