@@ -53,3 +53,38 @@ a:active {
   font-size: 70%;
   color: gray;
 }
+
+/* Heatmap Stuff */
+
+circle {
+		fill: #ffffff;
+		stroke: steelblue;
+		stroke-width: 1.5px;
+}
+.node {
+	font: 10px sans-serif;
+}
+ 
+.link {
+	fill: none;
+	stroke: #cccccc;
+	stroke-width: 1.5px;
+}
+		
+.yAxis path,
+.yAxis line,
+.xAxis path,
+.xAxis line {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges;
+}
+
+.xAxis text,
+.yAxis text {
+	font-family: sans-serif;
+	font-size: 12px;
+}
+
+
+/*End Heatmap Stuff */
