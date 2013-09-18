@@ -239,6 +239,14 @@
 
   <dependencies>
 
+    <!-- R integration -->
+
+    <dependency>
+      <groupId>us.levk</groupId>
+      <artifactId>jri-jsr223</artifactId>
+      <version>0.0.1</version>
+    </dependency>
+
     <!-- SuperCSV -->
 
     <dependency>

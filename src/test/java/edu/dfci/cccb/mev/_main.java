@@ -33,6 +33,7 @@ import org.eclipse.jetty.annotations.WebListenerAnnotationHandler;
 import org.eclipse.jetty.annotations.WebServletAnnotationHandler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
 
@@ -43,59 +44,37 @@ import org.eclipse.jetty.webapp.WebAppContext;
 public class _main {
 
   public static void main (String[] args) throws Exception {
-    final Properties testProperties = new Properties ();
-    testProperties.load (ClassLoader.getSystemClassLoader ().getResourceAsStream ("test.properties"));
 
     Server server = new Server (0) {
       {
         setHandler (new WebAppContext () {
           {
-            setWar (testProperties.getProperty ("war.path"));
+            setWar (new Properties () {
+              private static final long serialVersionUID = 1L;
+
+              {
+                load (ClassLoader.getSystemClassLoader ().getResourceAsStream ("test.properties"));
+              }
+            }.getProperty ("war.path"));
             setParentLoaderPriority (true);
-            final WebAppContext context = this;
+            setContextPath ("/");
             setConfigurations (new Configuration[] {
                                                     new AnnotationConfiguration () {
-                                                      public void configure (WebAppContext arg0) throws Exception {
+                                                      public void configure (WebAppContext context) throws Exception {
                                                         boolean metadataComplete = context.getMetaData ()
                                                                                           .isMetaDataComplete ();
                                                         context.addDecorator (new AnnotationDecorator (context));
 
-                                                        // Even if metadata is
-                                                        // complete, we still
-                                                        // need to scan for
-                                                        // ServletContainerInitializers
-                                                        // - if there are any
                                                         AnnotationParser parser = null;
-                                                        if (!metadataComplete)
-                                                        {
-                                                          // If metadata isn't
-                                                          // complete, if this
-                                                          // is a servlet 3
-                                                          // webapp or
-                                                          // isConfigDiscovered
-                                                          // is true, we need to
-                                                          // search for
-                                                          // annotations
-                                                          if (context.getServletContext ().getEffectiveMajorVersion () >= 3
-                                                              || context.isConfigurationDiscovered ())
-                                                          {
-                                                            _discoverableAnnotationHandlers.add (new WebServletAnnotationHandler (context));
-                                                            _discoverableAnnotationHandlers.add (new WebFilterAnnotationHandler (context));
-                                                            _discoverableAnnotationHandlers.add (new WebListenerAnnotationHandler (context));
-                                                          }
+                                                        if (!metadataComplete
+                                                            && (context.getServletContext ()
+                                                                       .getEffectiveMajorVersion () >= 3
+                                                            || context.isConfigurationDiscovered ())) {
+                                                          _discoverableAnnotationHandlers.add (new WebServletAnnotationHandler (context));
+                                                          _discoverableAnnotationHandlers.add (new WebFilterAnnotationHandler (context));
+                                                          _discoverableAnnotationHandlers.add (new WebListenerAnnotationHandler (context));
                                                         }
 
-                                                        // Regardless of
-                                                        // metadata, if there
-                                                        // are any
-                                                        // ServletContainerInitializers
-                                                        // with @HandlesTypes,
-                                                        // then we need to scan
-                                                        // all the
-                                                        // classes so we can
-                                                        // call their
-                                                        // onStartup() methods
-                                                        // correctly
                                                         createServletContainerInitializerAnnotationHandlers (context,
                                                                                                              getNonExcludedInitializers (context));
 
@@ -114,22 +93,18 @@ public class _main {
                                                       }
 
                                                       private void parse (final WebAppContext context,
-                                                                          AnnotationParser parser) throws Exception
-                                                      {
+                                                                          AnnotationParser parser) throws Exception {
                                                         List<Resource> _resources =
                                                                                     getResources (getClass ().getClassLoader ());
 
-                                                        for (Resource _resource : _resources)
-                                                        {
+                                                        for (Resource _resource : _resources) {
                                                           if (_resource == null)
                                                             return;
 
                                                           parser.clearHandlers ();
                                                           for (DiscoverableAnnotationHandler h : _discoverableAnnotationHandlers)
-                                                          {
                                                             if (h instanceof AbstractDiscoverableAnnotationHandler)
-                                                              ((AbstractDiscoverableAnnotationHandler) h).setResource (null); //
-                                                          }
+                                                              ((AbstractDiscoverableAnnotationHandler) h).setResource (null);
                                                           parser.registerHandlers (_discoverableAnnotationHandlers);
                                                           parser.registerHandler (_classInheritanceHandler);
                                                           parser.registerHandlers (_containerInitializerAnnotationHandlers);
@@ -168,6 +143,12 @@ public class _main {
             });
           }
         });
+        setThreadPool (new QueuedThreadPool () {
+          {
+            setMinThreads (5);
+            setMaxThreads (10);
+          }
+        });
       }
     };
 
@@ -176,9 +157,8 @@ public class _main {
 
     System.out.println (port);
 
-    Thread.sleep (10000);
+    Thread.sleep (100000);
 
-    server.destroy ();
     server.stop ();
   }
 }
