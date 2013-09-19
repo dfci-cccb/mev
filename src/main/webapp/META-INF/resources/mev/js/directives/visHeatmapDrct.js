@@ -231,6 +231,7 @@ drct.directive('visHeatmap', [function() {
 					
 				var treewidth = margin.left;
 				var treeheight = height;
+				var genes = new Array();
 				
 				function getter(node) {
 					
