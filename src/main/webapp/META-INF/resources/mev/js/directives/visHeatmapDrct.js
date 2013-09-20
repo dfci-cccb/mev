@@ -229,153 +229,156 @@ drct.directive('visHeatmap', [function() {
 						"column": function(d, i) { return d.col; }
 					});
 					
-				var treewidth = margin.left;
-				var treeheight = height;
-				var genes = new Array();
-				
-				function getter(node) {
+				if (newdata.tree) { //only goes here if tree information is built into system
 					
-					if (!node.children) {
-						return(node.name);
-					} else {
-						for (i = 0; i < 2; ++i) {
-							getter(node.children[i])
-						}
-					}
+					var treewidth = margin.left;
+					var treeheight = height;
+					var genes = new Array();
+					
+					var getter = function(node) {
 						
-				}
-				
-				var cluster = d3.layout.cluster()
-					.size([treeheight, treewidth -120])
-					.separation(function(a,b){ //Define a separation of neighboring nodes. Make neighbor distances equidistant so they can align with heatmap.
-						return a.parent == b.parent ? 5:5;
-				});
-				
-				function elbow(d, i){
-					return "M" + (treewidth - (d.source.distance * 100))  + "," + d.source.x
-					+ "V" + d.target.x + "H" + (treewidth - (d.target.distance * 100));
-				};
-				
-				function click(d){
-					var nColor = '#ffffff'; //Initial nonselected color of a node.
-					var pColor = '#cccccc'; //Initial nonselected color of a branch.
-					
-					var cir = d3.selectAll("svg") //Selects all the circles representing nodes but only those which were the clicked circle, using datum as the equality filter.
-						.selectAll("circle")
-						.filter(function(db){
-							return d === db ? 1 : 0;
-					});
-					
-					var path = d3.selectAll(".link") //Selects all paths but only those which have the same source coordinates as the node clicked.
-						.filter(function(dp){
-							return (d.x === dp.source.x && d.y === dp.source.y) ? 1 : 0;
-						});
-					//Check the state of the clicked node. If 'active' (color is green) swap to inactive colors and pass those colors down to all children and vice versa.
-					if(cir.style('fill') == '#00ff00'){
-							cir.style('fill', nColor)
-								.transition().attr('r', 2).duration(500); //Change radius of nonactive nodes.
-							path.transition().style('stroke', pColor).duration(500);
-					}
-					else{
-						nColor = '#00ff00';
-						pColor = '#00ff00';
-						cir.style('fill', nColor)
-							.transition().attr('r', 5).duration(500);
-						path.transition().style('stroke', pColor).duration(500);
-					};
-					
-					if(d.children){ //Check if the node clicked is not a leaf. If the node has children, travel down the three updating the colors to indicate selection.
-						walk(d, nColor, pColor);
-					}
-					else{
-						if(nColor == '#00ff00'){ //Check color to see if indicated action is a select/deselect
-							if(genes.indexOf(d.name) == -1){ //Check if gene already is in the array.
-								genes.push(d.name)
+						if (!node.children) {
+							return(node.name);
+						} else {
+							for (i = 0; i < 2; ++i) {
+								getter(node.children[i])
 							}
 						}
-						else{ //Algorithm for removing genes from the list on a deselect.
-							var index = genes.indexOf(d.name); //Get the index of the given gene in the gene array.
-							genes.splice(index, 1); //Splice that gene out of the array using its gotten index.
-						};
+							
+					}
+					
+					var cluster = d3.layout.cluster()
+						.size([treeheight, treewidth -120])
+						.separation(function(a,b){ //Define a separation of neighboring nodes. Make neighbor distances equidistant so they can align with heatmap.
+							return a.parent == b.parent ? 5:5;
+					});
+					
+					var elbow = function(d, i){
+						return "M" + (treewidth - (d.source.distance * 100))  + "," + d.source.x
+						+ "V" + d.target.x + "H" + (treewidth - (d.target.distance * 100));
 					};
-					alert(genes);
-				};
-				//Function to walk down the tree from a selected node and apply proper color assignments based on selection.
-				function walk(d, nColor, pColor){
-					//alert(d.name);
-					d.children.forEach(function(dc){ //Loop through each child, recursively calling walk() as necessary.
-						d3.selectAll("svg")
+					
+					var click = function(d){
+						var nColor = '#ffffff'; //Initial nonselected color of a node.
+						var pColor = '#cccccc'; //Initial nonselected color of a branch.
+						
+						var cir = d3.selectAll("svg") //Selects all the circles representing nodes but only those which were the clicked circle, using datum as the equality filter.
 							.selectAll("circle")
 							.filter(function(db){
-								return dc === db ? 1 : 0;
-							})
-							.transition().style("fill",nColor).duration(500)
-							.transition().attr("r", 2).duration(500);
+								return d === db ? 1 : 0;
+						});
 						
-						d3.selectAll(".link")
+						var path = d3.selectAll(".link") //Selects all paths but only those which have the same source coordinates as the node clicked.
 							.filter(function(dp){
-								return (dc.x === dp.source.x && dc.y === dp.source.y) ? 1 : 0;
-							})
-							.transition().style("stroke", pColor).duration(500);
-							
-						if(dc.children){ //Check if children exist, if so, recurse the previous function.
-							walk(dc, nColor, pColor);
+								return (d.x === dp.source.x && d.y === dp.source.y) ? 1 : 0;
+							});
+						//Check the state of the clicked node. If 'active' (color is green) swap to inactive colors and pass those colors down to all children and vice versa.
+						if(cir.style('fill') == '#00ff00'){
+								cir.style('fill', nColor)
+									.transition().attr('r', 2).duration(500); //Change radius of nonactive nodes.
+								path.transition().style('stroke', pColor).duration(500);
 						}
 						else{
-							if(nColor == '#00ff00'){
-								if(genes.indexOf(dc.name) == -1){
-									genes.push(dc.name);
-								};
+							nColor = '#00ff00';
+							pColor = '#00ff00';
+							cir.style('fill', nColor)
+								.transition().attr('r', 5).duration(500);
+							path.transition().style('stroke', pColor).duration(500);
+						};
+						
+						if(d.children){ //Check if the node clicked is not a leaf. If the node has children, travel down the three updating the colors to indicate selection.
+							walk(d, nColor, pColor);
+						}
+						else{
+							if(nColor == '#00ff00'){ //Check color to see if indicated action is a select/deselect
+								if(genes.indexOf(d.name) == -1){ //Check if gene already is in the array.
+									genes.push(d.name)
+								}
+							}
+							else{ //Algorithm for removing genes from the list on a deselect.
+								var index = genes.indexOf(d.name); //Get the index of the given gene in the gene array.
+								genes.splice(index, 1); //Splice that gene out of the array using its gotten index.
+							};
+						};
+						alert(genes);
+					};
+					//Function to walk down the tree from a selected node and apply proper color assignments based on selection.
+					var walk = function(d, nColor, pColor){
+						//alert(d.name);
+						d.children.forEach(function(dc){ //Loop through each child, recursively calling walk() as necessary.
+							d3.selectAll("svg")
+								.selectAll("circle")
+								.filter(function(db){
+									return dc === db ? 1 : 0;
+								})
+								.transition().style("fill",nColor).duration(500)
+								.transition().attr("r", 2).duration(500);
+							
+							d3.selectAll(".link")
+								.filter(function(dp){
+									return (dc.x === dp.source.x && dc.y === dp.source.y) ? 1 : 0;
+								})
+								.transition().style("stroke", pColor).duration(500);
+								
+							if(dc.children){ //Check if children exist, if so, recurse the previous function.
+								walk(dc, nColor, pColor);
 							}
 							else{
-								var index = genes.indexOf(dc.name);
-								genes.splice(index, 1);
-							}
-						};
-					});
-				};
-				
-				var nodes = cluster.nodes(newdata.tree)//Create the nodes based on the tree structure.
-				 
-				var link = cellwindow.selectAll("path") //Create the branches.
-					.data(cluster.links(nodes))
-					.enter().append("path")
-					.attr("class", "link")
-					.attr("d", elbow) //Call function elbow() so that the paths drawn are straight and not curved.
+								if(nColor == '#00ff00'){
+									if(genes.indexOf(dc.name) == -1){
+										genes.push(dc.name);
+									};
+								}
+								else{
+									var index = genes.indexOf(dc.name);
+									genes.splice(index, 1);
+								}
+							};
+						});
+					};
 					
-		 
-				var node = cellwindow.selectAll("circle") //Take the data in nodes and create individual nodes.
-					.data(nodes)
-					.enter().append("circle")
-					.attr("class","node")
-					.attr("cx", function(d) {
-						if( !(d.parent) ){
-							return Math.floor( (treewidth - (d.distance * 100)) );
-						} else {
-							if( !(d.children) ){
-								return  Math.floor(treewidth) ;
+					var nodes = cluster.nodes(newdata.tree)//Create the nodes based on the tree structure.
+					 
+					var link = cellwindow.selectAll("path") //Create the branches.
+						.data(cluster.links(nodes))
+						.enter().append("path")
+						.attr("class", "link")
+						.attr("d", elbow) //Call function elbow() so that the paths drawn are straight and not curved.
+						
+			 
+					var node = cellwindow.selectAll("circle") //Take the data in nodes and create individual nodes.
+						.data(nodes)
+						.enter().append("circle")
+						.attr("class","node")
+						.attr("cx", function(d) {
+							if( !(d.parent) ){
+								return Math.floor( (treewidth - (d.distance * 100)) );
 							} else {
-								return Math.floor(treewidth - (d.distance * 100));
+								if( !(d.children) ){
+									return  Math.floor(treewidth) ;
+								} else {
+									return Math.floor(treewidth - (d.distance * 100));
+								}
 							}
-						}
-					})
-					.attr("cy", function(d) {
-						if( !(d.parent) ){
-							return Math.floor(d.x);
-						} else {
-							if( !(d.children) ){
+						})
+						.attr("cy", function(d) {
+							if( !(d.parent) ){
 								return Math.floor(d.x);
 							} else {
-								return Math.floor(d.x) ;
+								if( !(d.children) ){
+									return Math.floor(d.x);
+								} else {
+									return Math.floor(d.x) ;
+								}
 							}
-						}
-					})
-					.attr("r", 2)
-					.on("click", function(d) {
-						console.log(d);
-						console.log( getter(d) );
-					})
-					.on("click", click);	
+						})
+						.attr("r", 2)
+						.on("click", function(d) {
+							console.log(d);
+							console.log( getter(d) );
+						})
+						.on("click", click);	
+				}
 				
 			});
 		 
