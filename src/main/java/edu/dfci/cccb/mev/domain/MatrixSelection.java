@@ -20,7 +20,9 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import lombok.experimental.ExtensionMethod;
 
@@ -30,6 +32,8 @@ import lombok.experimental.ExtensionMethod;
  */
 @Accessors (fluent = true, chain = false)
 @ExtensionMethod (Collections.class)
+@ToString
+@EqualsAndHashCode
 public class MatrixSelection {
 
   private @Getter @JsonView final Map<String, String> attributes;

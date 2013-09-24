@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import lombok.experimental.ExtensionMethod;
 
@@ -34,6 +35,7 @@ import lombok.experimental.ExtensionMethod;
 @ExtensionMethod (Collections.class)
 @Accessors (fluent = true, chain = false)
 @EqualsAndHashCode
+@ToString (exclude = "range")
 public class MatrixAnnotation <T> {
 
   @Deprecated private @Getter @JsonView final String type; // to be deleted on 10/13/2013

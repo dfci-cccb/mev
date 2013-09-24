@@ -19,6 +19,7 @@ import java.util.List;
 
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -31,6 +32,7 @@ import com.fasterxml.jackson.annotation.JsonView;
  */
 @RequiredArgsConstructor
 @EqualsAndHashCode
+@ToString
 public class MatrixData {
 
   public static final MatrixData EMPTY_MATRIX_DATA = new MatrixData (null);

@@ -14,8 +14,8 @@
  */
 package edu.dfci.cccb.mev.domain;
 
-import static edu.dfci.cccb.mev.domain.MatrixAnnotation.Meta.CATEGORICAL;
-import static edu.dfci.cccb.mev.domain.MatrixAnnotation.Meta.QUANTITATIVE;
+import static edu.dfci.cccb.mev.domain.AnnotationDimension.COLUMN;
+import static edu.dfci.cccb.mev.domain.AnnotationDimension.ROW;
 import static edu.dfci.cccb.mev.domain.MatrixData.EMPTY_MATRIX_DATA;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -41,6 +41,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.sql.DataSource;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -51,6 +53,7 @@ import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealMatrixPreservingVisitor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvListReader;
@@ -61,7 +64,7 @@ import us.levk.math.linear.HugeRealMatrix;
  * @author levk
  * 
  */
-@ToString
+@ToString (exclude = { "rowAnnotations", "columnAnnotations", "rowSelections", "columnSelections" })
 @Log4j
 public class Heatmap implements Closeable {
 
@@ -69,8 +72,8 @@ public class Heatmap implements Closeable {
 
   private RealMatrix data;
   private @Getter MatrixSummary summary;
-  private List<Map<String, ?>> rowAnnotations;
-  private List<Map<String, ?>> columnAnnotations;
+  private Annotations rowAnnotations;
+  private Annotations columnAnnotations;
   private List<Map<String, Map<String, String>>> rowSelections = new SelectionHolderList ();
   private List<Map<String, Map<String, String>>> columnSelections = new SelectionHolderList ();
 
@@ -109,7 +112,7 @@ public class Heatmap implements Closeable {
    * @return
    */
   public Collection<String> getRowAnnotationTypes () {
-    return getAnnotationTypes (rowAnnotations);
+    return rowAnnotations.getAttributes ();
   }
 
   /**
@@ -118,7 +121,7 @@ public class Heatmap implements Closeable {
    * @return
    */
   public Collection<String> getColumnAnnotationTypes () {
-    return getAnnotationTypes (columnAnnotations);
+    return columnAnnotations.getAttributes ();
   }
 
   /**
@@ -130,8 +133,8 @@ public class Heatmap implements Closeable {
    * @return
    */
   public List<MatrixAnnotation<?>> getRowAnnotation (int startIndex, int endIndex,
-                                                     String type) throws AnnotationNotFoundException {
-    return getAnnotation (rowAnnotations, startIndex, endIndex, type);
+                                                     String attribute) throws AnnotationNotFoundException {
+    return rowAnnotations.getByIndex (startIndex, endIndex, attribute);
   }
 
   /**
@@ -143,8 +146,8 @@ public class Heatmap implements Closeable {
    * @return
    */
   public List<MatrixAnnotation<?>> getColumnAnnotation (int startIndex, int endIndex,
-                                                        String type) throws AnnotationNotFoundException {
-    return getAnnotation (columnAnnotations, startIndex, endIndex, type);
+                                                        String attribute) throws AnnotationNotFoundException {
+    return columnAnnotations.getByIndex (startIndex, endIndex, attribute);
   }
 
   /**
@@ -246,6 +249,7 @@ public class Heatmap implements Closeable {
     private @Getter @Setter CellProcessor annotationProcessor = null;
     private @Getter @Setter String delimiterRegex = "\t";
     private @Getter @Setter List<String> columnAnnotationTypes = asList ("column");
+    private @Autowired DataSource restDataSource;
     private @Getter @Setter List<String> rowAnnotationTypes = new AbstractList<String> () {
 
       @Override
@@ -376,8 +380,10 @@ public class Heatmap implements Closeable {
                                                 return min;
                                               }
                                             }));
-        result.rowAnnotations = rowAnnotations;
-        result.columnAnnotations = columnAnnotations;
+        result.rowAnnotations = new Annotations (result.universalId, ROW, restDataSource);
+        result.columnAnnotations = new Annotations (result.universalId, COLUMN, restDataSource);
+        result.rowAnnotations.setAnnotations(rowAnnotations);
+        result.columnAnnotations.setAnnotations(columnAnnotations);
         return result;
       } catch (RuntimeException | Error e) {
         if (data != null)
@@ -385,50 +391,6 @@ public class Heatmap implements Closeable {
         throw e;
       }
     }
-  }
-
-  private Collection<String> getAnnotationTypes (List<Map<String, ?>> dimmension) {
-    Set<String> result = new HashSet<String> ();
-    for (Map<String, ?> entry : dimmension)
-      result.addAll (entry.keySet ());
-    return result;
-  }
-
-  @SuppressWarnings ({ "rawtypes", "unchecked" })
-  private List<MatrixAnnotation<?>> getAnnotation (List<Map<String, ?>> dimension,
-                                                   int startIndex, int endIndex,
-                                                   String type) throws AnnotationNotFoundException {
-    endIndex = max (endIndex, 0);
-    endIndex = min (endIndex, dimension.size () - 1);
-    startIndex = max (0, startIndex);
-    startIndex = min (startIndex, endIndex);
-    List<MatrixAnnotation<?>> result = new ArrayList<> ();
-    for (int index = startIndex; index <= endIndex; index++) {
-      Number min = Double.MAX_VALUE;
-      Number max = Double.MIN_VALUE;
-      Set<Object> categorical = new HashSet<> ();
-      boolean isQuantitative = true;
-      for (Map<String, ?> entry : dimension) {
-        Object value = entry.get (type);
-        if (value == null)
-          throw new AnnotationNotFoundException (type);
-        if (isQuantitative)
-          if (value instanceof Number) {
-            Number number = (Number) value;
-            if (min.doubleValue () >= number.doubleValue ())
-              min = number;
-            if (max.doubleValue () <= number.doubleValue ())
-              max = number;
-          } else
-            isQuantitative = false;
-        categorical.add (value);
-      }
-      result.add (new MatrixAnnotation (type,
-                                        dimension.get (index).get (type),
-                                        isQuantitative ? QUANTITATIVE : CATEGORICAL,
-                                        isQuantitative ? asList (min, max) : categorical));
-    }
-    return result;
   }
 
   private Collection<String> getSelectionIds (List<Map<String, Map<String, String>>> dimension) {

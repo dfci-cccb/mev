@@ -12,28 +12,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package edu.dfci.cccb.mev.domain;
-
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import lombok.experimental.Accessors;
-
-import com.fasterxml.jackson.annotation.JsonView;
-
 /**
  * @author levk
  *
  */
-@Accessors (fluent = true)
-@EqualsAndHashCode
-@RequiredArgsConstructor
-@ToString
-public class MatrixSummary {
-
-  private final @Getter @JsonView int rows;
-  private final @Getter @JsonView int columns;
-  private final @Getter @JsonView double max;
-  private final @Getter @JsonView double min;
-}
+package edu.dfci.cccb.mev.support;
