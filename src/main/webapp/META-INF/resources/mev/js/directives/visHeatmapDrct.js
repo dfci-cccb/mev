@@ -28,11 +28,12 @@ drct.directive('visHeatmap', [function() {
 			var width = scope.width - margin.left - margin.right;
 			var height = scope.height - margin.top - margin.bottom;
 			
-			var vis = d3.select(element[0])
+			var svg = d3.select(element[0])
 				.append("svg")
+				.attr("class", "chart")
+				.attr("pointer-events", "all")
 				.attr("width", width + margin.left + margin.right)
-				.attr("height", height + margin.top + margin.bottom)
-				.append("g")
+				.attr("height", height + margin.top + margin.bottom);
 
 			scope.$watch('inputdata', function(newdata, olddata) {
 				
@@ -40,7 +41,7 @@ drct.directive('visHeatmap', [function() {
 					return;
 				}
 				
-				vis.selectAll('*').remove();
+				svg.selectAll('*').remove();
 			
 				function zoom() {
 					
@@ -59,10 +60,9 @@ drct.directive('visHeatmap', [function() {
 							.style("text-anchor", "start")
 							.attr("dy", ( cellYPosition.rangeBand()/2 ) + "px");
 							
-					cellwindow.selectAll(".heatmapcells").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-					cellwindow.selectAll(".link").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-					cellwindow.selectAll(".node").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-			 
+					cellcover.selectAll("rect").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+					cellcover.selectAll(".link").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+					cellcover.selectAll(".node").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 				}
 				
 				var threshold = 150;
@@ -180,13 +180,27 @@ drct.directive('visHeatmap', [function() {
 								return invIndexYMapper(d);
 							}
 						});
+				
+				var vis = svg.append("g")
+					.attr("class", "uncovered")
 						
-				var cellwindow = vis.append("svg").attr("class", "cellWindow")
+				var clip = svg.append("defs").append("svg:clipPath")
+					.attr("id", "clip")
+					.append("svg:rect")
+					.attr("id", "clip-rect")
 					.attr("x", 0)
-					.attr("y", margin.top)
-					.attr("width", width+ margin.left)
-					.attr("height", height)
-					.call(d3.behavior.zoom().x(cellXPositionLin).y(cellYPositionLin).scaleExtent([1, 8]).on("zoom", zoom))
+					.attr("y", margin.top )
+					.attr("width", width + margin.left)
+					.attr("height", height );
+				
+				var cellcover = svg.append("g")
+					.attr("class", "heatmapcells")
+					.attr("clip-path", "url(#clip)")
+					.call(d3.behavior.zoom()
+						.x(cellXPositionLin)
+						.y(cellYPositionLin)
+						.scaleExtent([1, 8])
+						.on("zoom", zoom));
 				
 				vis.append("g").attr("class", "xAxis").attr("transform", "translate(0," + (margin.top) + ")")
 					.call(xAxis)
@@ -204,30 +218,30 @@ drct.directive('visHeatmap', [function() {
 							.style("text-anchor", "start")
 							.attr("dy", ( cellYPosition.rangeBand()/2 ) + "px");
 				
-				cellwindow.append("g")
-					.attr("class", "heatmapcells").selectAll("rect")
-					.data(newdata.data)
-					.enter()
-					.append("rect")
-					.attr({
-						"class": "cells",
-						"height": function(d){
-							return .95*( cellYPosition.rangeBand() );
-						},
-						"width": function(d){
-							return .95*( cellXPosition.rangeBand() );
-						},
-						"x": function(d, i) { return cellXPositionLin( indexXMapper(d.col) ); },
-						"y": function(d, i) { return cellYPositionLin( indexYMapper(d.row) ) - margin.top; },
-						"fill": function(d) {
-							return "rgb(" + redColorControl(d.value, "red") + "," + greenColorControl(d.value, "red") + ","+ blueColorControl(d.value, "red")+")";
-			 
-						},
-						"value": function(d) { return d.value; },
-						"index": function(d, i) { return i; },
-						"row": function(d, i) { return d.row; },
-						"column": function(d, i) { return d.col; }
-					});
+				cellcover.append("g")
+					.selectAll("rect")
+						.data(newdata.data)
+						.enter()
+						.append("rect")
+						.attr({
+							"class": "cells",
+							"height": function(d){
+								return .95*( cellYPosition.rangeBand() );
+							},
+							"width": function(d){
+								return .95*( cellXPosition.rangeBand() );
+							},
+							"x": function(d, i) { return cellXPositionLin( indexXMapper(d.col) ); },
+							"y": function(d, i) { return cellYPositionLin( indexYMapper(d.row) ); },
+							"fill": function(d) {
+								return "rgb(" + redColorControl(d.value, "red") + "," + greenColorControl(d.value, "red") + ","+ blueColorControl(d.value, "red")+")";
+				 
+							},
+							"value": function(d) { return d.value; },
+							"index": function(d, i) { return i; },
+							"row": function(d, i) { return d.row; },
+							"column": function(d, i) { return d.col; }
+						});
 					
 				if (newdata.tree) { //only goes here if tree information is built into system
 					
@@ -339,14 +353,14 @@ drct.directive('visHeatmap', [function() {
 					
 					var nodes = cluster.nodes(newdata.tree)//Create the nodes based on the tree structure.
 					 
-					var link = cellwindow.selectAll("path") //Create the branches.
+					var link = cellcover.selectAll("path") //Create the branches.
 						.data(cluster.links(nodes))
 						.enter().append("path")
 						.attr("class", "link")
 						.attr("d", elbow) //Call function elbow() so that the paths drawn are straight and not curved.
 						
 			 
-					var node = cellwindow.selectAll("circle") //Take the data in nodes and create individual nodes.
+					var node = cellcover.selectAll("circle") //Take the data in nodes and create individual nodes.
 						.data(nodes)
 						.enter().append("circle")
 						.attr("class","node")
