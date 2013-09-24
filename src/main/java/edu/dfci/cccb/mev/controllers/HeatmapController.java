@@ -78,7 +78,7 @@ public class HeatmapController {
   public MatrixSummary summary (@PathVariable ("id") String id) throws HeatmapNotFoundException {
     return heatmaps.get (id).getSummary ();
   }
-  
+
   @RequestMapping (value = "/{id}/data/[{startRow:[0-9]+}:{endRow:[0-9]+},{startColumn:[0-9]+}:{endColumn:[0-9]+}]")
   @ResponseBody
   public MatrixData data (@PathVariable ("id") String id,
@@ -92,10 +92,11 @@ public class HeatmapController {
                  + " ending column " + endColumn);
     return heatmaps.get (id).getData (startRow, endRow, startColumn, endColumn);
   }
-  
+
   @RequestMapping (value = "/{id}/data", method = GET)
   @ResponseBody
-  @Deprecated // To be removed after 10/1/2013
+  @Deprecated
+  // To be removed after 10/1/2013
   public MatrixData data (@PathVariable ("id") String id,
                           @RequestParam (value = "startRow", required = false) Integer startRow,
                           @RequestParam (value = "endRow", required = false) Integer endRow,
@@ -140,12 +141,12 @@ public class HeatmapController {
                                                @PathVariable ("type") String type) throws HeatmapNotFoundException,
                                                                                   InvalidDimensionException,
                                                                                   AnnotationNotFoundException {
-      if (isRow (dimension))
-        return heatmaps.get (id).getRowAnnotation (startIndex, endIndex, type);
-      else if (isColumn (dimension))
-        return heatmaps.get (id).getColumnAnnotation (startIndex, endIndex, type);
-      else
-        throw new InvalidDimensionException (dimension);
+    if (isRow (dimension))
+      return heatmaps.get (id).getRowAnnotation (startIndex, endIndex, type);
+    else if (isColumn (dimension))
+      return heatmaps.get (id).getColumnAnnotation (startIndex, endIndex, type);
+    else
+      throw new InvalidDimensionException (dimension);
   }
 
   @RequestMapping (value = "/{id}/selection/{dimension}", method = GET)
@@ -188,6 +189,20 @@ public class HeatmapController {
       for (int count = 1; heatmaps.contains (id = name + "-" + count); count++);
     put (id, data);
     return id;
+  }
+
+  @RequestMapping (value = "/{id}/annotation/{dimension}", method = { POST, PUT })
+  @ResponseStatus (OK)
+  public void annotate (@PathVariable ("id") String id,
+                        @PathVariable ("dimension") String dimension,
+                        @RequestParam ("filedata") MultipartFile data) throws HeatmapNotFoundException,
+                                                                      InvalidDimensionException, IOException {
+    if (isRow (dimension))
+      heatmaps.get (id).setRowAnnotations (data.getInputStream ());
+    else if (isColumn (dimension))
+      heatmaps.get (id).setColumnAnnotations (data.getInputStream ());
+    else
+      throw new InvalidDimensionException (dimension);
   }
 
   @RequestMapping (value = "/{hm-id}/selection/{dimension}", method = POST)
