@@ -179,12 +179,14 @@ public class AnnotationDataAccessLayer implements Closeable {
 
       do {
         Row row = ds.getRow ();
-        String value = (String) row.getValue (0);
+        if (row != null) {
+          String value = (String) row.getValue (0);
 
-        result.add (new MatrixAnnotation<Object> (attribute,
-                                                  value,
-                                                  isQuantitative ? QUANTITATIVE : CATEGORICAL,
-                                                  isQuantitative ? asList (min, max) : categorical));
+          result.add (new MatrixAnnotation<Object> (attribute,
+                                                    value,
+                                                    isQuantitative ? QUANTITATIVE : CATEGORICAL,
+                                                    isQuantitative ? asList (min, max) : categorical));
+        }
       } while (ds.next ());
     }
     return result;
@@ -197,7 +199,9 @@ public class AnnotationDataAccessLayer implements Closeable {
     // if the table already exists, don't override it
     // import into a new table, and later copy the indexes
     boolean isNew = targetTable == null;
-    log.debug ("Importing " + (isNew ? "new " : "") + "source " + sourceTable + " with context " + sourceDataContext + " to target " + targetTable + " with context " + targetDataContext);
+    log.debug ("Importing "
+               + (isNew ? "new " : "") + "source " + sourceTable + " with context " + sourceDataContext + " to target "
+               + targetTable + " with context " + targetDataContext);
     boolean ret = false;
 
     String targetTableName;
