@@ -412,8 +412,10 @@ public class AnnotationDataAccessLayer implements Closeable {
         DataContext dc = callback.getDataContext ();
 
         for (String tableName : dc.getDefaultSchema ().getTableNames ()) {
-          if (tableName.startsWith (dataNamespace, 0))
+          if (tableName.startsWith (dataNamespace, 0)) {
+            log.debug ("Dropping table " + tableName + " on close");
             callback.dropTable (dc.getDefaultSchema (), tableName).execute ();
+          }
         }
       }
     });

@@ -244,8 +244,21 @@ public class Heatmap implements Closeable {
    * @see java.io.Closeable#close() */
   @Override
   public void close () throws IOException {
-    if (data instanceof Closeable)
-      ((Closeable) data).close ();
+    for (Closeable resource : new ArrayList<Closeable> () {
+      private static final long serialVersionUID = 1L;
+
+      {
+        add (rowAnnotations);
+        add (columnAnnotations);
+        if (data instanceof Closeable)
+          add ((Closeable) data);
+      }
+    })
+      try {
+        resource.close ();
+      } catch (Throwable e) {
+        log.warn ("Unable to close " + resource + " for " + this, e);
+      }
   }
 
   @Accessors (fluent = true, chain = true)
@@ -390,8 +403,8 @@ public class Heatmap implements Closeable {
                                             }));
         result.rowAnnotations = new Annotations (result.universalId, ROW, restDataSource);
         result.columnAnnotations = new Annotations (result.universalId, COLUMN, restDataSource);
-        result.rowAnnotations.setAnnotations(rowAnnotations);
-        result.columnAnnotations.setAnnotations(columnAnnotations);
+        result.rowAnnotations.setAnnotations (rowAnnotations);
+        result.columnAnnotations.setAnnotations (columnAnnotations);
         return result;
       } catch (RuntimeException | Error e) {
         if (data != null)
