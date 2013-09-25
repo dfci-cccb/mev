@@ -1,63 +1,72 @@
 ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', function($scope, $http, $routeParams) {
-    
-    //Variables
-    $scope.project = $routeParams.project;
-    $scope.markedRows = []
-    $scope.getPageParams = {};
 
-    //Functions
-    $scope.pushToParams = function(key, value) {
-	    $scope.getPageParams[key]=value;
-	}
 	
-	$scope.pullFromParams = function(key) {
-	    delete $scope.getPageParams[key];	
-	}
+	$scope.tuples = [["GNDE3", "23", "yes"],
+	                ["GNDE4", "15", "no"],
+	                ["GNDE5", "18", "yes"],
+	                ["GNDE7", "5", "no"],
+	                ["GNDE12", "26", "no"]];
 	
-	$scope.purgeParams = function() {
-	    $scope.getPageParams = {};	
-	}
+	$scope.headers = ["Column1", "Column2", "Column3"];
 	
-    $scope.getPage = function(pagenum) {
-		if (pagenum < 0 || pagenum > $scope.totalpages) {
+	$scope.fieldFilters = new Array;
+	
+	$scope.remAll = function() {
+		$scope.fieldFilters = [];
+	};
+	
+	$scope.remFilter = function(input){
 		
-		} else {
-            
-            $scope.getPageParams["id"] = $scope.project;
-		    $scope.getPageParams["page"] = pagenum;
-		    $scope.getPageParams["format"] = "json";
-		    
-		    $http({
-				method:"GET", 
-				url:'data/geneset',
-				params: $scope.getPageParams,
+		if ($scope.fieldFilters.length >= 1) {
+			$scope.fieldFilters = $scope.fieldFilters.filter( function(filt){
+				return filt.variable != input.variable
 			})
-			.success( function(data) {
-				$scope.tuples = data.tuples;
-				$scope.fields = data.fields;
-				$scope.currentpage = data.page_id;
-				$scope.totalpages = data.total_pages;
-			});
-		 }
-    }
-    
-    $scope.markRow = function(row) {
-	
-		if ($scope.markedRows.indexOf(row) == -1) {
-			$scope.markedRows.push(row);
 		}
 		
-	}
+	};
 	
-	$scope.removeRow = function(row) {
-	
-		var rowindex = $scope.markedRows.indexOf(row);
-		if (rowindex != -1) {
-			$scope.markedRows.splice(rowindex, 1);
-		}	
+	$scope.addFilter = function(input){
 		
+		if ($scope.fieldFilters.filter(function(filt) {return filt.variable == input.variable}).length == 0) {
+			$scope.fieldFilters.push(input);
+		} else {
+			alert("You have already selected a filter for this attribute. Remove it first.");
+		}
+		
+		$scope.modalinput = {variable:undefined, value:"Insert Value", operator:"="};
+		
+	};
+	
+	$scope.modalinput = {variable:undefined, value:"Insert Value", operator:"="};
+	
+	$scope.selectfilter = function(input){
+		$scope.modalinput = {variable:input, value:"Insert Value", operator:"="};
 	}
+	
+	$scope.reqQuery = function(reqPage) {
+		
+		if ($scope.fieldFilters.length > 0) {
+			
+			$http({
+				method:"PUT",
+				url:"heatmap/"+$routeParams.geneset+"/annotation/"+"row"+ "/filter",
+				params: {
+					format:"json",
+					page: reqPage,
+					request: $scope.fieldFilters
+				}
+			})
+			.success( function(data) {
+				$scope.tuples = data;
+			})
+			.error(function(){
+				alert("error!")
+			});
+			
+		}
+		
+	};
 
-   $scope.getPage(1);
+
     
-  }]);
+}]);

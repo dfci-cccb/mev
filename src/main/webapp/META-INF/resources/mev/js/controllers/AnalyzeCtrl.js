@@ -19,6 +19,7 @@ ctrl.controller('AnalyzeCtrl', ['$scope', '$rootScope', '$routeParams', '$http',
 	
 	$scope.output = "Select your file to upload.";
 	//Function to upload files
+	
 	$scope.sendFile = function() {
 			//Variable declarations
 		

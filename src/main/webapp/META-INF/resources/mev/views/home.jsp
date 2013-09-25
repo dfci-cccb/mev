@@ -94,16 +94,17 @@
 	</div>
   </div>
 
-  <!--Bootstrap -->
-  <script src="/resources/static/webjars/bootstrap/${buildProperties['bootstrap.version']}/${profileProperties['bootstrap.js.source']}"></script>
+  <script>window.jQuery || document.write('<script src="/resources/static/webjars/jquery/${buildProperties['jquery.version']}/${profileProperties['jquery.source']}"><\/script>')</script>
+  
   <!--D3-->
   <script src="/resources/static/webjars/d3js/${buildProperties['d3.version']}/${profileProperties['d3.source']}"></script>
 
   <!-- Effeckt -->
   <script src="/resources/static/webjars/jquery/${buildProperties['jquery.version']}/${profileProperties['jquery.source']}"></script>
-
-  <script>window.jQuery || document.write('<script src="/resources/static/webjars/jquery/${buildProperties['jquery.version']}/${profileProperties['jquery.source']}"><\/script>')</script>
   <script src="/resources/static/mev/js/effeckt/modules/off-screen-nav.js"></script>
+  
+  <!--Bootstrap -->
+  <script src="/resources/static/webjars/bootstrap/${buildProperties['bootstrap.version']}/${profileProperties['bootstrap.js.source']}"></script>
 
   <!--Angular-->
   <script src="/resources/static/webjars/angularjs/${buildProperties['angularjs.version']}/${profileProperties['angularjs.source']}"></script>

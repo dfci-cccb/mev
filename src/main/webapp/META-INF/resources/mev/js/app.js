@@ -32,8 +32,8 @@ angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives', 
 		templateUrl: '/views/partials/heatmap', 
 		controller: 'HeatmapCtrl'});
 		
-	$routeProvider.when('/geneselect/:dataset', {
-		templateUrl: '/views/partials/genelib', 
+	$routeProvider.when('/filter/:dataset', {
+		templateUrl: '/views/partials/filter', 
 		controller: 'GeneSelectCtrl'});
 		
     $routeProvider.otherwise({redirectTo: '/home'});
