@@ -12,6 +12,7 @@
 				marginright="80"
 				margintop="80"
 				marginbottom="80"
+				celllink="selectedcells"
 				pushtomarked="markRow(inputindecies, inputdimension)">
 			</vis-Heatmap>
 
@@ -31,6 +32,12 @@
 					<button class="btn btn-mini" type="button" ng-click="pageUp()"><i class="icon-chevron-up"></i></button>
 					<button class="btn btn-mini" type="button" ng-click="pageDown()"><i class="icon-chevron-down"></i></button>
 				</p>
+		    </div>
+		    <div class="row" >
+		 	   <vis-Ranged-Bar 
+					inputdata="selectedcells"
+				</vis-Ranged-Bar>
+		    	{{selectedcells}}
 		    </div>
 			
 		</div>

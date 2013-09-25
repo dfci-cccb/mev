@@ -13,7 +13,7 @@ drct.directive('visHeatmap', [function() {
 			marginright: "=",
 			margintop: "=",
 			marginbottom: "=",
-			pushtomarked:"&"
+			celllink: "="
 		},
 		template: "<div class='heatmap'></div>",
 		link: function (scope, element, attrs) {
@@ -235,13 +235,22 @@ drct.directive('visHeatmap', [function() {
 							"y": function(d, i) { return cellYPositionLin( indexYMapper(d.row) ); },
 							"fill": function(d) {
 								return "rgb(" + redColorControl(d.value, "red") + "," + greenColorControl(d.value, "red") + ","+ blueColorControl(d.value, "red")+")";
-				 
+					
 							},
 							"value": function(d) { return d.value; },
 							"index": function(d, i) { return i; },
 							"row": function(d, i) { return d.row; },
 							"column": function(d, i) { return d.col; }
+						})
+						.on("click", function(d){
+							scope.$apply(function(){
+								scope.celllink = {
+									range: d3.extent(newdata.data, function(x){return x.value} ),
+									cell:{gene:d.row, sample:d.col, value:d.value}
+								};
+							})
 						});
+
 					
 				if (newdata.tree) { //only goes here if tree information is built into system
 					
@@ -314,7 +323,7 @@ drct.directive('visHeatmap', [function() {
 								genes.splice(index, 1); //Splice that gene out of the array using its gotten index.
 							};
 						};
-						alert(genes);
+						//alert(genes); ReAdd function that will do something with selected genes. 
 					};
 					//Function to walk down the tree from a selected node and apply proper color assignments based on selection.
 					var walk = function(d, nColor, pColor){
@@ -387,11 +396,10 @@ drct.directive('visHeatmap', [function() {
 							}
 						})
 						.attr("r", 2)
-						.on("click", function(d) {
-							console.log(d);
-							console.log( getter(d) );
-						})
-						.on("click", click);	
+						.on("click", click)
+						//.on("click", function(d) {
+						//	getter(d)
+						//}) Not sure what this does
 				}
 				
 			});

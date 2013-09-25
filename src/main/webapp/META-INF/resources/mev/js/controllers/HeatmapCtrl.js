@@ -8,6 +8,8 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 	var firstpull = true;
 	var pullallow = true;
 	
+	$scope.selectedcells = new Array;
+	
 	$scope.pageUp = function() {
 		
 		if ($scope.curstartrow == 0) {
