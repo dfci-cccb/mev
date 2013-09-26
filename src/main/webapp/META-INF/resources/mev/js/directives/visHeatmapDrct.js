@@ -68,9 +68,9 @@ drct.directive('visHeatmap', [function() {
 				var threshold = 150;
 				
 				var colorScaleForward = function(j) {
-			 
+					
 					var value = d3.scale.linear()
-						.domain(d3.extent(newdata.data, function(x){return x.value} ))
+						.domain([newdata.matrixsummary.min, newdata.matrixsummary.max])
 						.rangeRound([0, 255]);
 			 
 					var output = 0;
@@ -87,7 +87,7 @@ drct.directive('visHeatmap', [function() {
 			 
 				var colorScaleReverse = function(j) {	 
 					var value = d3.scale.linear()
-						.domain(d3.extent(newdata.data, function(x){return x.value} ))
+						.domain([newdata.matrixsummary.min, newdata.matrixsummary.max])
 						.rangeRound([255, 0]);
 					var output = 0;
 					if ( value(j) >= threshold ) {
