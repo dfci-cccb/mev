@@ -17,12 +17,14 @@ package edu.dfci.cccb.mev.domain;
 import static edu.dfci.cccb.mev.domain.AnnotationDimension.COLUMN;
 import static edu.dfci.cccb.mev.domain.AnnotationDimension.ROW;
 import static edu.dfci.cccb.mev.domain.MatrixData.EMPTY_MATRIX_DATA;
+import static java.lang.Double.NaN;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.util.Arrays.asList;
 import static java.util.UUID.randomUUID;
 import static org.supercsv.prefs.CsvPreference.TAB_PREFERENCE;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
@@ -54,6 +56,8 @@ import lombok.extern.log4j.Log4j;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealMatrixPreservingVisitor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.multipart.MultipartFile;
+import org.supercsv.cellprocessor.ConvertNullTo;
 import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvListReader;
@@ -266,7 +270,7 @@ public class Heatmap implements Closeable {
     private @Getter @Setter boolean allowComments = false;
     private @Getter @Setter boolean allowEmptyLines = false;
     private @Getter @Setter boolean assumeSingleColumnAnnotation = true;
-    private @Getter @Setter CellProcessor valueProcessor = new ParseDouble ();
+    private @Getter @Setter CellProcessor valueProcessor = new ConvertNullTo (NaN, new ParseDouble ());
     private @Getter @Setter CellProcessor annotationProcessor = null;
     private @Getter @Setter String delimiterRegex = "\t";
     private @Getter @Setter List<String> columnAnnotationTypes = asList ("column");
@@ -284,8 +288,46 @@ public class Heatmap implements Closeable {
       }
     };
 
-    public Heatmap build (InputStream input) throws IOException {
-      BufferedReader reader = new BufferedReader (new InputStreamReader (input));
+    public Heatmap build (final MultipartFile file) throws IOException {
+      final InputStream input = file.getInputStream ();
+      final long size = file.getSize ();
+      log.debug ("Building heatmap from " + size + " bytes of uploaded data");
+      BufferedReader reader = new BufferedReader (new InputStreamReader (new InputStream () {
+        private final InputStream in = new BufferedInputStream (input);
+        private final List<Integer> logUpdateThresholds = new ArrayList<Integer> (asList (10,
+                                                                                          20,
+                                                                                          30,
+                                                                                          40,
+                                                                                          50,
+                                                                                          60,
+                                                                                          70,
+                                                                                          80,
+                                                                                          90));
+        private boolean complete = false;
+        private long count = 0;
+
+        /* (non-Javadoc)
+         * @see java.io.InputStream#read() */
+        @Override
+        public int read () throws IOException {
+          int result = in.read ();
+          if (result < 0) {
+            if (!complete) {
+              complete = true;
+              log.debug ("Processing uploaded file " + file.getOriginalFilename () + " is complete");
+            }
+          } else {
+            count++;
+            if (logUpdateThresholds.size () > 0)
+              if (((double) count) * 100 / size > logUpdateThresholds.get (0)) {
+                log.debug ("Processing uploaded file "
+                           + file.getOriginalFilename () + " is " + logUpdateThresholds.get (0) + "% complete");
+                logUpdateThresholds.remove (0);
+              }
+          }
+          return result;
+        }
+      }));
       String[] fields = reader.readLine ().split (delimiterRegex);
       if (log.isDebugEnabled ())
         log.debug ("Parsing matrix with header: " + Arrays.toString (fields));

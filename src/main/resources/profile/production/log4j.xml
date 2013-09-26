@@ -4,7 +4,7 @@
   <appender name="log" class="org.apache.log4j.RollingFileAppender">
     <param name="threshold" value="debug" />
     <param name="file" value="${log.file.location}" />
-    <layout class="org.apache.log4j.PatternLayout">
+    <layout class="org.apache.log4j.EnhancedPatternLayout">
       <param name="ConversionPattern" value="${log4j.pattern}" />
     </layout>
   </appender>

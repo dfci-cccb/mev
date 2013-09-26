@@ -65,18 +65,20 @@ public class HeatmapController {
   private @Autowired Heatmaps heatmaps;
   private @Autowired Heatmap.Builder heatmapBuilder;
 
+  // Summary
+  
+  @RequestMapping (value = "/{id}/summary")
+  @ResponseBody
+  public MatrixSummary summary (@PathVariable ("id") String id) throws HeatmapNotFoundException {
+    return heatmaps.get (id).getSummary ();
+  }  
+  
   // GET
 
   @RequestMapping (method = GET)
   @ResponseBody
   public Collection<String> get () {
     return heatmaps.list ();
-  }
-
-  @RequestMapping (value = "/{id}/summary")
-  @ResponseBody
-  public MatrixSummary summary (@PathVariable ("id") String id) throws HeatmapNotFoundException {
-    return heatmaps.get (id).getSummary ();
   }
 
   @RequestMapping (value = "/{id}/data/[{startRow:[0-9]+}:{endRow:[0-9]+},{startColumn:[0-9]+}:{endColumn:[0-9]+}]")
@@ -182,8 +184,8 @@ public class HeatmapController {
 
   @RequestMapping (params = "format=tsv", method = POST)
   @ResponseBody
-  public String add (@RequestParam ("filedata") MultipartFile data,
-                     @RequestParam ("name") String name) throws InvalidHeatmapFormatException {
+  public String add (@RequestParam ("filedata") MultipartFile data) throws InvalidHeatmapFormatException {
+    String name = data.getOriginalFilename ();
     String id = name;
     if (heatmaps.contains (id))
       for (int count = 1; heatmaps.contains (id = name + "-" + count); count++);
@@ -224,7 +226,7 @@ public class HeatmapController {
   public void put (@PathVariable ("id") String id,
                    @RequestParam ("filedata") MultipartFile data) throws InvalidHeatmapFormatException {
     try {
-      Heatmap heatmap = heatmapBuilder.build (data.getInputStream ());
+      Heatmap heatmap = heatmapBuilder.build (data);
       heatmaps.put (id, heatmap);
       if (log.isDebugEnabled ())
         log.debug ("Put heatmap " + heatmap + " keyed " + id);
@@ -279,6 +281,7 @@ public class HeatmapController {
   @ResponseStatus (NOT_FOUND)
   @ResponseBody
   public String handeNotFoundException (Exception e) {
+    log.warn ("Unbound resource", e);
     return e.getLocalizedMessage ();
   }
 
@@ -286,6 +289,7 @@ public class HeatmapController {
   @ResponseStatus (BAD_REQUEST)
   @ResponseBody
   public String handeBadRequestException (InvalidDimensionException e) {
+    log.warn ("Bad REST call", e);
     return e.getLocalizedMessage ();
   }
 
@@ -293,6 +297,7 @@ public class HeatmapController {
   @ResponseStatus (UNSUPPORTED_MEDIA_TYPE)
   @ResponseBody
   public String handleBadDataException (InvalidHeatmapFormatException e) {
+    log.warn ("Bad upload data", e);
     return e.getLocalizedMessage ();
   }
 

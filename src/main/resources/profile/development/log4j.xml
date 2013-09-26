@@ -4,14 +4,14 @@
   <appender name="stderr" class="org.apache.log4j.ConsoleAppender">
     <param name="threshold" value="warn" />
     <param name="target" value="System.err" />
-    <layout class="org.apache.log4j.PatternLayout">
+    <layout class="org.apache.log4j.EnhancedPatternLayout">
       <param name="ConversionPattern" value="${log4j.pattern}" />
     </layout>
   </appender>
   <appender name="stdout" class="org.apache.log4j.ConsoleAppender">
     <param name="threshold" value="debug" />
     <param name="target" value="System.out" />
-    <layout class="org.apache.log4j.PatternLayout">
+    <layout class="org.apache.log4j.EnhancedPatternLayout">
       <param name="ConversionPattern" value="${log4j.pattern}" />
     </layout>
     <filter class="org.apache.log4j.varia.LevelRangeFilter">
@@ -19,6 +19,9 @@
       <param name="LevelMax" value="info" />
     </filter>
   </appender>
+  <logger name="org.eobjects.metamodel">
+    <level value="info" />
+  </logger>
   <root>
     <priority value="debug"></priority>
     <appender-ref ref="stderr" />

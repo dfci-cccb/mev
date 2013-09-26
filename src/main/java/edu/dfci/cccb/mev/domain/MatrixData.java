@@ -14,6 +14,8 @@
  */
 package edu.dfci.cccb.mev.domain;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.AbstractList;
 import java.util.List;
 
@@ -33,7 +35,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class MatrixData {
+public class MatrixData implements Closeable {
 
   public static final MatrixData EMPTY_MATRIX_DATA = new MatrixData (null);
 
@@ -90,5 +92,14 @@ public class MatrixData {
         return data == null ? 0 : data.getColumnDimension () * data.getRowDimension ();
       }
     };
+  }
+
+  /* (non-Javadoc)
+   * @see java.io.Closeable#close()
+   */
+  @Override
+  public void close () throws IOException {
+    if (data instanceof Closeable)
+      ((Closeable) data).close ();
   }
 }

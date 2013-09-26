@@ -19,6 +19,7 @@ import javax.sql.DataSource;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import lombok.experimental.ExtensionMethod;
 import lombok.extern.log4j.Log4j;
 
 import org.eobjects.metamodel.BatchUpdateScript;
@@ -51,10 +52,12 @@ import org.eobjects.metamodel.util.SimpleTableDef;
 import edu.dfci.cccb.mev.domain.MatrixAnnotation;
 
 @Log4j
+@ExtensionMethod (Arrays.class)
 public class AnnotationDataAccessLayer implements Closeable {
   private final UpdateableDataContext dbDataContext;
   private final String dataNamespace;
   private static final String INDEX_COL_NAME = "mev_index";
+  private static final String ANNOTATION_ID_COLUMN_NAME = "annotationId";
 
   private int reloadCounter = 0;
   private String currentTableName = "";
@@ -87,10 +90,13 @@ public class AnnotationDataAccessLayer implements Closeable {
 
   public boolean setAnnotations (InputStream data) {
     DataContext csvDataContext = DataContextFactory.createCsvDataContext (data, '\t', ' ');
+    log.debug ("csvDataContext=" + csvDataContext);
 
     // get the one and only table (csv)
     Schema csvSchema = csvDataContext.getDefaultSchema ();
+    log.debug ("csvSchema=" + csvSchema);
     Table[] tables = csvSchema.getTables ();
+    log.debug ("tables=" + tables.toString ());
     assert tables.length == 1;
     Table table = tables[0];
 
@@ -101,6 +107,7 @@ public class AnnotationDataAccessLayer implements Closeable {
 
     Table csvTable = table;
     Table dbTable = getTableByName (dbDataContext, currentTableName);
+    log.debug ("Importing " + csvTable + " into " + dbTable);
     return importTable (dbDataContext, dbTable, csvDataContext, csvTable);
   }
 
@@ -211,29 +218,26 @@ public class AnnotationDataAccessLayer implements Closeable {
       targetTableName = generateUniqueTableName ();
 
     // create a new table for the data
-    Table newTable = createTable (targetDataContext, sourceDataContext, sourceTable, targetTableName);
+    Table newTable = createTable (targetDataContext, targetTable, sourceDataContext, sourceTable, targetTableName);
 
     // import data:
     // if new - just write the data to the table
     // if update - write the data to a new table,
     // - then import mev_index from old table\
     // - then drop the old table
-    if (isNew) {
+    if (isNew)
       ret = insertTableData (targetDataContext, newTable, sourceDataContext, sourceTable);
-    }
-    else {
-      if (updateTableData (targetDataContext, newTable, sourceDataContext, sourceTable, targetTable))
-        ;
-      {
-        dropTable (targetDataContext, this.currentTableName);
-      }
-    }
+    else if (updateTableData (targetDataContext, newTable, sourceDataContext, sourceTable, targetTable)
+             && !log.isDebugEnabled ()) // FIXME: this is a space leak on the
+                                        // database, remove once it works
+      dropTable (targetDataContext, this.currentTableName);
     this.currentTableName = targetTableName;
 
     return ret;
   }
 
   private Table createTable (final UpdateableDataContext targetDataContext,
+                             final Table oldTable,
                              final DataContext sourceDataContext,
                              final Table theSourceTable,
                              final String targetTableName) {
@@ -253,13 +257,15 @@ public class AnnotationDataAccessLayer implements Closeable {
 
         // create schema
         TableCreationBuilder tcb = callback.createTable (targetDataContext.getDefaultSchema (), targetTableName);
+        if (oldTable != null)
+          tcb = tcb.like (oldTable);
         ColumnCreationBuilder mevIndexCB = null;
         for (Column column : theSourceTable.getColumns ()) {
           String columnName = column.getName ();
           // assume the first column in the annotations is the unique identifier
           // if it's name is blank, assign a default "annotationId"
           if (column.getColumnNumber () == 0 && column.getName ().equals (""))
-            columnName = "annotationId";
+            columnName = ANNOTATION_ID_COLUMN_NAME;
           // create the column def
           log.debug (columnName + " (" + column.getType () + "|" + column.getNativeType () + ")");
           ColumnCreationBuilder ccb = tcb.withColumn (columnName)
@@ -334,7 +340,7 @@ public class AnnotationDataAccessLayer implements Closeable {
               rib = rib.value (INDEX_COL_NAME, mev_index_counter++);
             }
 
-            log.debug (debug + rib.toSql ());
+            // log.debug (debug + " : " + rib.toSql ());
             rib.execute ();
           }
         }
@@ -360,49 +366,72 @@ public class AnnotationDataAccessLayer implements Closeable {
         dc = Converters.addTypeConverter (dc, mevIndexColumn, new StringToIntegerConverter ());
 
         // import data
-        Query sourceQuery = sourceDataContext.query ().from (sourceTable).selectAll ().toQuery ();
-        try (DataSet sourceDS = sourceDataContext.executeQuery (sourceQuery)) {
-          String indexLookupColumnName = indexLookupTable.getColumn (0).getName ();
-          boolean isError = false;
-          while (sourceDS.next ()) {
-
-            Row row = sourceDS.getRow ();
-            RowInsertionBuilder rib = callback.insertInto (targetTable);
-            // iterate through columns
-            for (SelectItem si : row.getSelectItems ()) {
-              log.debug (row.getValue (si) + "\t");
-              // the first column is the annotationId
-              if (si.getColumn ().getColumnNumber () == 0) {
-                Query lookupAnnIndexQuery = targetDataContext.query ()
-                                                             .from (indexLookupTable)
-                                                             .select (INDEX_COL_NAME)
-                                                             .where (indexLookupColumnName)
-                                                             .eq (row.getValue (si)).toQuery ();
-                log.debug (lookupAnnIndexQuery.toSql ());
-                try (DataSet indexDS = targetDataContext.executeQuery (lookupAnnIndexQuery)) {
-                  if (!indexDS.next ()) {
-                    log.debug ("AnnotationId '"
-                               + row.getValue (si) + "' was not found in "
-                               + indexLookupTable.getQualifiedLabel ());
-                    isError = true;
-                    break;
-                  }
-                  else {
-                    rib = rib.value (INDEX_COL_NAME, indexDS.getRow ().getValue (0));
-                    rib = rib.value (targetTable.getColumn (0).getName (), row.getValue (si));
-                  }
-                }
-              }
-              else {
-                if (!si.getColumn ().getName ().equals (INDEX_COL_NAME))
-                  rib = rib.value (si.getColumn ().getName (), row.getValue (si));
-              }
+        int count = 0;
+        if (log.isDebugEnabled ())
+          try (DataSet countIncoming = sourceDataContext.executeQuery (sourceDataContext.query ()
+                                                                                        .from (sourceTable)
+                                                                                        .selectCount ()
+                                                                                        .toQuery ());
+               DataSet countIncoming2 = targetDataContext.executeQuery (targetDataContext.query ()
+                                                                                         .from (indexLookupTable)
+                                                                                         .selectCount ()
+                                                                                         .toQuery ())) {
+            countIncoming.next ();
+            countIncoming2.next ();
+            log.debug ("Merging "
+                       + countIncoming.getRow () + " entries from table " + sourceTable + " and "
+                       + countIncoming2.getRow () + " entries from table " + indexLookupTable);
+          }
+        try (DataSet originalDataSet = targetDataContext.executeQuery (targetDataContext.query ()
+                                                                                        .from (indexLookupTable)
+                                                                                        .selectAll ()
+                                                                                        .toQuery ())) {
+          Column annotationIdColumn = indexLookupTable.getColumnByName (ANNOTATION_ID_COLUMN_NAME);
+          Column mergingIdColumn = sourceTable.getColumns ()[0];
+          for (Row originalRow; originalDataSet.next (); count++) {
+            originalRow = originalDataSet.getRow ();
+            Object annotationId = originalRow.getValue (annotationIdColumn);
+            try (DataSet mergingDataSet = sourceDataContext.executeQuery (sourceDataContext.query ()
+                                                                                           .from (sourceTable)
+                                                                                           .selectAll ()
+                                                                                           .where (mergingIdColumn)
+                                                                                           .eq (annotationId)
+                                                                                           .toQuery ())) {
+              RowInsertionBuilder insert = callback.insertInto (targetTable);
+              for (SelectItem originalItem : originalRow.getSelectItems ())
+                insert.value (originalItem.getColumn ().getName (), originalRow.getValue (originalItem.getColumn ()));
+              for (; mergingDataSet.next (); log.debug (mergingDataSet.getRow ()))
+                for (SelectItem mergingItem : mergingDataSet.getRow ().getSelectItems ())
+                  insert.value (mergingItem.getColumn ().getName (),
+                                mergingDataSet.getRow ().getValue (mergingItem.getColumn ()));
+              insert.execute ();
             }
-            log.debug (rib.toSql ());
-            if (!isError)
-              rib.execute ();
           }
         }
+
+        /* try (DataSet sourceDS = sourceDataContext.executeQuery
+         * (sourceDataContext.query () .from (sourceTable) .selectAll ()
+         * .toQuery ())) { String indexLookupColumnName =
+         * indexLookupTable.getColumn (0).getName (); boolean isError = false;
+         * for (; sourceDS.next (); count++) { Row row = sourceDS.getRow ();
+         * RowInsertionBuilder rib = callback.insertInto (targetTable); //
+         * iterate through columns for (SelectItem si : row.getSelectItems ()) {
+         * // log.debug (row.getValue (si) + "\t"); // the first column is the
+         * annotationId if (si.getColumn ().getColumnNumber () == 0) { Query
+         * lookupAnnIndexQuery = targetDataContext.query () .from
+         * (indexLookupTable) .select (INDEX_COL_NAME) .where
+         * (indexLookupColumnName) .eq (row.getValue (si)).toQuery (); log.debug
+         * (lookupAnnIndexQuery.toSql ()); try (DataSet indexDS =
+         * targetDataContext.executeQuery (lookupAnnIndexQuery)) { if
+         * (!indexDS.next ()) { log.debug ("AnnotationId '" + row.getValue (si)
+         * + "' was not found in " + indexLookupTable.getQualifiedLabel ());
+         * isError = true; break; } else { rib = rib.value (INDEX_COL_NAME,
+         * indexDS.getRow ().getValue (0)); rib = rib.value
+         * (targetTable.getColumn (0).getName (), row.getValue (si)); } } } else
+         * { if (!si.getColumn ().getName ().equals (INDEX_COL_NAME)) rib =
+         * rib.value (si.getColumn ().getName (), row.getValue (si)); } }
+         * log.debug (rib.toSql ()); if (!isError) rib.execute (); } } */
+        log.debug ("Processed " + count + " entries from source table");
       }
     });
     return true;
