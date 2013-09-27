@@ -1,13 +1,98 @@
-ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', function($scope, $http, $routeParams) {
+ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', '$q', function($scope, $http, $routeParams, $q) {
 
+	var annotations = new annotationsGetter;
+
+	$scope.matrixsummary = undefined;
+	$scope.headers = null;
+	$scope.dimension = "row";
+	$scope.page = 0;
+	$scope.range = [0, 100];
 	
-	$scope.tuples = [["GNDE3", "23", "yes"],
-	                ["GNDE4", "15", "no"],
-	                ["GNDE5", "18", "yes"],
-	                ["GNDE7", "5", "no"],
-	                ["GNDE12", "26", "no"]];
+	function tuple(name) {
+		this.name = name;
+		this.data = [];
+		this.add = function(attr, val){
+			this.data.push({
+				attribute:attr,
+				value:val})
+		};
+		this.get = function(attr){
+			return this.data.filter(function(element){
+				return (element.attribute == attr)
+			});
+		};
+	};
 	
-	$scope.headers = ["Column1", "Column2", "Column3"];
+	function annotationsGetter(){
+		
+		this.get = function (){
+			
+			$http({
+				method:"GET",
+				url:"heatmap/"+$routeParams.dataset+"/annotation/"+ $scope.dimension,
+				params: {
+					format:"json"
+				}
+			})
+			.success( function(data) {
+				$scope.headers = data;
+			})
+			.error(function(){
+				alert("Could not pull row attributes.");
+			});
+			
+		};
+		
+	};
+	
+	$http({
+		method:"GET",
+		url:"heatmap/"+$routeParams.dataset+"/summary/",
+		params: {
+			format:"json",
+		}
+	})
+	.success( function(data) {
+		$scope.matrixsummary = data;
+		getTuples(0, $scope.matrixsummary[($scope.dimension + "s")]);
+	});
+	
+	function getTuples(startind, endind){
+	
+		var arr = d3.range(startind, endind)
+		
+		$q.all(arr.map(function(rowid){	
+			
+			return $http({
+				method:"GET",
+				url:"heatmap/"+$routeParams.dataset+"/annotation/" + $scope.dimension + "/"+ rowid,
+				params: {
+					format:"json",
+				}
+			})
+			.success( function(data) {
+				return data;
+			});
+			
+		}))
+		.then(function(datas){
+			$scope.tuples = datas.map(function(data){
+				return data.data;
+			});
+		});
+		
+	};
+	
+	
+	
+	$scope.changeDimension = function(input){
+		console.log(input)
+		$scope.dimension = input;
+		annotations.get();
+		getTuples(0, $scope.matrixsummary[($scope.dimension + "s")]);
+		
+	}
+
 	
 	$scope.fieldFilters = new Array;
 	
@@ -45,27 +130,10 @@ ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', function($
 	
 	$scope.reqQuery = function(reqPage) {
 		
-		if ($scope.fieldFilters.length > 0) {
-			
-			$http({
-				method:"PUT",
-				url:"heatmap/"+$routeParams.geneset+"/annotation/"+"row"+ "/filter",
-				params: {
-					format:"json",
-					page: reqPage,
-					request: $scope.fieldFilters
-				}
-			})
-			.success( function(data) {
-				$scope.tuples = data;
-			})
-			.error(function(){
-				alert("error!")
-			});
-			
-		}
-		
 	};
+	
+	
+	annotations.get();
 
 
     

@@ -5,6 +5,15 @@
 </div>
 
 <div class="row">
+
+	<div class="btn-group">
+		<button class="btn" ng-click="changeDimension('row')">Rows</button>
+		<button class="btn" ng-click="changeDimension('column')">Columns</button>
+	</div>
+
+</div>
+
+<div class="row">
 	<div class="span3">
 
 		<ul class="thumbnails">
@@ -43,7 +52,7 @@
 	    	<tbody>
 	        	<tr ng-repeat="row in tuples">
 	            	<td ng-repeat="cell in row">
-	              		{{cell}}
+	              		{{cell.value}}
 	            	</td>
 	    		</tr>
 	    	</tbody>
