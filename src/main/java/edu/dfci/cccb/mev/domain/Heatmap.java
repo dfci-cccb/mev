@@ -141,6 +141,13 @@ public class Heatmap implements Closeable {
     return rowAnnotations.getByIndex (startIndex, endIndex, attribute);
   }
 
+  public List<MatrixAnnotation<?>> getRowAnnotation (int index) throws AnnotationNotFoundException {
+    List<MatrixAnnotation<?>> result = new ArrayList<MatrixAnnotation<?>> ();
+    for (String attribute : getRowAnnotationTypes ())
+      result.addAll (rowAnnotations.getByIndex (index, index, attribute));
+    return result;
+  }
+
   public void setRowAnnotations (InputStream tsv) throws IOException {
     rowAnnotations.setAnnotations (tsv);
   }
@@ -156,6 +163,13 @@ public class Heatmap implements Closeable {
   public List<MatrixAnnotation<?>> getColumnAnnotation (int startIndex, int endIndex,
                                                         String attribute) throws AnnotationNotFoundException {
     return columnAnnotations.getByIndex (startIndex, endIndex, attribute);
+  }
+  
+  public List<MatrixAnnotation<?>> getColumnAnnotation (int index) throws AnnotationNotFoundException {
+    List<MatrixAnnotation<?>> result = new ArrayList<MatrixAnnotation<?>> ();
+    for (String attribute : getColumnAnnotationTypes ())
+      result.addAll (columnAnnotations.getByIndex (index, index, attribute));
+    return result;
   }
 
   public void setColumnAnnotations (InputStream tsv) throws IOException {
