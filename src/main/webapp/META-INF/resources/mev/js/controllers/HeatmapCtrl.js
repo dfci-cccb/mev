@@ -2,12 +2,16 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 
 	$scope.matrixlocation = $routeParams.matrixLocation;
 	$scope.curstartrow = 0;
-	$scope.curendrow = 39;
+	$scope.curendrow = 80;
 	$scope.curstartcol = 0;
-	$scope.curendcol = 39;
+	$scope.curendcol = 80;
 	var firstpull = true;
 	var pullallow = true;
 	$scope.matrixsummary = undefined;
+	
+	$scope.selectedcells = new Object();
+
+	$scope.selections = [];
 	
 	$http({
 		method:"PUT",
@@ -19,9 +23,12 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 	.success( function(data) {
 		$scope.matrixsummary = data;
 		
+		
+		$scope.pullSelections("column");
+		$scope.pullSelections("row");
 	});
 	
-	$scope.selectedcells = new Array;
+	
 	
 	$scope.pageUp = function() {
 		
@@ -112,23 +119,52 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 
 	};
 	
-	$scope.markRow = function(inputindecies, inputdimension) {
+	$scope.pullSelections = function(inputdimension) {
 
 		$http({
-			method:"PUT",
+			method:"GET",
 			url:"heatmap/"+$scope.matrixlocation+"/selection/" + inputdimension,
 			params: {
-				format:"json",
-				name: $scope.inputname,
-				color: $scope.inputgroup,
-				indecies: inputindecies
+				format:"json"
 			}
 		})
 		.success( function(data) {
-			return;
+			$scope.selections[inputdimension] = data;
+			console.log($scope.selections[inputdimension])
 		});
 
-	}
+	};
+	
+	
+	
+	
+	
+	$scope.pushSelections = function(selectionname, dimension) {
+		
+		if ($scope.selectedcells[dimension]) {
+			$http({
+				method:"PUT",
+				url:"heatmap/"+$scope.matrixlocation+"/selection/"+dimension+"s"+"/"+selectionname,
+				params: {
+					format:"json",
+					selection: $scope.selectedcells[dimension][0]
+				}
+			})
+			.success( function(data) {
+				alert("Added!");
+				
+				$scope.pullSelections(dimension);
+				
+				
+			});
+		}
+		
+		
+	};
+	
+	$scope.selectedcells.row = ['blah', 'blah2', 'blah3'];
+	
+	$scope.pushSelections("tester", "row");
 	
 	//pull page function
 	$scope.pullPage = function() {
@@ -214,6 +250,7 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 	//Initial call for values
 	
 	$scope.pullPage();
+	
 	
 	$scope.sendRowFile = function() {
 			//Variable declarations

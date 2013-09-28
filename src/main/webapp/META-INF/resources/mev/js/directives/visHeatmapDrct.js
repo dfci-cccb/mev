@@ -323,7 +323,7 @@ drct.directive('visHeatmap', [function() {
 								genes.splice(index, 1); //Splice that gene out of the array using its gotten index.
 							};
 						};
-						//alert(genes); ReAdd function that will do something with selected genes. 
+						selectedcells["row"] = genes; //function that will do something with selected genes. 
 					};
 					//Function to walk down the tree from a selected node and apply proper color assignments based on selection.
 					var walk = function(d, nColor, pColor){
