@@ -503,9 +503,7 @@ public class Heatmap implements Closeable {
     @Override
     @Synchronized
     public Map<String, Map<String, String>> get (int index) {
-      log.debug ("Asked for index " + index + " current size is " + size ());
-      for (; size () < index; add (null))
-        log.debug ("Adding an empty cell");
+      for (; size () <= index; add (null));
       Map<String, Map<String, String>> result = super.get (index);
       if (result == null)
         set (index, result = new HashMap<String, Map<String, String>> ());
