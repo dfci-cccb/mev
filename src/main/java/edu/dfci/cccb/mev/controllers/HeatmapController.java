@@ -227,9 +227,9 @@ public class HeatmapController {
   @ResponseBody
   public String select (@PathVariable ("hm-id") String heatmapId,
                         @PathVariable ("dimension") String dimension,
-                        @RequestParam ("selection") MatrixSelection selection) throws HeatmapNotFoundException,
-                                                                              InvalidDimensionException,
-                                                                              IndexOutOfBoundsException {
+                        @RequestBody MatrixSelection selection) throws HeatmapNotFoundException,
+                                                               InvalidDimensionException,
+                                                               IndexOutOfBoundsException {
     String result = randomUUID ().toString ();
     select (heatmapId, dimension, result, selection);
     return result;

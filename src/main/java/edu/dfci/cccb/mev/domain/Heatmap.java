@@ -164,7 +164,7 @@ public class Heatmap implements Closeable {
                                                         String attribute) throws AnnotationNotFoundException {
     return columnAnnotations.getByIndex (startIndex, endIndex, attribute);
   }
-  
+
   public List<MatrixAnnotation<?>> getColumnAnnotation (int index) throws AnnotationNotFoundException {
     List<MatrixAnnotation<?>> result = new ArrayList<MatrixAnnotation<?>> ();
     for (String attribute : getColumnAnnotationTypes ())
@@ -487,7 +487,8 @@ public class Heatmap implements Closeable {
   }
 
   private void setSelection (List<Map<String, Map<String, String>>> dimension, String id, MatrixSelection selection) {
-    for (int index : selection.indecis ())
+    log.debug ("Setting selection " + selection + " for heatmap " + this);
+    for (int index : selection.indices ())
       dimension.get (index).put (id, selection.attributes ());
   }
 
@@ -496,14 +497,15 @@ public class Heatmap implements Closeable {
       selections.remove (id);
   }
 
-  private class SelectionHolderList extends ArrayList<Map<String, Map<String, String>>> {
+  private static class SelectionHolderList extends ArrayList<Map<String, Map<String, String>>> {
     private static final long serialVersionUID = 1L;
 
     @Override
     @Synchronized
     public Map<String, Map<String, String>> get (int index) {
-      while (size () < index)
-        add (null);
+      log.debug ("Asked for index " + index + " current size is " + size ());
+      for (; size () < index; add (null))
+        log.debug ("Adding an empty cell");
       Map<String, Map<String, String>> result = super.get (index);
       if (result == null)
         set (index, result = new HashMap<String, Map<String, String>> ());

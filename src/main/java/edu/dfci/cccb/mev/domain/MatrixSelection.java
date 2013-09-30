@@ -38,12 +38,12 @@ import lombok.experimental.ExtensionMethod;
 public class MatrixSelection {
 
   private @Getter @Setter @JsonView Map<String, String> attributes = null;
-  private @Getter @Setter @JsonView List<Integer> indecis = null;
+  private @Getter @Setter @JsonView List<Integer> indices = null;
   
   public MatrixSelection () {}
   
   public MatrixSelection (Map<String, String> attributes, List<Integer> indecis) {
     this.attributes = attributes.unmodifiableMap ();
-    this.indecis = indecis.unmodifiableList ();
+    this.indices = indecis.unmodifiableList ();
   }
 }
