@@ -13,7 +13,7 @@ drct.directive('visRangedBar', [function() {
 			scope.margintop = 30;
 			scope.marginbottom = 20;
 			scope.width = 300;
-			scope.height = 50;
+			scope.height = 60;
 			
 			var margin = {
 				left: scope.marginleft,
