@@ -9,6 +9,7 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 	var pullallow = true;
 	$scope.matrixsummary = undefined;
 	$scope.selectionname = undefined;
+	$scope.analyzeOptions = ["LIMMA", "EuclidianClustering"]
 	
 	$scope.selectedcells = new Object();
 
@@ -29,6 +30,20 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 		$scope.pullSelections("row");
 	});
 	
+	$scope.analyzeRequester = function() {
+		
+		$http({
+			method:"PUT",
+			url:"heatmap/"+$scope.matrixlocation+"/analysis/" + $scope.selectionAnalysis + "(" + $scope.selection1 + "," + $scope.selection2 + ")",
+			params: {
+				format:"json",
+			}
+		})
+		.success( function(data) {
+			Alert("Success! Please wait for your analysis to complete.")
+		});
+		
+	}
 	
 	
 	$scope.pageUp = function() {

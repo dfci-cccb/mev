@@ -89,6 +89,38 @@
 					</div>
 				</div>
 				
+				<div class="accordion-group">
+					<div class="accordion-heading">
+						<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
+							Analysis
+						</a>
+					</div>
+					<div id="collapseThree" class="accordion-body collapse">
+						<div class="accordion-inner">
+						
+							<select ng-model="selectionAnalysis"> 
+							
+								<option ng-repeat="analysis in analyzeOptions" value="{{analysis}}"> {{analysis}} </option>
+							
+							</select>
+							
+							<select ng-model="selection1"> 
+							
+								<option ng-repeat="selection in selections.row" value="{{selection}}"> {{selection}} </option>
+							
+							</select>
+							
+							<select ng-model="selection2"> 
+							
+								<option ng-repeat="selection in selections.column" value="{{selection}}"> {{selection}} </option>
+							
+							</select>
+							
+							<button class="btn btn-block btn-primary" ng-click="analyzeRequester(selectionAnalysis, selection1, selection2)">Analyze</button>
+						</div>
+					</div>
+				</div>
+				
 			</div>
 						
 		</div>
