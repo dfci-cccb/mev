@@ -80,6 +80,12 @@ circle {
 	shape-rendering: crispEdges;
 }
 
+#filtertable {
+	width: 800px;
+	height: 600px;
+	overflow: auto;
+}
+
 .xAxis text,
 .yAxis text {
 	font-family: sans-serif;

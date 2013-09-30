@@ -5,15 +5,6 @@
 </div>
 
 <div class="row">
-
-	<div class="btn-group">
-		<button class="btn" ng-click="changeDimension('row')">Rows</button>
-		<button class="btn" ng-click="changeDimension('column')">Columns</button>
-	</div>
-
-</div>
-
-<div class="row">
 	<div class="span3">
 
 		<ul class="thumbnails">
@@ -43,20 +34,34 @@
 	
 	<!-- Data Table -->
 	<div class="span8">
-	    <table class='table table-hover table-bordered'>
-	    	<thead>
-		        <tr>
-		          <th ng-repeat="header in headers">{{header}}<i class="icon-plus-sign" data-target="#myModal" data-toggle="modal" ng-click="selectfilter( header )"></i></th>
-		        </tr>
-	    	</thead>
-	    	<tbody>
-	        	<tr ng-repeat="row in tuples">
-	            	<td ng-repeat="cell in row">
-	              		{{cell.value}}
-	            	</td>
-	    		</tr>
-	    	</tbody>
-	    </table>
+		
+		<div class="btn-group">
+			<button class="btn" ng-click="changeDimension('row')">Rows</button>
+			<button class="btn" ng-click="changeDimension('column')">Columns</button>
+		</div>
+		
+		<div class="pagination pagination-right">
+			<ul>
+				<li ng-repeat="page in nearbypages" ><a ng-click="getPage(page)">{{page + 1}}</a></li> 
+			</ul>
+		</div>
+	
+		<div id="filtertable">
+		    <table class="table table-hover table-bordered">
+		    	<thead>
+			        <tr>
+			          <th ng-repeat="header in headers">{{header}}<i class="icon-plus-sign" data-target="#myModal" data-toggle="modal" ng-click="selectfilter( header )"></i></th>
+			        </tr>
+		    	</thead>
+		    	<tbody>
+		        	<tr ng-repeat="row in tuples">
+		            	<td ng-repeat="cell in row">
+		              		{{cell.value}}
+		            	</td>
+		    		</tr>
+		    	</tbody>
+			</table>
+		</div>
 	</div>
 	
 </div>
