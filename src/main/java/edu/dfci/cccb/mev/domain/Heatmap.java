@@ -473,7 +473,8 @@ public class Heatmap implements Closeable {
   private Collection<String> getSelectionIds (List<Map<String, Map<String, String>>> dimension) {
     Set<String> result = new HashSet<> ();
     for (Map<String, Map<String, String>> index : dimension)
-      result.addAll (index.keySet ());
+      if (index != null)
+        result.addAll (index.keySet ());
     return result;
   }
 
