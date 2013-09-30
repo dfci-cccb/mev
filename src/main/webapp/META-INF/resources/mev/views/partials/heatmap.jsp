@@ -37,28 +37,56 @@
 					inputdata="selectedcells"
 				</vis-Ranged-Bar>
 		    </div>
-		    
-		    <div class="row">
-				
-				<div class="row">
-					<input id="file" type="file" multiple name="upload" />
-				</div>
-				
-				<div class="row">
-					<div class="progress progress-striped active" id="progbox" style="visibility: hidden;">
-						<div class="bar" id="progbar"></div>
+			
+			<div class="accordion" id="accordion2">
+			
+				<div class="accordion-group">
+					<div class="accordion-heading">
+						<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+							Annotations
+						</a>
+					</div>
+					<div id="collapseOne" class="accordion-body collapse">
+						<div class="accordion-inner">
 						
+							<input id="file" type="file" multiple name="upload" />
+
+							<div class="progress progress-striped active" id="progbox" style="visibility: hidden;">
+								<div class="bar" id="progbar"></div>
+								
+							</div>
+						
+							<button class="btn btn-block btn-primary" ng-click="sendRowFile()">Submit Row Annotations</button>
+							<button class="btn btn-block btn-primary" ng-click="sendColFile()">Submit Column Annotations</button>
+							
+							<div id="rowoutput"></div>
+							<div id="coloutput"></div>
+						</div>
 					</div>
 				</div>
 				
-				<div class="row">
-					<button class="btn btn-small btn-primary" ng-click="sendRowFile()">Submit Row Annotations</button>
-					<div id="rowoutput"></div>
-				</div>
-				
-				<div class="row">
-					<button class="btn btn-small btn-primary" ng-click="sendColFile()">Submit Column Annotations</button>
-					<div id="coloutput"></div>
+				<div class="accordion-group">
+					<div class="accordion-heading">
+						<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+							Selections
+						</a>
+					</div>
+					<div id="collapseTwo" class="accordion-body collapse">
+						<div class="accordion-inner">
+						
+							<p>Your Row Selections:</p>
+							
+							<p ng-repeat="selection in selections['row']">{{selection}}</p>
+							
+							
+							<p>Your Column Selections:</p>
+							
+							<p ng-repeat="selection in selections['column']">{{selection}}</p>
+							
+							<button class="btn btn-block btn-primary" data-target="#myRowModal" data-toggle="modal">Add Row Selection </button>
+							<button class="btn btn-block btn-primary" data-target="#myColumnModal" data-toggle="modal">Add Column Selection </button>
+						</div>
+					</div>
 				</div>
 				
 			</div>
@@ -67,4 +95,43 @@
 		<!--End Column 2 -->
 	</div>
 
+</div>
+
+<div id="myRowModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i></button>
+    <h3 id="myModalLabel">Add New Filter</h3>
+  </div>
+  
+  <div class="modal-body">
+  
+		<p>Name:</p><input ng-model='selectionname' />
+
+  </div>
+  
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary"  data-dismiss="modal" aria-hidden="true" ng-click="pushSelections(selectionname, 'row') ">Add Row Selection</button>
+  </div>
+  
+</div>
+
+<div id="myColumnModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i></button>
+    <h3 id="myModalLabel">Add New Filter</h3>
+  </div>
+  
+  <div class="modal-body">
+  
+		<p>Name:</p><input ng-model='selectionname' />
+
+  </div>
+  
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary"  data-dismiss="modal" aria-hidden="true" ng-click="pushSelections(selectionname, 'column')">Add Column Selection</button>
+  </div>
 </div>

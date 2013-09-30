@@ -18,7 +18,6 @@ drct.directive('visHeatmap', [function() {
 		template: "<div class='heatmap'></div>",
 		link: function (scope, element, attrs) {
 			
-			
 			var margin = {
 					left: scope.marginleft,
 					right: scope.marginright,
@@ -323,7 +322,7 @@ drct.directive('visHeatmap', [function() {
 								genes.splice(index, 1); //Splice that gene out of the array using its gotten index.
 							};
 						};
-						selectedcells["row"] = genes; //function that will do something with selected genes. 
+						scope.celllink["row"] = genes; //adds selected genes to cell links 
 					};
 					//Function to walk down the tree from a selected node and apply proper color assignments based on selection.
 					var walk = function(d, nColor, pColor){
