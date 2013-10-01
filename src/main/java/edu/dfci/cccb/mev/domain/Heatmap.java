@@ -30,6 +30,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectOutput;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,6 +54,9 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
+import org.apache.commons.math3.exception.NotStrictlyPositiveException;
+import org.apache.commons.math3.exception.OutOfRangeException;
+import org.apache.commons.math3.linear.AbstractRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealMatrixPreservingVisitor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +66,8 @@ import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvListReader;
 
+import us.levk.math.linear.EucledianDistanceClusterer;
+import us.levk.math.linear.EucledianDistanceClusterer.Cluster;
 import us.levk.math.linear.HugeRealMatrix;
 
 /**
@@ -80,6 +86,8 @@ public class Heatmap implements Closeable {
   private Annotations columnAnnotations;
   private List<Map<String, Map<String, String>>> rowSelections = new SelectionHolderList ();
   private List<Map<String, Map<String, String>>> columnSelections = new SelectionHolderList ();
+  private @Getter Cluster rowClusters = null;
+  private @Getter Cluster columnClusters = null;
 
   /**
    * Constructs empty heatmap; this is not very useful as the Heatmap object is
@@ -145,6 +153,7 @@ public class Heatmap implements Closeable {
     List<MatrixAnnotation<?>> result = new ArrayList<MatrixAnnotation<?>> ();
     for (String attribute : getRowAnnotationTypes ())
       result.addAll (rowAnnotations.getByIndex (index, index, attribute));
+    log.debug ("Returning " + result.size () + " annotation objects for row " + index + " in " + this);
     return result;
   }
 
@@ -169,6 +178,7 @@ public class Heatmap implements Closeable {
     List<MatrixAnnotation<?>> result = new ArrayList<MatrixAnnotation<?>> ();
     for (String attribute : getColumnAnnotationTypes ())
       result.addAll (columnAnnotations.getByIndex (index, index, attribute));
+    log.debug ("Returning " + result.size () + " annotation objects for column " + index + " in " + this);
     return result;
   }
 
@@ -256,6 +266,58 @@ public class Heatmap implements Closeable {
    */
   public void deleteColumnSelections (String id) {
     deleteSelection (columnSelections, id);
+  }
+
+  public enum ClusteringAlgorhythm {
+    EUCLEDIAN
+  }
+
+  public Heatmap clusterColumns (ClusteringAlgorhythm algorhythm) throws IOException {
+    if (columnClusters == null) {
+      RealMatrix data = transpose (this.data);
+      Cluster root = cluster (data, algorhythm);
+
+      Heatmap result = null;
+      try {
+        result = new Heatmap ();
+        result.data = new HugeRealMatrix (data.getColumnDimension (), data.getRowDimension ());
+        result.columnClusters = root;
+        reorderByColumnCluster (result.data, root, data, indexer ());
+        return result;
+      } catch (RuntimeException | Error e) {
+        if (result != null)
+          try {
+            result.close ();
+          } catch (Exception e2) {
+            log.warn ("Swallowing exception on close", e2);
+          }
+        throw e;
+      }
+    } else
+      return this;
+  }
+
+  public Heatmap clusterRows (ClusteringAlgorhythm algorhythm) throws IOException {
+    if (rowClusters == null) {
+      Cluster root = cluster (data, algorhythm);
+      Heatmap result = null;
+      try {
+        result = new Heatmap ();
+        result.data = new HugeRealMatrix (data.getColumnDimension (), data.getRowDimension ());
+        result.rowClusters = root;
+        reorderByRowCluster (result.data, root, data, indexer ());
+        return result;
+      } catch (RuntimeException | Error e) {
+        if (result != null)
+          try {
+            result.close ();
+          } catch (Exception e2) {
+            log.warn ("Swallowing exception on close", e2);
+          }
+        throw e;
+      }
+    } else
+      return this;
   }
 
   /* (non-Javadoc)
@@ -510,5 +572,124 @@ public class Heatmap implements Closeable {
         set (index, result = new HashMap<String, Map<String, String>> ());
       return result;
     }
+  }
+
+  private Cluster cluster (RealMatrix data, ClusteringAlgorhythm algorhythm) throws IOException {
+    switch (algorhythm) {
+    case EUCLEDIAN:
+      return new EucledianDistanceClusterer ().eucledian (data);
+    default:
+      throw new IllegalArgumentException ();
+    }
+  }
+
+  @SuppressWarnings ("unused")
+  private void toStream (final Object rowSeparator, final Object columnSeparator, final ObjectOutput out) throws IOException {
+    data.walkInRowOrder (new RealMatrixPreservingVisitor () {
+      @Override
+      @SneakyThrows (IOException.class)
+      public void visit (int row, int column, double value) {
+        if (column == 0 && row != 0)
+          out.writeObject (columnSeparator);
+        else if (row != 0)
+          out.writeObject (rowSeparator);
+        out.writeObject (value);
+      }
+
+      @Override
+      public void start (int rows, int columns, int startRow, int endRow, int startColumn, int endColumn) {}
+
+      @Override
+      public double end () {
+        return 0;
+      }
+    });
+  }
+
+  private void reorderByRowCluster (RealMatrix copy, Cluster cluster, RealMatrix original, Iterator<Integer> indexer) {
+    if (cluster.children () != null) {
+      reorderByRowCluster (copy, cluster.children ()[0], original, indexer);
+      reorderByRowCluster (copy, cluster.children ()[1], original, indexer);
+    } else
+      copy.setRow (indexer.next (), original.getRow (cluster.contains ().get (0)));
+  }
+
+  private void reorderByColumnCluster (RealMatrix copy, Cluster cluster, RealMatrix original, Iterator<Integer> indexer) {
+    if (cluster.children () != null) {
+      reorderByColumnCluster (copy, cluster.children ()[0], original, indexer);
+      reorderByColumnCluster (copy, cluster.children ()[1], original, indexer);
+    } else
+      copy.setColumn (indexer.next (), original.getColumn (cluster.contains ().get (0)));
+  }
+
+  private RealMatrix transpose (final RealMatrix original) {
+    return new AbstractRealMatrix () {
+
+      @Override
+      public void setEntry (int row, int column, double value) throws OutOfRangeException {
+        original.setEntry (column, row, value);
+      }
+
+      @Override
+      public int getRowDimension () {
+        return original.getColumnDimension ();
+      }
+
+      @Override
+      public double getEntry (int row, int column) throws OutOfRangeException {
+        return original.getEntry (column, row);
+      }
+
+      @Override
+      public int getColumnDimension () {
+        return original.getRowDimension ();
+      }
+
+      @Override
+      public RealMatrix createMatrix (int rowDimension, int columnDimension) throws NotStrictlyPositiveException {
+        return original.createMatrix (rowDimension, columnDimension);
+      }
+
+      @Override
+      public RealMatrix copy () {
+        final RealMatrix result = createMatrix (getRowDimension (), getColumnDimension ());
+        walkInOptimizedOrder (new RealMatrixPreservingVisitor () {
+
+          @Override
+          public void visit (int row, int column, double value) {
+            result.setEntry (row, column, value);
+          }
+
+          @Override
+          public void start (int rows, int columns, int startRow, int endRow, int startColumn, int endColumn) {}
+
+          @Override
+          public double end () {
+            return NaN;
+          }
+        });
+        return result;
+      }
+    };
+  }
+
+  private Iterator<Integer> indexer () {
+    return new Iterator<Integer> () {
+
+      private int count = 0;
+
+      @Override
+      public void remove () {}
+
+      @Override
+      public Integer next () {
+        return count++;
+      }
+
+      @Override
+      public boolean hasNext () {
+        return true;
+      }
+    };
   }
 }

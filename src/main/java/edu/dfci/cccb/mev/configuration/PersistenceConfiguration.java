@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
-import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -53,20 +52,6 @@ public class PersistenceConfiguration {
       }
     };
   }
-
-  /*@Bean
-  public HibernateTransactionManager transactionManager () {
-    try {
-      return new HibernateTransactionManager (sessionFactory ().getObject ());
-    } catch (Throwable e) {
-      StringBuffer sb = new StringBuffer ("\n\n\n\n\n");
-      for (; e != null; e = e.getCause ())
-        sb.append ("CAUGHT EXCEPTION " + e.getClass ().getSimpleName () + ": " + e.getMessage () + "\n");
-      sb.append ("\n\n\n\n\n\n");
-      System.err.println (sb);
-      return null;
-    }
-  }*/
 
   @Bean
   public PersistenceExceptionTranslationPostProcessor exceptionTranslation () {
