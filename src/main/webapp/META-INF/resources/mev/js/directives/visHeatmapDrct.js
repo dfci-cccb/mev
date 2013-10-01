@@ -48,10 +48,10 @@ drct.directive('visHeatmap', [function() {
 					vis.select(".xAxis").call(xAxis)
 						.selectAll("text")  
 							.style("text-anchor", "start")
-							.attr("dy", ( (cellXPosition.rangeBand() )) + "px")
-							.attr("dx", "10px")
+							.attr("dy", (( -cellXPosition.rangeBand() )) + "px")
+							.attr("dx", "20px")
 							.attr("transform", function(d) {
-								return "rotate(-90)" 
+								return "rotate(90)" 
 							});
 							
 					vis.select(".yAxis").call(yAxis)
@@ -164,7 +164,7 @@ drct.directive('visHeatmap', [function() {
 						.domain( d3.extent( d3.range(newdata.rowlabels.length) ) )
 						.range([margin.top, margin.top + height - cellYPosition.rangeBand() ]);
 				
-				var xAxis = d3.svg.axis().scale(cellXPositionLin).orient("top")
+				var xAxis = d3.svg.axis().scale(cellXPositionLin).orient("bottom")
 						.ticks(newdata.columnlabels.length)
 						.tickFormat(function(d) {
 							if (d % 1 == 0 && d >= 0 && d < newdata.columnlabels.length) {
@@ -201,14 +201,14 @@ drct.directive('visHeatmap', [function() {
 						.scaleExtent([1, 8])
 						.on("zoom", zoom));
 				
-				vis.append("g").attr("class", "xAxis").attr("transform", "translate(0," + (margin.top) + ")")
+				vis.append("g").attr("class", "xAxis").attr("transform", "translate(0," + (margin.top + height) + ")")
 					.call(xAxis)
 					.selectAll("text")  
 						.style("text-anchor", "start")
-						.attr("dy", ( (cellXPosition.rangeBand() )) + "px")
-						.attr("dx", "10px")
+						.attr("dy", (( -cellXPosition.rangeBand() )) + "px")
+						.attr("dx", "20px")
 						.attr("transform", function(d) {
-							return "rotate(-90)" 
+							return "rotate(90)" 
 						});
 					
 				vis.append("g").attr("class", "yAxis").attr("transform", "translate(" + (width + margin.left) + ")")
