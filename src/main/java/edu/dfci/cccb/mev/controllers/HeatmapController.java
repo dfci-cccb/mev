@@ -43,10 +43,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
-import us.levk.math.linear.EucledianDistanceClusterer.Cluster;
 import edu.dfci.cccb.mev.domain.AnnotationNotFoundException;
 import edu.dfci.cccb.mev.domain.Heatmap;
 import edu.dfci.cccb.mev.domain.Heatmap.ClusteringAlgorhythm;
+import edu.dfci.cccb.mev.domain.Heatmap.JsonCluster;
 import edu.dfci.cccb.mev.domain.HeatmapNotFoundException;
 import edu.dfci.cccb.mev.domain.Heatmaps;
 import edu.dfci.cccb.mev.domain.InvalidDimensionException;
@@ -201,7 +201,7 @@ public class HeatmapController {
   @RequestMapping (value = "/{id}/analysis/EuclidianClustering/{dimension}", method = GET)
   @ResponseBody
   // TODO: do a proper exception instead of IOException
-  public Cluster cluster (@PathVariable ("id") String id,
+  public JsonCluster cluster (@PathVariable ("id") String id,
                           @PathVariable ("dimension") String dimension) throws HeatmapNotFoundException,
                                                                        InvalidDimensionException, IOException {
     Heatmap current = heatmaps.get (id);

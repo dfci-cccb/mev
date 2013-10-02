@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.util.HashMap;
 
 import javax.script.ScriptEngine;
@@ -35,6 +36,7 @@ import org.apache.velocity.app.VelocityEngine;
 
 import us.levk.util.io.implementation.Provisional;
 import edu.dfci.cccb.mev.domain.Heatmap;
+import edu.dfci.cccb.mev.domain.MatrixSelection;
 
 /**
  * @author levk
@@ -72,7 +74,13 @@ public class Limma {
   }
 
   private static void configure (OutputStream configuration, Heatmap heatmap, String s1, String s2) throws IOException {
-
+    int rows = heatmap.getSummary ().rows ();
+    MatrixSelection first = heatmap.getRowSelection (s1, 0, rows);
+    MatrixSelection second = heatmap.getRowSelection (s2, 0, rows);
+    PrintStream out = new PrintStream (configuration);
+    for (int index = 0; index < rows; index++)
+      out.println (index + "\t" + (first.indices ().contains (index) ? 1 : (second.indices ().contains (index) ? 0 : -1)));
+    out.flush ();
   }
 
   private static void dump (OutputStream data, Heatmap heatmap) throws IOException {
