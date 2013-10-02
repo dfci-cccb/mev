@@ -358,25 +358,7 @@ public class Heatmap implements Closeable {
     if (columnClusters == null) {
       RealMatrix data = transpose (this.data);
       Cluster root = cluster (data, algorhythm);
-
-      Heatmap result = null;
-      try {
-        result = new Heatmap ();
-        result.data = new HugeRealMatrix (data.getColumnDimension (), data.getRowDimension ());
-        result.columnClusters = JsonCluster.from (root);
-        result.rowAnnotations = rowAnnotations;
-        //result.columnAnnotations = new Annotations (result.universalId, AnnotationDimension.COLUMN, rowAnnotations.get);
-        //reorderByColumnCluster (result.data, root, data, indexer ());
-        return result;
-      } catch (RuntimeException | Error e) {
-        if (result != null)
-          try {
-            result.close ();
-          } catch (Exception e2) {
-            log.warn ("Swallowing exception on close", e2);
-          }
-        throw e;
-      }
+      return builder.reorderColumns (this, reorderedIndices (root));
     } else
       return this;
   }
@@ -384,22 +366,7 @@ public class Heatmap implements Closeable {
   public Heatmap clusterRows (ClusteringAlgorhythm algorhythm) throws IOException {
     if (rowClusters == null) {
       Cluster root = cluster (data, algorhythm);
-      Heatmap result = null;
-      try {
-        result = new Heatmap ();
-        result.data = new HugeRealMatrix (data.getColumnDimension (), data.getRowDimension ());
-        result.rowClusters = JsonCluster.from (root);
-        //reorderByRowCluster (result.data, root, data, indexer ());
-        return result;
-      } catch (RuntimeException | Error e) {
-        if (result != null)
-          try {
-            result.close ();
-          } catch (Exception e2) {
-            log.warn ("Swallowing exception on close", e2);
-          }
-        throw e;
-      }
+      return builder.reorderRows (this, reorderedIndices (root));
     } else
       return this;
   }
@@ -516,6 +483,8 @@ public class Heatmap implements Closeable {
           return newOrder.size ();
         }
       });
+      result.builder = this;
+      result.summary = other.summary;
       return result;
     }
 
@@ -550,7 +519,31 @@ public class Heatmap implements Closeable {
         @Override
         public void remove () {}
       }, other.data.getColumnDimension ());
+      result.columnAnnotations = other.columnAnnotations;
+      result.rowAnnotations = new Annotations (result.universalId, AnnotationDimension.COLUMN, restDataSource);
+      result.rowAnnotations.setAnnotations (new AbstractList<Map<String, ?>> () {
 
+        @Override
+        public Map<String, ?> get (final int index) {
+          return new HashMap<String, Object> () {
+            private static final long serialVersionUID = 1L;
+
+            {
+              try {
+                for (MatrixAnnotation<?> annotation : other.getRowAnnotation (index))
+                  put (annotation.attribute (), annotation.value ());
+              } catch (AnnotationNotFoundException e) {}
+            }
+          };
+        }
+
+        @Override
+        public int size () {
+          return newOrder.size ();
+        }
+      });
+      result.builder = this;
+      result.summary = other.summary;
       return result;
     }
 
@@ -879,26 +872,6 @@ public class Heatmap implements Closeable {
           }
         });
         return result;
-      }
-    };
-  }
-
-  private Iterator<Integer> indexer () {
-    return new Iterator<Integer> () {
-
-      private int count = 0;
-
-      @Override
-      public void remove () {}
-
-      @Override
-      public Integer next () {
-        return count++;
-      }
-
-      @Override
-      public boolean hasNext () {
-        return true;
       }
     };
   }
