@@ -45,8 +45,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import us.levk.math.linear.EucledianDistanceClusterer.Cluster;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import edu.dfci.cccb.mev.domain.AnnotationNotFoundException;
 import edu.dfci.cccb.mev.domain.Heatmap;
+import edu.dfci.cccb.mev.domain.Heatmap.ClusteringAlgorhythm;
 import edu.dfci.cccb.mev.domain.HeatmapNotFoundException;
 import edu.dfci.cccb.mev.domain.Heatmaps;
 import edu.dfci.cccb.mev.domain.InvalidDimensionException;
@@ -54,7 +61,6 @@ import edu.dfci.cccb.mev.domain.MatrixAnnotation;
 import edu.dfci.cccb.mev.domain.MatrixData;
 import edu.dfci.cccb.mev.domain.MatrixSelection;
 import edu.dfci.cccb.mev.domain.MatrixSummary;
-import edu.dfci.cccb.mev.domain.Heatmap.ClusteringAlgorhythm;
 
 /**
  * @author levk
@@ -199,8 +205,32 @@ public class HeatmapController {
       throw new InvalidDimensionException (dimension);
   }
 
+  public static class ClusterSerializer extends JsonSerializer<Cluster> {
+
+    /* (non-Javadoc)
+     * @see
+     * com.fasterxml.jackson.databind.JsonSerializer#serialize(java.lang.Object,
+     * com.fasterxml.jackson.core.JsonGenerator,
+     * com.fasterxml.jackson.databind.SerializerProvider) */
+    @Override
+    public void serialize (Cluster value, JsonGenerator jgen, SerializerProvider provider) throws IOException,
+                                                                                          JsonProcessingException {
+      jgen.writeStartObject ();
+      jgen.writeNumberField ("id", value.id ());
+      jgen.writeNumberField ("d", value.d ());
+      if (value.children () != null && value.children ().length > 0) {
+        jgen.writeArrayFieldStart ("children");
+        serialize (value.children ()[0], jgen, provider);
+        serialize (value.children ()[1], jgen, provider);
+        jgen.writeEndArray ();
+      }
+      jgen.writeEndObject ();
+    }
+  }
+
   @RequestMapping (value = "/{id}/analysis/EuclidianClustering/{dimension}", method = GET)
   @ResponseBody
+  @JsonSerialize (using = ClusterSerializer.class)
   // TODO: do a proper exception instead of IOException
   public Cluster cluster (@PathVariable ("id") String id,
                           @PathVariable ("dimension") String dimension) throws HeatmapNotFoundException,
