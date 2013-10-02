@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,15 +36,9 @@ import com.fasterxml.jackson.annotation.JsonView;
 @ExtensionMethod (Collections.class)
 @ToString
 @EqualsAndHashCode
+@AllArgsConstructor
 public class MatrixSelection {
 
   private @Getter @Setter @JsonView Map<String, String> attributes = null;
   private @Getter @Setter @JsonView List<Integer> indices = null;
-  
-  public MatrixSelection () {}
-  
-  public MatrixSelection (Map<String, String> attributes, List<Integer> indecis) {
-    this.attributes = attributes.unmodifiableMap ();
-    this.indices = indecis.unmodifiableList ();
-  }
 }
