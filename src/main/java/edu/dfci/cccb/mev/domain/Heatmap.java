@@ -27,6 +27,7 @@ import static org.supercsv.prefs.CsvPreference.TAB_PREFERENCE;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -43,6 +44,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
@@ -81,6 +83,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
+
+import edu.dfci.cccb.mev.analysis.Limma;
 
 /**
  * @author levk
@@ -145,6 +149,7 @@ public class Heatmap implements Closeable {
                                                                                                                                            Provisionals.file ();
                                                                                                                              rnk =
                                                                                                                                    Provisionals.file ();
+                                                                                                                             Limma.execute (Heatmap.this, key.getValue0 (), key.getValue1 (), output, significant, rnk);
                                                                                                                              return new Triplet<Provisional, Provisional, Provisional> (output,
                                                                                                                                                                                         significant,
                                                                                                                                                                                         rnk);
@@ -389,6 +394,18 @@ public class Heatmap implements Closeable {
       }
     } else
       return this;
+  }
+  
+  public enum LimmaOutput {
+    FULL, SIGNIFICANT, RNK
+  }
+  
+  public File limma (String experiment, String control, LimmaOutput type) {
+    try {
+      return (File) limma.get (new Pair<String, String> (experiment, control)).getValue (type.ordinal ());
+    } catch (ExecutionException e) {
+      throw new RuntimeException (e.getCause ());
+    }
   }
 
   /* (non-Javadoc)
@@ -674,8 +691,7 @@ public class Heatmap implements Closeable {
     }
   }
 
-  @SuppressWarnings ("unused")
-  private void toStream (final Object rowSeparator, final Object columnSeparator, final ObjectOutput out) throws IOException {
+  public void toStream (final Object rowSeparator, final Object columnSeparator, final ObjectOutput out) throws IOException {
     data.walkInRowOrder (new RealMatrixPreservingVisitor () {
       @Override
       @SneakyThrows (IOException.class)

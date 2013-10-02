@@ -26,12 +26,17 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import lombok.extern.log4j.Log4j;
 
+import org.codehaus.plexus.util.IOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -47,6 +52,7 @@ import edu.dfci.cccb.mev.domain.AnnotationNotFoundException;
 import edu.dfci.cccb.mev.domain.Heatmap;
 import edu.dfci.cccb.mev.domain.Heatmap.ClusteringAlgorhythm;
 import edu.dfci.cccb.mev.domain.Heatmap.JsonCluster;
+import edu.dfci.cccb.mev.domain.Heatmap.LimmaOutput;
 import edu.dfci.cccb.mev.domain.HeatmapNotFoundException;
 import edu.dfci.cccb.mev.domain.Heatmaps;
 import edu.dfci.cccb.mev.domain.InvalidDimensionException;
@@ -202,8 +208,8 @@ public class HeatmapController {
   @ResponseBody
   // TODO: do a proper exception instead of IOException
   public JsonCluster cluster (@PathVariable ("id") String id,
-                          @PathVariable ("dimension") String dimension) throws HeatmapNotFoundException,
-                                                                       InvalidDimensionException, IOException {
+                              @PathVariable ("dimension") String dimension) throws HeatmapNotFoundException,
+                                                                           InvalidDimensionException, IOException {
     Heatmap current = heatmaps.get (id);
     Heatmap clustered = null;
     if (isRow (dimension))
@@ -219,6 +225,20 @@ public class HeatmapController {
       return clustered.getRowClusters ();
     else
       return clustered.getColumnClusters ();
+  }
+
+  @RequestMapping (value = "/{id}/analysis/limma({experiment},{control})/{output}", method = GET)
+  @ResponseStatus (OK)
+  public void limma (@PathVariable ("id") String id,
+                     @PathVariable ("experiment") String experiment,
+                     @PathVariable ("control") String control,
+                     @PathVariable ("output") String output,
+                     HttpServletResponse response) throws HeatmapNotFoundException, IOException {
+    File result = heatmaps.get (id).limma (experiment, control, LimmaOutput.valueOf (output.toUpperCase ()));
+    response.setContentType ("text/plain");
+    try (FileInputStream out = new FileInputStream (result)) {
+      IOUtil.copy (out, response.getOutputStream ());
+    }
   }
 
   // POST

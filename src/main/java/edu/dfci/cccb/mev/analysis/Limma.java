@@ -22,10 +22,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -35,7 +37,9 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
 import us.levk.util.io.implementation.Provisional;
+import edu.dfci.cccb.mev.domain.AnnotationNotFoundException;
 import edu.dfci.cccb.mev.domain.Heatmap;
+import edu.dfci.cccb.mev.domain.MatrixAnnotation;
 import edu.dfci.cccb.mev.domain.MatrixSelection;
 
 /**
@@ -52,7 +56,7 @@ public class Limma {
                               String selection2,
                               final File output,
                               final File significant,
-                              final File rnk) throws IOException, ScriptException {
+                              final File rnk) throws IOException, ScriptException, AnnotationNotFoundException {
     try (final Provisional input = file ();
          final Provisional configuration = file ();
          ByteArrayOutputStream script = new ByteArrayOutputStream ()) {
@@ -79,11 +83,42 @@ public class Limma {
     MatrixSelection second = heatmap.getRowSelection (s2, 0, rows);
     PrintStream out = new PrintStream (configuration);
     for (int index = 0; index < rows; index++)
-      out.println (index + "\t" + (first.indices ().contains (index) ? 1 : (second.indices ().contains (index) ? 0 : -1)));
+      out.println (index
+                   + "\t" + (first.indices ().contains (index) ? 1 : (second.indices ().contains (index) ? 0 : -1)));
     out.flush ();
   }
 
-  private static void dump (OutputStream data, Heatmap heatmap) throws IOException {
+  private static void dump (final OutputStream data, final Heatmap heatmap) throws IOException,
+                                                                           AnnotationNotFoundException {
+    final String newline = System.getProperty ("line.separator", "\n"), tab = "\t";
+    StringBuffer header = new StringBuffer ();
+    for (MatrixAnnotation<?> column : heatmap.getColumnAnnotation (0, heatmap.getSummary ().columns () - 1, "COLUMN"))
+      header.append (tab).append (column.attribute ());
+    data.write (header.append (newline).toString ().getBytes ());
+    heatmap.toStream (newline,
+                      new Object () {
+                        private Iterator<MatrixAnnotation<?>> rows = heatmap.getRowAnnotation (0,
+                                                                                               heatmap.getSummary ()
+                                                                                                      .rows (),
+                                                                                               "annotation-0")
+                                                                            .iterator ();
 
+                        /* (non-Javadoc)
+                         * @see java.lang.Object#toString() */
+                        @Override
+                        public String toString () {
+                          return rows.next ().toString () + tab;
+                        }
+                      },
+                      new ObjectOutputStream () {
+                        /* (non-Javadoc)
+                         * @see
+                         * java.io.ObjectOutputStream#writeObjectOverride(java
+                         * .lang.Object) */
+                        @Override
+                        protected void writeObjectOverride (Object obj) throws IOException {
+                          data.write (obj.toString ().getBytes ());
+                        }
+                      });
   }
 }
