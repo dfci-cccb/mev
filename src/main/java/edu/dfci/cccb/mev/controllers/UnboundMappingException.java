@@ -16,9 +16,9 @@ package edu.dfci.cccb.mev.controllers;
 
 import java.util.ResourceBundle;
 
-import org.springframework.context.i18n.LocaleContextHolder;
-
 import lombok.Getter;
+
+import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
  * @author levk

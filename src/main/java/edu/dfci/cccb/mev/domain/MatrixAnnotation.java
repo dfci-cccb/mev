@@ -17,14 +17,14 @@ package edu.dfci.cccb.mev.domain;
 import java.util.Collection;
 import java.util.Collections;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import lombok.experimental.ExtensionMethod;
+
+import com.fasterxml.jackson.annotation.JsonView;
 
 /**
  * A value type for a single matrix annotation

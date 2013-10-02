@@ -49,14 +49,15 @@ import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
+import us.levk.math.linear.EucledianDistanceClusterer.Cluster;
+import us.levk.spring.web.log4javascript.controllers.Log4JavascriptController;
+import us.levk.spring.web.method.CookiesHandlerArgumentResolver;
+
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import us.levk.math.linear.EucledianDistanceClusterer.Cluster;
-import us.levk.spring.web.log4javascript.controllers.Log4JavascriptController;
-import us.levk.spring.web.method.CookiesHandlerArgumentResolver;
 import edu.dfci.cccb.mev.domain.Heatmap;
 
 /**
@@ -189,7 +190,8 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
                     jgen.writeEndArray ();
                   }
                   jgen.writeEndObject ();
-                }
+                } else
+                  super.writeValue (jgen, v);
               }
             });
           }
