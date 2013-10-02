@@ -248,6 +248,30 @@
 
   <dependencies>
 
+    <!-- Google Guava -->
+
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>15.0</version>
+    </dependency>
+
+    <!-- Tuples -->
+
+    <dependency>
+      <groupId>org.javatuples</groupId>
+      <artifactId>javatuples</artifactId>
+      <version>1.2</version>
+    </dependency>
+
+    <!-- IO Utilities -->
+
+    <dependency>
+      <groupId>us.levk</groupId>
+      <artifactId>io-util</artifactId>
+      <version>0.0.1</version>
+    </dependency>
+
     <!-- MetaModel -->
 
     <dependency>
@@ -639,6 +663,7 @@
 
     <repository>
       <id>lev-kuznetsov</id>
+      <name>Modular Libraries</name>
       <url>https://raw.github.com/lev-kuznetsov/m2/master/releases</url>
     </repository>
 

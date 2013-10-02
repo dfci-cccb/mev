@@ -19,6 +19,7 @@ import static org.springframework.http.MediaType.APPLICATION_XML;
 import static org.springframework.http.MediaType.TEXT_HTML;
 import static org.springframework.http.MediaType.TEXT_PLAIN;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -48,6 +49,12 @@ import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import us.levk.math.linear.EucledianDistanceClusterer.Cluster;
 import us.levk.spring.web.log4javascript.controllers.Log4JavascriptController;
 import us.levk.spring.web.method.CookiesHandlerArgumentResolver;
 import edu.dfci.cccb.mev.domain.Heatmap;
@@ -164,6 +171,27 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
         return new MappingJackson2JsonView () {
           {
             setPrettyPrint (true);
+            setObjectMapper (new ObjectMapper () {
+              private static final long serialVersionUID = 1L;
+
+              public void writeValue (JsonGenerator jgen, Object v) throws IOException,
+                                                                   JsonGenerationException,
+                                                                   JsonMappingException {
+                if (v instanceof Cluster) {
+                  Cluster value = (Cluster) v;
+                  jgen.writeStartObject ();
+                  jgen.writeNumberField ("id", value.id ());
+                  jgen.writeNumberField ("d", value.d ());
+                  if (value.children () != null && value.children ().length > 0) {
+                    jgen.writeArrayFieldStart ("children");
+                    writeValue (jgen, value.children ()[0]);
+                    writeValue (jgen, value.children ()[1]);
+                    jgen.writeEndArray ();
+                  }
+                  jgen.writeEndObject ();
+                }
+              }
+            });
           }
         };
       }

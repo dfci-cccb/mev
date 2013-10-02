@@ -205,32 +205,8 @@ public class HeatmapController {
       throw new InvalidDimensionException (dimension);
   }
 
-  public static class ClusterSerializer extends JsonSerializer<Cluster> {
-
-    /* (non-Javadoc)
-     * @see
-     * com.fasterxml.jackson.databind.JsonSerializer#serialize(java.lang.Object,
-     * com.fasterxml.jackson.core.JsonGenerator,
-     * com.fasterxml.jackson.databind.SerializerProvider) */
-    @Override
-    public void serialize (Cluster value, JsonGenerator jgen, SerializerProvider provider) throws IOException,
-                                                                                          JsonProcessingException {
-      jgen.writeStartObject ();
-      jgen.writeNumberField ("id", value.id ());
-      jgen.writeNumberField ("d", value.d ());
-      if (value.children () != null && value.children ().length > 0) {
-        jgen.writeArrayFieldStart ("children");
-        serialize (value.children ()[0], jgen, provider);
-        serialize (value.children ()[1], jgen, provider);
-        jgen.writeEndArray ();
-      }
-      jgen.writeEndObject ();
-    }
-  }
-
   @RequestMapping (value = "/{id}/analysis/EuclidianClustering/{dimension}", method = GET)
   @ResponseBody
-  @JsonSerialize (using = ClusterSerializer.class)
   // TODO: do a proper exception instead of IOException
   public Cluster cluster (@PathVariable ("id") String id,
                           @PathVariable ("dimension") String dimension) throws HeatmapNotFoundException,
