@@ -97,26 +97,10 @@
 					</div>
 					<div id="collapseThree" class="accordion-body collapse">
 						<div class="accordion-inner">
-						
-							<select ng-model="selectionAnalysis"> 
 							
-								<option ng-repeat="analysis in analyzeOptions" value="{{analysis}}"> {{analysis}} </option>
-							
-							</select>
-							
-							<select ng-model="selection1"> 
-							
-								<option ng-repeat="selection in selections.row" value="{{selection}}"> {{selection}} </option>
-							
-							</select>
-							
-							<select ng-model="selection2"> 
-							
-								<option ng-repeat="selection in selections.column" value="{{selection}}"> {{selection}} </option>
-							
-							</select>
-							
-							<button class="btn btn-block btn-primary" ng-click="analyzeRequester(selectionAnalysis, selection1, selection2)">Analyze</button>
+							<button class="btn btn-block btn-primary" data-target="#EuclideanClusteringModal" data-toggle="modal">Euclidean Cluster</button>
+							<button class="btn btn-block btn-primary" data-target="#LIMMAModalModal" data-toggle="modal">Limma Analyze</button>
+														
 						</div>
 					</div>
 				</div>
@@ -166,4 +150,58 @@
     <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
     <button class="btn btn-primary"  data-dismiss="modal" aria-hidden="true" ng-click="pushSelections(selectionname, 'column')">Add Column Selection</button>
   </div>
+</div>
+
+<div id="EuclideanClusteringModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i></button>
+    <h3 id="myModalLabel">Euclidean Clustering</h3>
+  </div>
+  
+  <div class="modal-body">
+
+		<select ng-model="EuclideanSelection"> 
+							
+			<option ng-repeat="selection in ['row', 'column']" value="{{selection}}"> {{selection}} </option>
+							
+		</select>
+
+  </div>
+  
+  <div class="modal-footer">
+    <button class="btn btn-warning" data-dismiss="modal" aria-hidden="true">Cancel</button>
+    <button class="btn btn-primary"  data-dismiss="modal" aria-hidden="true" ng-click="analyzeEuclideanRequester()">Analyze</button>
+  </div>
+  
+</div>
+
+<div id="LIMMAModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i></button>
+    <h3 id="myModalLabel">Limma Analysis</h3>
+  </div>
+  
+  <div class="modal-body">
+  
+		<select ng-model="LimmaSelection1"> 
+							
+			<option ng-repeat="selection in selections.column" value="{{selection}}"> {{selection}} </option>
+							
+		</select>
+		
+		<select ng-model="LimmaSelection2"> 
+							
+			<option ng-repeat="selection in selections.column" value="{{selection}}"> {{selection}} </option>
+							
+		</select>
+
+  </div>
+  
+  <div class="modal-footer">
+    <button class="btn btn-warning" data-dismiss="modal" aria-hidden="true">Cancel</button>
+    <button class="btn btn-primary"  data-dismiss="modal" aria-hidden="true" ng-click="analyzeLimmaRequester()">Analyze</button>
+  </div>
+  
 </div>

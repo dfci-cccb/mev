@@ -9,11 +9,11 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 	var pullallow = true;
 	$scope.matrixsummary = undefined;
 	$scope.selectionname = undefined;
-	$scope.analyzeOptions = ["LIMMA", "EuclidianClustering"]
+	$scope.analyzeOptions = ["LIMMA", "EuclideanClustering"]
 	
 	$scope.selectedcells = new Object();
 
-	$scope.selections = new Object();//{"row":[], "column":[]};
+	$scope.selections = new Object();
 	
 	$http({
 		method:"PUT",
@@ -30,21 +30,43 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 		$scope.pullSelections("row");
 	});
 	
-	$scope.analyzeRequester = function() {
+	$scope.analyzeEuclideanRequester = function() {
 		
 		$http({
-			method:"PUT",
-			url:"heatmap/"+$scope.matrixlocation+"/analysis/" + $scope.selectionAnalysis + "(" + $scope.selection1 + "," + $scope.selection2 + ")",
+			method:"GET",
+			url:"heatmap/"+$scope.matrixlocation+"/analysis/EuclidianClustering" + "/" + $scope.EuclideanSelection,
 			params: {
 				format:"json",
+				
 			}
 		})
 		.success( function(data) {
 			Alert("Success! Please wait for your analysis to complete.")
+		})
+		.error( function(data) {
+		    alert("Something went wrong, please contact us if the problem persists.");	
 		});
 		
 	}
 	
+	$scope.analyzeLimmaRequester = function() {
+
+		$http({
+			method:"GET",
+			url:"heatmap/"+$scope.matrixlocation+"/analysis/limma" + "(" + $scope.LimmaSelection1 + "," + $scope.LimmaSelection2 + ")",
+			params: {
+				format:"json",
+				
+			}
+		})
+		.success( function(data) {
+			Alert("Success! Please wait for your analysis to complete.")
+		})
+		.error( function(data) {
+		    alert("Something went wrong, please contact us if the problem persists.");	
+		});
+		
+	}
 	
 	$scope.pageUp = function() {
 		
@@ -153,13 +175,15 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 	$scope.pushSelections = function(selectionname, dimension) {
 		
 		if ($scope.selectedcells[dimension]) {
+			
+			console.log('{"attributes": {"name":'+ selectionname +'}, "indices":['+$scope.selectedcells[dimension]+ ']}');
 			$http({
 				method:"PUT",
 				url:"heatmap/"+$scope.matrixlocation+"/selection/"+dimension+"/"+selectionname,
 				params: {
 					format:"json"
 				},
-				data: '{"attributes": {"name":'+ selectionname +'}, "indices":['+$scope.selectedcells[dimension]+ ']}'
+				data: '{"attributes": {"name":"'+ selectionname +'"}, "indices":['+$scope.selectedcells[dimension]+ ']}'
 			})
 			.success( function(data) {
 				alert("Added!");
