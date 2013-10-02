@@ -32,7 +32,6 @@ import com.fasterxml.jackson.annotation.JsonView;
  * @author levk
  *
  */
-@Accessors (fluent = true, chain = false)
 @ExtensionMethod (Collections.class)
 @ToString
 @EqualsAndHashCode
@@ -41,4 +40,6 @@ public class MatrixSelection {
 
   private @Getter @Setter @JsonView Map<String, String> attributes = null;
   private @Getter @Setter @JsonView List<Integer> indices = null;
+  
+  public MatrixSelection () {}
 }

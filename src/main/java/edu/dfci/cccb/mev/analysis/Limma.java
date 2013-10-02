@@ -84,7 +84,7 @@ public class Limma {
     PrintStream out = new PrintStream (configuration);
     for (int index = 0; index < rows; index++)
       out.println (index
-                   + "\t" + (first.indices ().contains (index) ? 1 : (second.indices ().contains (index) ? 0 : -1)));
+                   + "\t" + (first.getIndices ().contains (index) ? 1 : (second.getIndices ().contains (index) ? 0 : -1)));
     out.flush ();
   }
 

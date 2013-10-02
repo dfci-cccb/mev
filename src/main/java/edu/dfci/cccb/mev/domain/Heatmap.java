@@ -96,6 +96,7 @@ public class Heatmap implements Closeable {
 
   private final UUID universalId = randomUUID ();
 
+  private Builder builder;
   private RealMatrix data;
   private @Getter MatrixSummary summary;
   private Annotations rowAnnotations;
@@ -149,7 +150,12 @@ public class Heatmap implements Closeable {
                                                                                                                                            Provisionals.file ();
                                                                                                                              rnk =
                                                                                                                                    Provisionals.file ();
-                                                                                                                             Limma.execute (Heatmap.this, key.getValue0 (), key.getValue1 (), output, significant, rnk);
+                                                                                                                             Limma.execute (Heatmap.this,
+                                                                                                                                            key.getValue0 (),
+                                                                                                                                            key.getValue1 (),
+                                                                                                                                            output,
+                                                                                                                                            significant,
+                                                                                                                                            rnk);
                                                                                                                              return new Triplet<Provisional, Provisional, Provisional> (output,
                                                                                                                                                                                         significant,
                                                                                                                                                                                         rnk);
@@ -358,7 +364,9 @@ public class Heatmap implements Closeable {
         result = new Heatmap ();
         result.data = new HugeRealMatrix (data.getColumnDimension (), data.getRowDimension ());
         result.columnClusters = JsonCluster.from (root);
-        reorderByColumnCluster (result.data, root, data, indexer ());
+        result.rowAnnotations = rowAnnotations;
+        //result.columnAnnotations = new Annotations (result.universalId, AnnotationDimension.COLUMN, rowAnnotations.get);
+        //reorderByColumnCluster (result.data, root, data, indexer ());
         return result;
       } catch (RuntimeException | Error e) {
         if (result != null)
@@ -381,7 +389,7 @@ public class Heatmap implements Closeable {
         result = new Heatmap ();
         result.data = new HugeRealMatrix (data.getColumnDimension (), data.getRowDimension ());
         result.rowClusters = JsonCluster.from (root);
-        reorderByRowCluster (result.data, root, data, indexer ());
+        //reorderByRowCluster (result.data, root, data, indexer ());
         return result;
       } catch (RuntimeException | Error e) {
         if (result != null)
@@ -395,11 +403,11 @@ public class Heatmap implements Closeable {
     } else
       return this;
   }
-  
+
   public enum LimmaOutput {
     FULL, SIGNIFICANT, RNK
   }
-  
+
   public File limma (String experiment, String control, LimmaOutput type) {
     try {
       return (File) limma.get (new Pair<String, String> (experiment, control)).getValue (type.ordinal ());
@@ -453,6 +461,98 @@ public class Heatmap implements Closeable {
         return Integer.MAX_VALUE;
       }
     };
+
+    Heatmap reorderColumns (final Heatmap other, final List<Integer> newOrder) throws IOException {
+      Heatmap result = new Heatmap ();
+      result.data = new HugeRealMatrix (new Iterator<Double> () {
+        private final int rows = other.data.getRowDimension ();
+        private final int columns = other.data.getColumnDimension ();
+        private final int entries = rows * columns;
+        private int index = 0;
+
+        private int row (int index) {
+          return index / rows;
+        }
+
+        private int column (int index) {
+          return index % rows;
+        }
+
+        @Override
+        public boolean hasNext () {
+          return index < entries;
+        }
+
+        @Override
+        public Double next () {
+          double result = other.data.getEntry (row (index), newOrder.get (column (index)));
+          index++;
+          return result;
+        }
+
+        @Override
+        public void remove () {}
+      }, other.data.getColumnDimension ());
+      result.rowAnnotations = other.rowAnnotations;
+      result.columnAnnotations = new Annotations (result.universalId, AnnotationDimension.COLUMN, restDataSource);
+      result.columnAnnotations.setAnnotations (new AbstractList<Map<String, ?>> () {
+
+        @Override
+        public Map<String, ?> get (final int index) {
+          return new HashMap<String, Object> () {
+            private static final long serialVersionUID = 1L;
+
+            {
+              try {
+                for (MatrixAnnotation<?> annotation : other.getColumnAnnotation (index))
+                  put (annotation.attribute (), annotation.value ());
+              } catch (AnnotationNotFoundException e) {}
+            }
+          };
+        }
+
+        @Override
+        public int size () {
+          return newOrder.size ();
+        }
+      });
+      return result;
+    }
+
+    Heatmap reorderRows (final Heatmap other, final List<Integer> newOrder) throws IOException {
+      Heatmap result = new Heatmap ();
+      result.data = new HugeRealMatrix (new Iterator<Double> () {
+        private final int rows = other.data.getRowDimension ();
+        private final int columns = other.data.getColumnDimension ();
+        private final int entries = rows * columns;
+        private int index = 0;
+
+        private int row (int index) {
+          return index / rows;
+        }
+
+        private int column (int index) {
+          return index % rows;
+        }
+
+        @Override
+        public boolean hasNext () {
+          return index < entries;
+        }
+
+        @Override
+        public Double next () {
+          double result = other.data.getEntry (newOrder.get (row (index)), column (index));
+          index++;
+          return result;
+        }
+
+        @Override
+        public void remove () {}
+      }, other.data.getColumnDimension ());
+
+      return result;
+    }
 
     public Heatmap build (final MultipartFile file) throws IOException {
       final InputStream input = file.getInputStream ();
@@ -613,6 +713,7 @@ public class Heatmap implements Closeable {
         result.columnAnnotations = new Annotations (result.universalId, COLUMN, restDataSource);
         result.rowAnnotations.setAnnotations (rowAnnotations);
         result.columnAnnotations.setAnnotations (columnAnnotations);
+        result.builder = this;
         return result;
       } catch (RuntimeException | Error e) {
         if (data != null)
@@ -641,8 +742,8 @@ public class Heatmap implements Closeable {
 
   private void setSelection (List<Map<String, Map<String, String>>> dimension, String id, MatrixSelection selection) {
     log.debug ("Setting selection " + selection + " for heatmap " + this);
-    for (int index : selection.indices ())
-      dimension.get (index).put (id, selection.attributes ());
+    for (int index : selection.getIndices ())
+      dimension.get (index).put (id, selection.getAttributes ());
   }
 
   private void deleteSelection (List<Map<String, Map<String, String>>> dimension, String id) {
@@ -713,20 +814,22 @@ public class Heatmap implements Closeable {
     });
   }
 
-  private void reorderByRowCluster (RealMatrix copy, Cluster cluster, RealMatrix original, Iterator<Integer> indexer) {
-    if (cluster.children () != null) {
-      reorderByRowCluster (copy, cluster.children ()[0], original, indexer);
-      reorderByRowCluster (copy, cluster.children ()[1], original, indexer);
-    } else
-      copy.setRow (indexer.next (), original.getRow (cluster.contains ().get (0)));
-  }
+  private List<Integer> reorderedIndices (final Cluster cluster) {
+    return new ArrayList<Integer> () {
+      private static final long serialVersionUID = 1L;
 
-  private void reorderByColumnCluster (RealMatrix copy, Cluster cluster, RealMatrix original, Iterator<Integer> indexer) {
-    if (cluster.children () != null) {
-      reorderByColumnCluster (copy, cluster.children ()[0], original, indexer);
-      reorderByColumnCluster (copy, cluster.children ()[1], original, indexer);
-    } else
-      copy.setColumn (indexer.next (), original.getColumn (cluster.contains ().get (0)));
+      {
+        visit (cluster);
+      }
+
+      private void visit (Cluster cluster) {
+        if (cluster.children () != null) {
+          visit (cluster.children ()[0]);
+          visit (cluster.children ()[1]);
+        } else
+          add (cluster.contains ().get (0));
+      }
+    };
   }
 
   private RealMatrix transpose (final RealMatrix original) {
