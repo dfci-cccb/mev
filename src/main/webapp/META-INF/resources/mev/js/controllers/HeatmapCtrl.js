@@ -62,7 +62,7 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 			}
 		})
 		.success( function(data) {
-			Alert("Success! Please wait for your analysis to complete.")
+			alert("Success! Please wait for your analysis to complete.")
 		})
 		.error( function(data) {
 		    alert("Something went wrong, please contact us if the problem persists.");	
