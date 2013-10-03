@@ -347,7 +347,7 @@
     <dependency>
       <groupId>us.levk</groupId>
       <artifactId>math</artifactId>
-      <version>0.0.5</version>
+      <version>0.0.7</version>
     </dependency>
 
     <!-- WebJars -->
