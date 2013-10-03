@@ -115,6 +115,11 @@ public class Heatmap implements Closeable {
 
                                                                                                                          @Override
                                                                                                                          public void onRemoval (RemovalNotification<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> arg0) {
+                                                                                                                           log.debug ("Ejecting limma analysis "
+                                                                                                                                      + Heatmap.this
+                                                                                                                                      + "("
+                                                                                                                                      + arg0.getKey ()
+                                                                                                                                      + ") from cache");
                                                                                                                            Provisional p =
                                                                                                                                            null;
                                                                                                                            for (Iterator<Object> iterator =
@@ -391,6 +396,7 @@ public class Heatmap implements Closeable {
    * @see java.io.Closeable#close() */
   @Override
   public void close () throws IOException {
+    log.debug ("Closing " + this);
     limma.invalidateAll ();
     limma.cleanUp ();
     for (Closeable resource : new ArrayList<Closeable> () {

@@ -17,9 +17,13 @@ package edu.dfci.cccb.mev.domain;
 import static org.springframework.context.annotation.ScopedProxyMode.TARGET_CLASS;
 import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import lombok.extern.log4j.Log4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -31,7 +35,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope (value = SCOPE_SESSION, proxyMode = TARGET_CLASS)
-public class Heatmaps {
+@Log4j
+public class Heatmaps implements Closeable {
 
   private final Map<String, Heatmap> heatmaps = new HashMap<> ();
   
@@ -60,5 +65,18 @@ public class Heatmaps {
   public void put (String id, Heatmap heatmap) {
     history.log ("Added heatmap " + id);
     heatmaps.put (id, heatmap);
+  }
+
+  /* (non-Javadoc)
+   * @see java.io.Closeable#close()
+   */
+  @Override
+  public void close () throws IOException {
+    for (Heatmap heatmap : heatmaps.values ())
+      try {
+        heatmap.close ();
+      } catch (IOException | RuntimeException e) {
+        log.warn ("Exception while closing " + heatmap, e);
+      }
   }
 }
