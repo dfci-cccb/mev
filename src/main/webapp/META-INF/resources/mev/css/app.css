@@ -61,11 +61,11 @@ circle {
 		stroke: steelblue;
 		stroke-width: 1.5px;
 }
-.node {
+.topnode, .leftnode {
 	font: 10px sans-serif;
 }
  
-.link {
+.toplink, .leftlink {
 	fill: none;
 	stroke: #cccccc;
 	stroke-width: 1.5px;
