@@ -53,7 +53,9 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 
 		$http({
 			method:"GET",
-			url:"heatmap/"+$scope.matrixlocation+"/analysis/limma" + "(" + $scope.LimmaSelection1 + "," + $scope.LimmaSelection2 + ")",
+			url:"heatmap/"+$scope.matrixlocation+"/analysis/limma" 
+				+ "(" + $scope.LimmaSelection1 + "," + $scope.LimmaSelection2 + ")"
+				+ "/" + $scope.LimmaOutputOption,
 			params: {
 				format:"json",
 				
@@ -172,18 +174,17 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 
 	};
 
-	$scope.pushSelections = function(selectionname, dimension) {
+	$scope.pushSelections = function(dimension) {
 		
 		if ($scope.selectedcells[dimension]) {
 			
-			console.log('{"attributes": {"name":'+ selectionname +'}, "indices":['+$scope.selectedcells[dimension]+ ']}');
 			$http({
 				method:"PUT",
-				url:"heatmap/"+$scope.matrixlocation+"/selection/"+dimension+"/"+selectionname,
+				url:"heatmap/"+$scope.matrixlocation+"/selection/"+dimension+"/"+$scope.selectionname,
 				params: {
 					format:"json"
 				},
-				data: '{"attributes": {"name":"'+ selectionname +'"}, "indices":['+$scope.selectedcells[dimension]+ ']}'
+				data: '{"attributes": {"name":"'+ $scope.selectionname +'"}, "indices":['+$scope.selectedcells[dimension]+ ']}'
 			})
 			.success( function(data) {
 				alert("Added!");
