@@ -14,6 +14,11 @@
  */
 package edu.dfci.cccb.mev.analysis;
 
+import static org.apache.log4j.Level.DEBUG;
+import static org.apache.log4j.Level.ERROR;
+import static org.apache.log4j.Level.INFO;
+import static org.apache.log4j.Level.TRACE;
+import static org.apache.log4j.Level.WARN;
 import static us.levk.util.io.support.Provisionals.file;
 
 import java.io.ByteArrayInputStream;
@@ -33,8 +38,14 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import lombok.extern.log4j.Log4j;
+
+import org.apache.log4j.Level;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.runtime.RuntimeServices;
+import org.apache.velocity.runtime.log.LogChute;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
 import us.levk.util.io.implementation.Provisional;
 import edu.dfci.cccb.mev.domain.AnnotationNotFoundException;
@@ -46,10 +57,53 @@ import edu.dfci.cccb.mev.domain.MatrixSelection;
  * @author levk
  * 
  */
+@Log4j
 public class Limma {
 
   private static final ScriptEngine r = new ScriptEngineManager ().getEngineByName ("R");
-  private static final VelocityEngine velocity = new VelocityEngine ();
+  private static final VelocityEngine velocity = new VelocityEngine () {
+    {
+      setProperty (RESOURCE_LOADER, "classpath");
+      setProperty ("classpath.resource.loader.class", ClasspathResourceLoader.class.getName ());
+      setProperty (RUNTIME_LOG_LOGSYSTEM, new LogChute () {
+
+        @Override
+        public void log (int level, String message, Throwable t) {
+          log.log (toLevel (level), message, t);
+        }
+
+        @Override
+        public void log (int level, String message) {
+          log.log (toLevel (level), message);
+        }
+
+        @Override
+        public boolean isLevelEnabled (int level) {
+          return log.isEnabledFor (toLevel (level));
+        }
+
+        @Override
+        public void init (RuntimeServices rs) throws Exception {}
+
+        private Level toLevel (int level) {
+          switch (level) {
+          case TRACE_ID:
+            return TRACE;
+          case DEBUG_ID:
+            return DEBUG;
+          case INFO_ID:
+            return INFO;
+          case WARN_ID:
+            return WARN;
+          case ERROR_ID:
+            return ERROR;
+          default:
+            throw new IllegalArgumentException ("Undefined mapping for LogChute level " + level);
+          }
+        }
+      });
+    }
+  };
 
   public static void execute (Heatmap heatmap,
                               String selection1,
@@ -83,8 +137,8 @@ public class Limma {
     MatrixSelection second = heatmap.getRowSelection (s2, 0, rows);
     PrintStream out = new PrintStream (configuration);
     for (int index = 0; index < rows; index++)
-      out.println (index
-                   + "\t" + (first.getIndices ().contains (index) ? 1 : (second.getIndices ().contains (index) ? 0 : -1)));
+      out.println (index + "\t"
+                   + (first.getIndices ().contains (index) ? 1 : (second.getIndices ().contains (index) ? 0 : -1)));
     out.flush ();
   }
 
