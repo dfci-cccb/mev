@@ -358,7 +358,9 @@ public class Heatmap implements Closeable {
     if (columnClusters == null) {
       RealMatrix data = transpose (this.data);
       Cluster root = cluster (data, algorhythm);
-      return builder.reorderColumns (this, reorderedIndices (root));
+      Heatmap result = builder.reorderColumns (this, reorderedIndices (root));
+      result.columnClusters = JsonCluster.from (root);
+      return result;
     } else
       return this;
   }
@@ -366,7 +368,9 @@ public class Heatmap implements Closeable {
   public Heatmap clusterRows (ClusteringAlgorhythm algorhythm) throws IOException {
     if (rowClusters == null) {
       Cluster root = cluster (data, algorhythm);
-      return builder.reorderRows (this, reorderedIndices (root));
+      Heatmap result = builder.reorderRows (this, reorderedIndices (root));
+      rowClusters = JsonCluster.from (root);
+      return result;
     } else
       return this;
   }
@@ -430,6 +434,7 @@ public class Heatmap implements Closeable {
     };
 
     Heatmap reorderColumns (final Heatmap other, final List<Integer> newOrder) throws IOException {
+      log.debug ("Reordering columns: " + newOrder);
       Heatmap result = new Heatmap ();
       result.data = new HugeRealMatrix (new Iterator<Double> () {
         private final int rows = other.data.getRowDimension ();
@@ -438,11 +443,11 @@ public class Heatmap implements Closeable {
         private int index = 0;
 
         private int row (int index) {
-          return index / rows;
+          return index / columns;
         }
 
         private int column (int index) {
-          return index % rows;
+          return index % columns;
         }
 
         @Override
@@ -497,11 +502,11 @@ public class Heatmap implements Closeable {
         private int index = 0;
 
         private int row (int index) {
-          return index / rows;
+          return index / columns;
         }
 
         private int column (int index) {
-          return index % rows;
+          return index % columns;
         }
 
         @Override
