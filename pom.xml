@@ -87,6 +87,11 @@
         </excludes>
       </resource>
 
+      <resource>
+        <directory>src/main/r</directory>
+        <filtering>false</filtering>
+      </resource>
+
     </resources>
 
     <testResources>
