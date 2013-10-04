@@ -106,75 +106,146 @@ public class Heatmap implements Closeable {
   private @Getter JsonCluster rowClusters = null;
   private @Getter JsonCluster columnClusters = null;
 
-  private final LoadingCache<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> limma =
-                                                                                                           CacheBuilder.newBuilder ()
-                                                                                                                       .maximumSize (100)
-                                                                                                                       .expireAfterWrite (20,
-                                                                                                                                          TimeUnit.MINUTES)
-                                                                                                                       .removalListener (new RemovalListener<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> () {
+  private final LoadingCache<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> limmaRows =
+                                                                                                               CacheBuilder.newBuilder ()
+                                                                                                                           .maximumSize (100)
+                                                                                                                           .expireAfterWrite (20,
+                                                                                                                                              TimeUnit.MINUTES)
+                                                                                                                           .removalListener (new RemovalListener<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> () {
 
-                                                                                                                         @Override
-                                                                                                                         public void onRemoval (RemovalNotification<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> arg0) {
-                                                                                                                           log.debug ("Ejecting limma analysis "
-                                                                                                                                      + Heatmap.this
-                                                                                                                                      + "("
-                                                                                                                                      + arg0.getKey ()
-                                                                                                                                      + ") from cache");
-                                                                                                                           Provisional p =
-                                                                                                                                           null;
-                                                                                                                           for (Iterator<Object> iterator =
-                                                                                                                                                            arg0.getValue ()
-                                                                                                                                                                .iterator (); iterator.hasNext ();)
-                                                                                                                             try {
-                                                                                                                               p =
-                                                                                                                                   (Provisional) iterator.next ();
-                                                                                                                               p.close ();
-                                                                                                                             } catch (RuntimeException | Error | IOException e) {
-                                                                                                                               log.warn ("Unable to close provisional "
-                                                                                                                                                 + p
-                                                                                                                                                 + " for "
-                                                                                                                                                 + Heatmap.this,
-                                                                                                                                         e);
+                                                                                                                             @Override
+                                                                                                                             public void onRemoval (RemovalNotification<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> arg0) {
+                                                                                                                               log.debug ("Ejecting limma analysis "
+                                                                                                                                          + Heatmap.this
+                                                                                                                                          + "("
+                                                                                                                                          + arg0.getKey ()
+                                                                                                                                          + ") from cache");
+                                                                                                                               Provisional p =
+                                                                                                                                               null;
+                                                                                                                               for (Iterator<Object> iterator =
+                                                                                                                                                                arg0.getValue ()
+                                                                                                                                                                    .iterator (); iterator.hasNext ();)
+                                                                                                                                 try {
+                                                                                                                                   p =
+                                                                                                                                       (Provisional) iterator.next ();
+                                                                                                                                   p.close ();
+                                                                                                                                 } catch (RuntimeException | Error | IOException e) {
+                                                                                                                                   log.warn ("Unable to close provisional "
+                                                                                                                                                     + p
+                                                                                                                                                     + " for "
+                                                                                                                                                     + Heatmap.this,
+                                                                                                                                             e);
+                                                                                                                                 }
                                                                                                                              }
-                                                                                                                         }
-                                                                                                                       })
-                                                                                                                       .build (new CacheLoader<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> () {
+                                                                                                                           })
+                                                                                                                           .build (new CacheLoader<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> () {
 
-                                                                                                                         @Override
-                                                                                                                         public Triplet<Provisional, Provisional, Provisional> load (Pair<String, String> key) throws Exception {
-                                                                                                                           Provisional output =
-                                                                                                                                                null,
-                                                                                                                           significant =
-                                                                                                                                         null,
-                                                                                                                           rnk =
-                                                                                                                                 null;
-                                                                                                                           try {
-                                                                                                                             output =
-                                                                                                                                      Provisionals.file ();
-                                                                                                                             significant =
-                                                                                                                                           Provisionals.file ();
-                                                                                                                             rnk =
-                                                                                                                                   Provisionals.file ();
-                                                                                                                             Limma.execute (Heatmap.this,
-                                                                                                                                            key.getValue0 (),
-                                                                                                                                            key.getValue1 (),
-                                                                                                                                            output,
-                                                                                                                                            significant,
-                                                                                                                                            rnk);
-                                                                                                                             return new Triplet<Provisional, Provisional, Provisional> (output,
-                                                                                                                                                                                        significant,
-                                                                                                                                                                                        rnk);
-                                                                                                                           } catch (RuntimeException | Error | IOException e) {
-                                                                                                                             if (output != null)
-                                                                                                                               output.close ();
-                                                                                                                             if (significant != null)
-                                                                                                                               significant.close ();
-                                                                                                                             if (rnk != null)
-                                                                                                                               rnk.close ();
-                                                                                                                             throw e;
-                                                                                                                           }
-                                                                                                                         }
-                                                                                                                       });
+                                                                                                                             @Override
+                                                                                                                             public Triplet<Provisional, Provisional, Provisional> load (Pair<String, String> key) throws Exception {
+                                                                                                                               Provisional output =
+                                                                                                                                                    null,
+                                                                                                                               significant =
+                                                                                                                                             null,
+                                                                                                                               rnk =
+                                                                                                                                     null;
+                                                                                                                               try {
+                                                                                                                                 output =
+                                                                                                                                          Provisionals.file ();
+                                                                                                                                 significant =
+                                                                                                                                               Provisionals.file ();
+                                                                                                                                 rnk =
+                                                                                                                                       Provisionals.file ();
+                                                                                                                                 Limma.execute (Heatmap.this,
+                                                                                                                                                key.getValue0 (),
+                                                                                                                                                key.getValue1 (),
+                                                                                                                                                output,
+                                                                                                                                                significant,
+                                                                                                                                                rnk,
+                                                                                                                                                "row");
+                                                                                                                                 return new Triplet<Provisional, Provisional, Provisional> (output,
+                                                                                                                                                                                            significant,
+                                                                                                                                                                                            rnk);
+                                                                                                                               } catch (RuntimeException | Error | IOException e) {
+                                                                                                                                 if (output != null)
+                                                                                                                                   output.close ();
+                                                                                                                                 if (significant != null)
+                                                                                                                                   significant.close ();
+                                                                                                                                 if (rnk != null)
+                                                                                                                                   rnk.close ();
+                                                                                                                                 throw e;
+                                                                                                                               }
+                                                                                                                             }
+                                                                                                                           });
+  private final LoadingCache<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> limmaColumns =
+          CacheBuilder.newBuilder ()
+                      .maximumSize (100)
+                      .expireAfterWrite (20,
+                                         TimeUnit.MINUTES)
+                      .removalListener (new RemovalListener<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> () {
+
+                        @Override
+                        public void onRemoval (RemovalNotification<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> arg0) {
+                          log.debug ("Ejecting limma analysis "
+                                     + Heatmap.this
+                                     + "("
+                                     + arg0.getKey ()
+                                     + ") from cache");
+                          Provisional p =
+                                          null;
+                          for (Iterator<Object> iterator =
+                                                           arg0.getValue ()
+                                                               .iterator (); iterator.hasNext ();)
+                            try {
+                              p =
+                                  (Provisional) iterator.next ();
+                              p.close ();
+                            } catch (RuntimeException | Error | IOException e) {
+                              log.warn ("Unable to close provisional "
+                                                + p
+                                                + " for "
+                                                + Heatmap.this,
+                                        e);
+                            }
+                        }
+                      })
+                      .build (new CacheLoader<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> () {
+
+                        @Override
+                        public Triplet<Provisional, Provisional, Provisional> load (Pair<String, String> key) throws Exception {
+                          Provisional output =
+                                               null,
+                          significant =
+                                        null,
+                          rnk =
+                                null;
+                          try {
+                            output =
+                                     Provisionals.file ();
+                            significant =
+                                          Provisionals.file ();
+                            rnk =
+                                  Provisionals.file ();
+                            Limma.execute (Heatmap.this,
+                                           key.getValue0 (),
+                                           key.getValue1 (),
+                                           output,
+                                           significant,
+                                           rnk,
+                                           "column");
+                            return new Triplet<Provisional, Provisional, Provisional> (output,
+                                                                                       significant,
+                                                                                       rnk);
+                          } catch (RuntimeException | Error | IOException e) {
+                            if (output != null)
+                              output.close ();
+                            if (significant != null)
+                              significant.close ();
+                            if (rnk != null)
+                              rnk.close ();
+                            throw e;
+                          }
+                        }
+                      });
 
   /**
    * Constructs empty heatmap; this is not very useful as the Heatmap object is
@@ -384,9 +455,17 @@ public class Heatmap implements Closeable {
     FULL, SIGNIFICANT, RNK
   }
 
-  public File limma (String experiment, String control, LimmaOutput type) {
+  public File limmaRows (String experiment, String control, LimmaOutput type) {
     try {
-      return (File) limma.get (new Pair<String, String> (experiment, control)).getValue (type.ordinal ());
+      return (File) limmaRows.get (new Pair<String, String> (experiment, control)).getValue (type.ordinal ());
+    } catch (ExecutionException e) {
+      throw new RuntimeException (e.getCause ());
+    }
+  }
+  
+  public File limmaColumns (String experiment, String control, LimmaOutput type) {
+    try {
+      return (File) limmaColumns.get (new Pair<String, String> (experiment, control)).getValue (type.ordinal ());
     } catch (ExecutionException e) {
       throw new RuntimeException (e.getCause ());
     }
@@ -397,8 +476,10 @@ public class Heatmap implements Closeable {
   @Override
   public void close () throws IOException {
     log.debug ("Closing " + this);
-    limma.invalidateAll ();
-    limma.cleanUp ();
+    limmaRows.invalidateAll ();
+    limmaRows.cleanUp ();
+    limmaColumns.invalidateAll ();
+    limmaColumns.cleanUp ();
     for (Closeable resource : new ArrayList<Closeable> () {
       private static final long serialVersionUID = 1L;
 

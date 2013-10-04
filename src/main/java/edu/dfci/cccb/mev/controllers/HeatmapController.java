@@ -26,6 +26,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collection;
@@ -227,18 +228,26 @@ public class HeatmapController {
       return clustered.getColumnClusters ();
   }
 
-  @RequestMapping (value = "/{id}/analysis/limma({experiment},{control})/{output}", method = GET)
+  @RequestMapping (value = "/{id}/analysis/limma({dimension},{experiment},{control})/{output}", method = GET)
   @ResponseStatus (OK)
   public void limma (@PathVariable ("id") String id,
                      @PathVariable ("experiment") String experiment,
                      @PathVariable ("control") String control,
                      @PathVariable ("output") String output,
-                     HttpServletResponse response) throws HeatmapNotFoundException, IOException {
+                     @PathVariable ("dimension") String dimension,
+                     HttpServletResponse response) throws HeatmapNotFoundException,
+                                                  IOException,
+                                                  InvalidDimensionException {
     response.setContentType ("text/plain");
     response.setHeader ("Content-Disposition", "attachment;filename=" + output + ".txt");
-    IOUtils.copy (new FileInputStream (heatmaps.get (id).limma (experiment,
-                                                                control,
-                                                                LimmaOutput.valueOf (output.toUpperCase ()))),
+    Heatmap heatmap = heatmaps.get(id);
+    File limma;
+    if (isRow (dimension))
+      limma = heatmap.limmaRows (experiment, control, LimmaOutput.valueOf (output.toUpperCase ()));
+    else if (isColumn (dimension))
+      limma = heatmap.limmaColumns (experiment, control, LimmaOutput.valueOf (output.toUpperCase ()));
+    else throw new InvalidDimensionException (dimension);
+    IOUtils.copy (new FileInputStream (limma),
                   response.getOutputStream ());
     response.flushBuffer ();
   }

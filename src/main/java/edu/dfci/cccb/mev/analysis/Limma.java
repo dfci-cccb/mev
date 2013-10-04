@@ -111,11 +111,14 @@ public class Limma {
                               String selection2,
                               final File output,
                               final File significant,
-                              final File rnk) throws IOException, ScriptException, AnnotationNotFoundException {
+                              final File rnk,
+                              String dimension) throws IOException,
+                                               ScriptException,
+                                               AnnotationNotFoundException {
     try (final Provisional input = file ();
          final Provisional configuration = file ();
          ByteArrayOutputStream script = new ByteArrayOutputStream ()) {
-      configure (new FileOutputStream (configuration), heatmap, selection1, selection2);
+      configureRows (new FileOutputStream (configuration), heatmap, selection1, selection2);
       dump (new FileOutputStream (input), heatmap);
       velocity.getTemplate (Limma.script).merge (new VelocityContext (new HashMap<String, String> () {
         private static final long serialVersionUID = 1L;
@@ -132,12 +135,23 @@ public class Limma {
     }
   }
 
-  private static void configure (OutputStream configuration, Heatmap heatmap, String s1, String s2) throws IOException {
+  private static void configureRows (OutputStream configuration, Heatmap heatmap, String s1, String s2) throws IOException {
     int rows = heatmap.getSummary ().rows ();
     MatrixSelection first = heatmap.getRowSelection (s1, 0, rows);
     MatrixSelection second = heatmap.getRowSelection (s2, 0, rows);
     PrintStream out = new PrintStream (configuration);
     for (int index = 0; index < rows; index++)
+      out.println (index + "\t"
+                   + (first.getIndices ().contains (index) ? 1 : (second.getIndices ().contains (index) ? 0 : -1)));
+    out.flush ();
+  }
+
+  private static void configureColumns (OutputStream configuration, Heatmap heatmap, String s1, String s2) throws IOException {
+    int columns = heatmap.getSummary ().columns ();
+    MatrixSelection first = heatmap.getColumnSelection (s1, 0, columns);
+    MatrixSelection second = heatmap.getColumnSelection (s2, 0, columns);
+    PrintStream out = new PrintStream (configuration);
+    for (int index = 0; index < columns; index++)
       out.println (index + "\t"
                    + (first.getIndices ().contains (index) ? 1 : (second.getIndices ().contains (index) ? 0 : -1)));
     out.flush ();
