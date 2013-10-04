@@ -162,9 +162,9 @@
   <div class="modal-body">
 
 		<select ng-model="EuclideanSelection"> 
-							
-			<option ng-repeat="selection in ['row', 'column']" value="{{selection}}"> {{selection}} </option>
-							
+		
+			<option ng-repeat="selection in ['column']" value="{{selection}}"> {{selection}} </option>
+				
 		</select>
 
   </div>
@@ -202,8 +202,6 @@
 			<option ng-repeat="option in ['significant', 'full', 'rnk']" value="{{option}}"> {{option}} </option>
 							
 		</select>
-		
-		{{selections}}
 
   </div>
   

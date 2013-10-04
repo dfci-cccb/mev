@@ -139,7 +139,7 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 			}
 		}
 
-		$scope.transformeddata = {data:[]};
+		$scope.transformeddata = {data:[], tree:{}};
 		
 		$scope.transformeddata.data = $scope.heatmapcells.map(function(cell, index){
 			
