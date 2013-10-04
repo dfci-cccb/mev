@@ -61,6 +61,7 @@ import edu.dfci.cccb.mev.domain.MatrixSelection;
 public class Limma {
 
   private static final ScriptEngine r = new ScriptEngineManager ().getEngineByName ("R");
+  private static final String script = "edu/dfci/cccb/mev/analysis/limma.R.vm";
   private static final VelocityEngine velocity = new VelocityEngine () {
     {
       setProperty (RESOURCE_LOADER, "classpath");
@@ -116,7 +117,7 @@ public class Limma {
          ByteArrayOutputStream script = new ByteArrayOutputStream ()) {
       configure (new FileOutputStream (configuration), heatmap, selection1, selection2);
       dump (new FileOutputStream (input), heatmap);
-      velocity.getTemplate ("limma.R.vm").merge (new VelocityContext (new HashMap<String, String> () {
+      velocity.getTemplate (Limma.script).merge (new VelocityContext (new HashMap<String, String> () {
         private static final long serialVersionUID = 1L;
 
         {
