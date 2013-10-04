@@ -305,11 +305,11 @@ drct.directive('visHeatmap', [function() {
 							leftwalk(d, nColor, pColor);
 						} else {
 							if(nColor == '#00ff00'){ //Check color to see if indicated action is a select/deselect
-								if(leftgenes.indexOf(d.name) == -1){ //Check if gene already is in the array.
-									leftgenes.push(d.name)
+								if(leftgenes.indexOf(d.id) == -1){ //Check if gene already is in the array.
+									leftgenes.push(d.id)
 								}
 							} else { //Algorithm for removing genes from the list on a deselect.
-								var index = leftgenes.indexOf(d.name); //Get the index of the given gene in the gene array.
+								var index = leftgenes.indexOf(d.id); //Get the index of the given gene in the gene array.
 								leftgenes.splice(index, 1); //Splice that gene out of the array using its gotten index.
 							};
 						};
@@ -340,11 +340,11 @@ drct.directive('visHeatmap', [function() {
 								leftwalk(dc, nColor, pColor);
 							} else {
 								if(nColor == '#00ff00'){
-									if(leftgenes.indexOf(dc.name) == -1){
-										leftgenes.push(dc.name);
+									if(leftgenes.indexOf(dc.id) == -1){
+										leftgenes.push(dc.id);
 									};
 								} else {
-									var index = leftgenes.indexOf(dc.name);
+									var index = leftgenes.indexOf(dc.id);
 									leftgenes.splice(index, 1);
 								}
 							};
@@ -426,8 +426,6 @@ drct.directive('visHeatmap', [function() {
 
 					var topelbow = function(d, i){
 						
-						console.log(d)
-						
 						return "M" + (d.target.x + margin.left )  + "," + (toptreeheight - (d.target.d * 1) )
 						+ "V" + (toptreeheight - (d.source.d * 1) ) + "H" +  ( d.source.x + margin.left  );
 					};
@@ -472,17 +470,19 @@ drct.directive('visHeatmap', [function() {
 							topwalk(d, nColor, pColor);
 						} else {
 							if(nColor == '#00ff00'){ //Check color to see if indicated action is a select/deselect
-								if(topgenes.indexOf(d.name) == -1){ //Check if gene already is in the array.
-									topgenes.push(d.name)
+								if(topgenes.indexOf(d.id) == -1){ //Check if gene already is in the array.
+									topgenes.push(d.id)
 								}
 							} else { //Algorithm for removing genes from the list on a deselect.
-								var index = topgenes.indexOf(d.name); //Get the index of the given gene in the gene array.
+								var index = topgenes.indexOf(d.id); //Get the index of the given gene in the gene array.
 								topgenes.splice(index, 1); //Splice that gene out of the array using its gotten index.
 							};
 						};
 						
-						scope.celllink.column = topgenes; //<-- Function to do something with selected genes.
-						
+						//<-- Function to do something with selected genes.
+						scope.$apply(function() {
+							scope.celllink.column = topgenes; 
+						});
 					};
 
 					//Function to walk down the tree from a selected node and apply proper color assignments based on selection.
@@ -508,11 +508,11 @@ drct.directive('visHeatmap', [function() {
 								topwalk(dc, nColor, pColor);
 							} else {
 								if(nColor == '#00ff00'){
-									if(topgenes.indexOf(dc.name) == -1){
-										topgenes.push(dc.name);
+									if(topgenes.indexOf(dc.id) == -1){
+										topgenes.push(dc.id);
 									};
 								} else {
-									var index = topgenes.indexOf(dc.name);
+									var index = topgenes.indexOf(dc.id);
 									topgenes.splice(index, 1);
 								}
 							};
@@ -557,10 +557,6 @@ drct.directive('visHeatmap', [function() {
 							}
 						})
 						.attr("r", 2)
-						.on("click", function(d) {
-							console.log(d);
-							console.log( getter(d) );
-						})
 						.on("click", topclick);
 					
 				}
