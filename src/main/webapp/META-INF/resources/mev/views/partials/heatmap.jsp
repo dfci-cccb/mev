@@ -7,11 +7,11 @@
 				inputcolor="red"
 				showlabels="true"
 				width="700"
-				height="700"
+				height="1000"
 				marginleft="80"
 				marginright="80"
-				margintop="80"
-				marginbottom="80"
+				margintop="200"
+				marginbottom="120"
 				celllink="selectedcells"
 				pushtomarked="markRow(inputindecies, inputdimension)">
 			</vis-Heatmap>

@@ -12,7 +12,8 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 	$scope.analyzeOptions = ["LIMMA", "EuclideanClustering"]
 	
 	$scope.selectedcells = new Object();
-
+	$scope.selectedcells.row = [];
+	$scope.selectedcells.column = [];
 	$scope.selections = new Object();
 	
 	$http({
@@ -23,11 +24,31 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 		}
 	})
 	.success( function(data) {
+
 		$scope.matrixsummary = data;
 		
 		
 		$scope.pullSelections("column");
 		$scope.pullSelections("row");
+		
+		
+		if ($scope.matrixsummary.columnClustered) {
+			
+			$http({
+				method:"GET",
+				url:"heatmap/"+$scope.matrixlocation+"/analysis/EuclidianClustering" + "/" + "column",
+				params: {
+					format:"json",
+				
+				}
+			})
+			.success( function(data) {
+				$scope.downloadedtree = data;
+				$scope.transformData();
+			})
+			
+		}
+		
 	});
 	
 	$scope.analyzeEuclideanRequester = function() {
@@ -41,7 +62,7 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 			}
 		})
 		.success( function(data) {
-			Alert("Success! Please wait for your analysis to complete.")
+			alert("Clustering analysis complete!")
 		})
 		.error( function(data) {
 		    alert("Something went wrong, please contact us if the problem persists.");	
@@ -138,6 +159,10 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 				return;
 			}
 		}
+		
+		if ($scope.matrixsummary.columnClustered && !$scope.downloadedtree) {
+				return;
+		}
 
 		$scope.transformeddata = {data:[], tree:{}};
 		
@@ -154,6 +179,7 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 		$scope.transformeddata.columnlabels = $scope.heatmapcolumns.map(function(d) { return d.value;});
 		$scope.transformeddata.rowlabels = $scope.heatmaprows.map(function(d) { return d.value;});
 		$scope.transformeddata.matrixsummary = $scope.matrixsummary;
+		$scope.transformeddata.tree.top = $scope.downloadedtree
 
 		firstpull = false;
 
@@ -172,6 +198,12 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 			$scope.selections[inputdimension] = data;
 		});
 
+	};
+	
+	$scope.requestTopTree = function() {
+	
+
+		
 	};
 
 	$scope.pushSelections = function(dimension) {
@@ -273,9 +305,6 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 			});
 			
 		});
-		
-			
-
 		
 	};
 	

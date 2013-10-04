@@ -60,8 +60,8 @@ drct.directive('visHeatmap', [function() {
 							.attr("dy", ( cellYPosition.rangeBand()/2 ) + "px");
 							
 					cellcover.selectAll("rect").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-					cellcover.selectAll(".link").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-					cellcover.selectAll(".node").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+					cellcover.selectAll("path").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+					cellcover.selectAll("circle").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 				}
 				
 				var threshold = 150;
@@ -188,9 +188,9 @@ drct.directive('visHeatmap', [function() {
 					.append("svg:rect")
 					.attr("id", "clip-rect")
 					.attr("x", 0)
-					.attr("y", margin.top )
+					.attr("y", 0 )
 					.attr("width", width + margin.left)
-					.attr("height", height );
+					.attr("height", height + margin.top );
 				
 				var cellcover = svg.append("g")
 					.attr("class", "heatmapcells")
@@ -263,8 +263,8 @@ drct.directive('visHeatmap', [function() {
 					});
 
 					var leftelbow = function(d, i){
-						return "M" + (lefttreewidth - (d.source.distance * 100) )  + "," + (d.source.x + margin.top )
-						+ "V" + ( d.target.x + margin.top  ) + "H" + (lefttreewidth - (d.target.distance * 100) );
+						return "M" + (lefttreewidth - (d.source.d * 100) )  + "," + (d.source.x + margin.top )
+						+ "V" + ( d.target.x + margin.top  ) + "H" + (lefttreewidth - (d.target.d * 100) );
 					};
 
 					var leftclick = function(d){
@@ -368,12 +368,12 @@ drct.directive('visHeatmap', [function() {
 						.attr("class","leftnode")
 						.attr("cx", function(d) {
 							if( !(d.parent) ){
-								return Math.floor( (lefttreewidth - (d.distance * 100)) );
+								return Math.floor( (lefttreewidth - (d.d * 100)) );
 							} else {
 								if( !(d.children) ){
 									return  Math.floor(lefttreewidth) ;
 								} else {
-									return Math.floor(lefttreewidth - (d.distance * 100));
+									return Math.floor(lefttreewidth - (d.d * 100));
 								}
 							}
 						})
@@ -396,9 +396,11 @@ drct.directive('visHeatmap', [function() {
 						.on("click", leftclick);
 					
 				}
-					
+				
+				
+				
 				if (newdata.tree.top) { //only goes here if tree information is built into system
-					
+
 					var toptreewidth = width;
 					var toptreeheight = margin.top;
 					
@@ -423,8 +425,11 @@ drct.directive('visHeatmap', [function() {
 					});
 
 					var topelbow = function(d, i){
-						return "M" + (d.target.x + margin.left )  + "," + (toptreeheight - (d.target.distance * 100) )
-						+ "V" + (toptreeheight - (d.source.distance * 100) ) + "H" +  ( d.source.x + margin.left  );
+						
+						console.log(d)
+						
+						return "M" + (d.target.x + margin.left )  + "," + (toptreeheight - (d.target.d * 1) )
+						+ "V" + (toptreeheight - (d.source.d * 1) ) + "H" +  ( d.source.x + margin.left  );
 					};
 					
 				
@@ -476,7 +481,7 @@ drct.directive('visHeatmap', [function() {
 							};
 						};
 						
-						//alert(topgenes) //<-- Function to do something with selected genes.
+						scope.celllink.column = topgenes; //<-- Function to do something with selected genes.
 						
 					};
 
@@ -531,12 +536,12 @@ drct.directive('visHeatmap', [function() {
 						.attr("class","topnode")
 						.attr("cy", function(d) {
 							if( !(d.parent) ){
-								return Math.floor( (toptreeheight - (d.distance * 100)) );
-							} else {
+								return Math.floor( (toptreeheight - (d.d )) );
+							} else  {
 								if( !(d.children) ){
 									return  Math.floor(toptreeheight) ;
 								} else {
-									return Math.floor(toptreeheight - (d.distance * 100));
+									return Math.floor(toptreeheight - (d.d ));
 								}
 							}
 						})
