@@ -470,6 +470,14 @@ public class Heatmap implements Closeable {
       throw new RuntimeException (e.getCause ());
     }
   }
+  
+  public List<Integer> findByRow (AnnotationSearchTerm[] terms) {
+    return rowAnnotations.find (terms);
+  }
+  
+  public List<Integer> findByColumn (AnnotationSearchTerm[] terms) {
+    return columnAnnotations.find (terms);
+  }
 
   /* (non-Javadoc)
    * @see java.io.Closeable#close() */

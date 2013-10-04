@@ -53,6 +53,10 @@ public class Annotations implements Closeable {
   public void close () throws IOException {
     dal.close ();
   }
+  
+  public List<Integer> find (AnnotationSearchTerm[] search) {
+    return dal.findByValue (search);
+  }
 }
 
 // ================= Examples =======================

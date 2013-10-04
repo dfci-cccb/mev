@@ -43,12 +43,14 @@ import org.eobjects.metamodel.query.LogicalOperator;
 import org.eobjects.metamodel.query.OperatorType;
 import org.eobjects.metamodel.query.Query;
 import org.eobjects.metamodel.query.SelectItem;
+import org.eobjects.metamodel.query.builder.SatisfiedSelectBuilder;
 import org.eobjects.metamodel.schema.Column;
 import org.eobjects.metamodel.schema.ColumnType;
 import org.eobjects.metamodel.schema.Schema;
 import org.eobjects.metamodel.schema.Table;
 import org.eobjects.metamodel.util.SimpleTableDef;
 
+import edu.dfci.cccb.mev.domain.AnnotationSearchTerm;
 import edu.dfci.cccb.mev.domain.MatrixAnnotation;
 
 @Log4j
@@ -57,7 +59,7 @@ public class AnnotationDataAccessLayer implements Closeable {
   private final UpdateableDataContext dbDataContext;
   private final String dataNamespace;
   private static final String INDEX_COL_NAME = "mev_index";
-  private static final String ANNOTATION_ID_COLUMN_NAME = "annotationId";
+  private static final String ANNOTATION_ID_COLUMN_NAME = "column";
 
   private int reloadCounter = 0;
   private String currentTableName = "";
@@ -199,6 +201,26 @@ public class AnnotationDataAccessLayer implements Closeable {
     return result;
   }
 
+  public List<Integer> findByValue (AnnotationSearchTerm[] search) {
+    List<Integer> result = new ArrayList<> ();
+    
+    SatisfiedSelectBuilder<?> b = dbDataContext.query ().from (currentTableName).selectAll ();
+    Column index = dbDataContext.getDefaultSchema ().getTableByName (currentTableName).getColumnByName (INDEX_COL_NAME);
+    
+    for (AnnotationSearchTerm term : search)
+      b.where (term.getAttribute ()).like (term.getOperand ());
+    
+    try (DataSet found = b.execute ()) {
+      while (found.next ()) {
+        Row row = found.getRow ();
+        Object i = row.getValue (index);
+        log.debug ("Found index " + i);
+        result.add (Integer.valueOf (i.toString ()));
+      }
+    }
+    return result;
+  }
+  
   private boolean importTable (UpdateableDataContext targetDataContext,
                                Table targetTable,
                                DataContext sourceDataContext,
@@ -391,10 +413,11 @@ public class AnnotationDataAccessLayer implements Closeable {
           for (Row originalRow; originalDataSet.next (); count++) {
             originalRow = originalDataSet.getRow ();
             Object annotationId = originalRow.getValue (annotationIdColumn);
-            try (DataSet mergingDataSet = sourceDataContext.executeQuery (sourceDataContext.query ()
+            try (DataSet mergingDataSet =
+                                          sourceDataContext.executeQuery (sourceDataContext.query ()
                                                                                            .from (sourceTable)
                                                                                            .selectAll ()
-                                                                                           .where (mergingIdColumn)
+                                                                                           .where (mergingIdColumn.getName ())
                                                                                            .eq (annotationId)
                                                                                            .toQuery ())) {
               RowInsertionBuilder insert = callback.insertInto (targetTable);
@@ -402,8 +425,10 @@ public class AnnotationDataAccessLayer implements Closeable {
                 insert.value (originalItem.getColumn ().getName (), originalRow.getValue (originalItem.getColumn ()));
               for (; mergingDataSet.next (); log.debug (mergingDataSet.getRow ()))
                 for (SelectItem mergingItem : mergingDataSet.getRow ().getSelectItems ())
-                  insert.value (mergingItem.getColumn ().getName (),
-                                mergingDataSet.getRow ().getValue (mergingItem.getColumn ()));
+                  if (!"".equals (mergingItem.getColumn ().getName ()))
+                    insert.value (mergingItem.getColumn ().getName (),
+                                  mergingDataSet.getRow ().getValue (mergingItem.getColumn ()));
+              log.debug (insert.toSql ());
               insert.execute ();
             }
           }

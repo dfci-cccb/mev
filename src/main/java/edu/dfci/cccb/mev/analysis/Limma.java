@@ -118,7 +118,10 @@ public class Limma {
     try (final Provisional input = file ();
          final Provisional configuration = file ();
          ByteArrayOutputStream script = new ByteArrayOutputStream ()) {
-      configureRows (new FileOutputStream (configuration), heatmap, selection1, selection2);
+      if ("row".equals (dimension))
+        configureRows (new FileOutputStream (configuration), heatmap, selection1, selection2);
+      else
+        configureColumns (new FileOutputStream (configuration), heatmap, selection1, selection2);
       dump (new FileOutputStream (input), heatmap);
       velocity.getTemplate (Limma.script).merge (new VelocityContext (new HashMap<String, String> () {
         private static final long serialVersionUID = 1L;

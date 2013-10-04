@@ -118,6 +118,13 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
     return new ContentNegotiatingViewResolver () {
       {
         setContentNegotiationManager (manager);
+        /* setViewResolvers (asList (new InternalResourceViewResolver () { {
+         * setPrefix ("/META-INF/resources/mev/views/"); setSuffix (".jsp");
+         * setOrder (2); setExposeContextBeansAsAttributes (true); } }, new
+         * ViewResolver () {
+         * @Override public View resolveViewName (String viewName, Locale
+         * locale) throws Exception { return new MappingJackson2JsonView () { {
+         * setPrettyPrint (true); } }; } })); */
       }
     };
   }
@@ -231,6 +238,7 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
               .mediaType ("html", TEXT_HTML)
               .mediaType ("xml", APPLICATION_XML)
               .mediaType ("tsv", TEXT_PLAIN)
+              .mediaType ("txt", TEXT_PLAIN)
               .mediaType ("json", APPLICATION_JSON);
   }
 

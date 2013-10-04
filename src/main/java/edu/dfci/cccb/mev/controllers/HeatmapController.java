@@ -49,6 +49,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 import edu.dfci.cccb.mev.domain.AnnotationNotFoundException;
+import edu.dfci.cccb.mev.domain.AnnotationSearchTerm;
 import edu.dfci.cccb.mev.domain.Heatmap;
 import edu.dfci.cccb.mev.domain.Heatmap.ClusteringAlgorhythm;
 import edu.dfci.cccb.mev.domain.Heatmap.LimmaOutput;
@@ -240,13 +241,14 @@ public class HeatmapController {
                                                   InvalidDimensionException {
     response.setContentType ("text/plain");
     response.setHeader ("Content-Disposition", "attachment;filename=" + output + ".txt");
-    Heatmap heatmap = heatmaps.get(id);
+    Heatmap heatmap = heatmaps.get (id);
     File limma;
     if (isRow (dimension))
       limma = heatmap.limmaRows (experiment, control, LimmaOutput.valueOf (output.toUpperCase ()));
     else if (isColumn (dimension))
       limma = heatmap.limmaColumns (experiment, control, LimmaOutput.valueOf (output.toUpperCase ()));
-    else throw new InvalidDimensionException (dimension);
+    else
+      throw new InvalidDimensionException (dimension);
     IOUtils.copy (new FileInputStream (limma),
                   response.getOutputStream ());
     response.flushBuffer ();
@@ -275,6 +277,20 @@ public class HeatmapController {
       heatmaps.get (id).setRowAnnotations (data.getInputStream ());
     else if (isColumn (dimension))
       heatmaps.get (id).setColumnAnnotations (data.getInputStream ());
+    else
+      throw new InvalidDimensionException (dimension);
+  }
+
+  @RequestMapping (value = "/{id}/annotation/{dimension}/search", method = { POST, PUT })
+  @ResponseBody
+  public List<Integer> search (@PathVariable ("id") String id,
+                               @PathVariable ("dimension") String dimension,
+                               @RequestBody AnnotationSearchTerm[] search) throws HeatmapNotFoundException,
+                                                                          InvalidDimensionException {
+    if (isRow (dimension))
+      return heatmaps.get (id).findByRow (search);
+    else if (isColumn (dimension))
+      return heatmaps.get (id).findByColumn (search);
     else
       throw new InvalidDimensionException (dimension);
   }
