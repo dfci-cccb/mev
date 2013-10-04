@@ -156,22 +156,23 @@
 
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i></button>
-    <h3 id="myModalLabel">Euclidean Clustering</h3>
+    <h3 id="myModalLabel">Clustering</h3>
   </div>
   
   <div class="modal-body">
 
-		<select ng-model="EuclideanSelection"> 
-		
+		<select ng-model="ClusterType">
+			<option ng-repeat="clustertype in ['Euclidian', 'Distance']" value="{{clustertype}}"> {{clustertype}} </option> 
+		</select> <p> by </p>
+		<select ng-model="ClusterDimension"> 
 			<option ng-repeat="selection in ['column']" value="{{selection}}"> {{selection}} </option>
-				
 		</select>
 
   </div>
   
   <div class="modal-footer">
     <button class="btn btn-warning" data-dismiss="modal" aria-hidden="true">Cancel</button>
-    <button class="btn btn-primary"  data-dismiss="modal" aria-hidden="true" ng-click="analyzeEuclideanRequester()">Analyze</button>
+    <button class="btn btn-primary"  data-dismiss="modal" aria-hidden="true" ng-click="analyzeClustering()">Analyze</button>
   </div>
   
 </div>

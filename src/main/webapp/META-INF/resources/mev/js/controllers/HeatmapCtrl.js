@@ -1,4 +1,4 @@
-ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($scope, $routeParams, $http) {
+ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', '$rootScope', function($scope, $routeParams, $http, $rootScope) {
 
 	$scope.matrixlocation = $routeParams.matrixLocation;
 	$scope.curstartrow = 0;
@@ -15,6 +15,20 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 	$scope.selectedcells.row = [];
 	$scope.selectedcells.column = [];
 	$scope.selections = new Object();
+	
+	$scope.retrieveHeatmaps = function() {
+
+		$http({
+				method:"GET",
+				url:"heatmap/",
+				params: {
+					format:"json"
+				}
+			})
+			.success( function(data) {
+				$rootScope.menuheatmaplist = data;
+			});
+	};
 	
 	$http({
 		method:"PUT",
@@ -51,11 +65,11 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 		
 	});
 	
-	$scope.analyzeEuclideanRequester = function() {
+	$scope.analyzeClustering = function(dimension) {
 		
 		$http({
 			method:"GET",
-			url:"heatmap/"+$scope.matrixlocation+"/analysis/EuclidianClustering" + "/" + $scope.EuclideanSelection,
+			url:"heatmap/"+$scope.matrixlocation+"/analysis/"+ $scope.ClusterType +"Clustering" + "/" + $scope.ClusterDimension,
 			params: {
 				format:"json",
 				
@@ -63,12 +77,13 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', function($sco
 		})
 		.success( function(data) {
 			alert("Clustering analysis complete!")
+			$scope.retrieveHeatmaps();
 		})
 		.error( function(data) {
 		    alert("Something went wrong, please contact us if the problem persists.");	
 		});
 		
-	}
+	};
 	
 	$scope.analyzeLimmaRequester = function() {
 
