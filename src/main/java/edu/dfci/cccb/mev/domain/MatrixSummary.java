@@ -36,4 +36,6 @@ public class MatrixSummary {
   private final @Getter @JsonView int columns;
   private final @Getter @JsonView double max;
   private final @Getter @JsonView double min;
+  private final @Getter @JsonView boolean rowClustered;
+  private final @Getter @JsonView boolean columnClustered;
 }

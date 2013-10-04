@@ -495,7 +495,12 @@ public class Heatmap implements Closeable {
         }
       });
       result.builder = this;
-      result.summary = other.summary;
+      result.summary = new MatrixSummary (other.summary.rows (),
+                                          other.summary.columns (),
+                                          other.summary.max (),
+                                          other.summary.min (),
+                                          other.summary.rowClustered (),
+                                          true);
       return result;
     }
 
@@ -554,7 +559,12 @@ public class Heatmap implements Closeable {
         }
       });
       result.builder = this;
-      result.summary = other.summary;
+      result.summary = new MatrixSummary (other.summary.rows (),
+                                          other.summary.columns (),
+                                          other.summary.max (),
+                                          other.summary.min (),
+                                          true,
+                                          other.summary.columnClustered ());
       return result;
     }
 
@@ -712,7 +722,7 @@ public class Heatmap implements Closeable {
                                               public double end () {
                                                 return min;
                                               }
-                                            }));
+                                            }), false, false);
         result.rowAnnotations = new Annotations (result.universalId, ROW, restDataSource);
         result.columnAnnotations = new Annotations (result.universalId, COLUMN, restDataSource);
         result.rowAnnotations.setAnnotations (rowAnnotations);
