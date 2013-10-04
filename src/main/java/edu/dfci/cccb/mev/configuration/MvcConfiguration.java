@@ -111,8 +111,7 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
   }
 
   /**
-   * Create the CNVR. Get Spring to inject the ContentNegotiationManager created
-   * by the configurer (see previous method).
+   * Create the CNVR
    */
   @Bean (name = "contentNegotiatingViewResolver ")
   public ViewResolver contentNegotiatingViewResolver (final ContentNegotiationManager manager) {
@@ -125,8 +124,6 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
 
   /**
    * Multipart resolver for file upload
-   * 
-   * @return
    */
   @Bean (name = "multipartResolver")
   public CommonsMultipartResolver multipartResolver () {
@@ -135,8 +132,6 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
 
   /**
    * JSP view resolver
-   * 
-   * @return
    */
   @Bean (name = "jspViewResolver")
   public ViewResolver jspViewResolver () {
@@ -152,8 +147,6 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
 
   /**
    * JSON view resolver
-   * 
-   * @return
    */
   @Bean (name = "jsonViewResolver")
   public ViewResolver jsonViewResolver () {
@@ -172,8 +165,6 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
 
   /**
    * Simple URL handler mapping bean used for utility controllers
-   * 
-   * @return
    */
   @Bean (name = "simpleUrlHandlerMapping")
   public SimpleUrlHandlerMapping simpleUrlHandlerMapping () {

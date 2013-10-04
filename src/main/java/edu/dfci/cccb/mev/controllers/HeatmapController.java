@@ -26,18 +26,14 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
-
 import lombok.extern.log4j.Log4j;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -228,17 +224,11 @@ public class HeatmapController {
   }
 
   @RequestMapping (value = "/{id}/analysis/limma({experiment},{control})/{output}", method = GET)
-  @ResponseStatus (OK)
-  public void limma (@PathVariable ("id") String id,
-                     @PathVariable ("experiment") String experiment,
-                     @PathVariable ("control") String control,
-                     @PathVariable ("output") String output,
-                     HttpServletResponse response) throws HeatmapNotFoundException, IOException {
-    File result = heatmaps.get (id).limma (experiment, control, LimmaOutput.valueOf (output.toUpperCase ()));
-    response.setContentType ("text/plain");
-    try (FileInputStream out = new FileInputStream (result)) {
-      IOUtil.copy (out, response.getOutputStream ());
-    }
+  public FileSystemResource limma (@PathVariable ("id") String id,
+                                   @PathVariable ("experiment") String experiment,
+                                   @PathVariable ("control") String control,
+                                   @PathVariable ("output") String output) throws HeatmapNotFoundException, IOException {
+    return new FileSystemResource (heatmaps.get (id).limma (experiment, control, LimmaOutput.valueOf (output.toUpperCase ())));
   }
 
   // POST
