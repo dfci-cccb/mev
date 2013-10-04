@@ -203,7 +203,7 @@ public class HeatmapController {
   @RequestMapping (value = "/{id}/analysis/EuclidianClustering/{dimension}", method = GET)
   @ResponseBody
   // TODO: do a proper exception instead of IOException
-  public JsonCluster cluster (@PathVariable ("id") String id,
+  public Object cluster (@PathVariable ("id") String id,
                               @PathVariable ("dimension") String dimension) throws HeatmapNotFoundException,
                                                                            InvalidDimensionException, IOException {
     Heatmap current = heatmaps.get (id);
@@ -215,7 +215,9 @@ public class HeatmapController {
     else
       throw new InvalidDimensionException (dimension);
     if (clustered != current) {
-      heatmaps.put (id + "-" + dimension + "-clustered", clustered);
+      String newId = id + "-" + dimension + "-clustered";
+      heatmaps.put (newId, clustered);
+      return newId;
     }
     if (isRow (dimension))
       return clustered.getRowClusters ();
