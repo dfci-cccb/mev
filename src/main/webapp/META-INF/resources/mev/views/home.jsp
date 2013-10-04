@@ -47,14 +47,10 @@
     </h4>
 
     <ul>
-      <li><a href="#/analyze"><spring:message code="home.analyze"/></a></li>
-      <li><a href="#/features"><spring:message code="home.features"/></a></li>
-      <li><a href="#/news"><spring:message code="home.news"/></a></li>
-      <li><a href="#/about"><spring:message code="home.about"/></a></li>
-      <li><a href="#/help"><spring:message code="home.help"/></a></li>
+	  <li><a data-target="#UploadModal" data-toggle="modal">Upload New File</a></li>
     </ul>
     
-    <h4> Uploads </h4>
+    <h4> Datasets: </h4>
     <ul>
       <li ng-repeat="visualization in menuheatmaplist"><a href="#/heatmap/{{visualization}}">{{visualization}}</a></li>
     </ul>
@@ -93,7 +89,54 @@
 	</div>
 	</div>
   </div>
+  
+  <!-- Modals -->
+  
+	<div id="UploadModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 
+	  <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i></button>
+		<h3 id="myModalLabel">Upload File</h3>
+	  </div>
+	  
+	  <div class="modal-body">
+	  
+			<div id="fileup">
+				
+				<div class="span3">
+				
+					<div class="row">
+						<input id="file" type="file" multiple name="upload" />
+					</div>
+					
+					<div class="row">
+						<div class="progress progress-striped active" id="progbox" style="visibility: hidden;">
+							<div class="bar" id="progbar"></div>
+							
+						</div>
+					</div>
+					
+					<div class="row">
+						<button ng-click="sendFile(0)">Submit Files</button>
+						<div id="output"></div>
+					</div>
+					
+				</div>
+				
+			</div> 
+
+	  </div>
+	  
+	  <div class="modal-footer">
+		<button class="btn btn-warning" aria-hidden="true" ng-click="sendFile()">Upload</button>
+		<button class="btn btn-primary"  data-dismiss="modal" aria-hidden="true">Close</button>
+	  </div>
+	  
+	</div>
+	
+	
+  <!-- End Modals -->
+ 
   <script>window.jQuery || document.write('<script src="/resources/static/webjars/jquery/${buildProperties['jquery.version']}/${profileProperties['jquery.source']}"><\/script>')</script>
   
   <!--D3-->
