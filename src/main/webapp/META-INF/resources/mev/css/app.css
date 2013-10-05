@@ -76,7 +76,7 @@ circle {
 .xAxis path,
 .xAxis line {
 	fill: none;
-	stroke: black;
+	stroke: white;
 	shape-rendering: crispEdges;
 }
 

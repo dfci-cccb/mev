@@ -57,7 +57,7 @@ angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives', 
 			//Variable declarations
 		
 			
-			var input = document.getElementById("file");
+			var input = document.getElementById("datasetfile");
 			var box = document.getElementById("progbox"); //DOM element of the growing progress bar
 			var bar = document.getElementById("progbar"); //DOM element of the growing progress bar
 			log.debug ("uploading files", input, input.files, input.files.length);

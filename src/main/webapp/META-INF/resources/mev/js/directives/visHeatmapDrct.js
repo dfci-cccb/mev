@@ -48,7 +48,7 @@ drct.directive('visHeatmap', [function() {
 					vis.select(".xAxis").call(xAxis)
 						.selectAll("text")  
 							.style("text-anchor", "start")
-							.attr("dy", (( -cellXPosition.rangeBand() )) + "px")
+							.attr("dy", ( -(cellXPositionLin(2) - cellXPositionLin(1) )/2 ) + "px")
 							.attr("dx", "20px")
 							.attr("transform", function(d) {
 								return "rotate(90)" 
@@ -57,7 +57,7 @@ drct.directive('visHeatmap', [function() {
 					vis.select(".yAxis").call(yAxis)
 						.selectAll("text")  
 							.style("text-anchor", "start")
-							.attr("dy", ( cellYPosition.rangeBand()/2 ) + "px");
+							.attr("dy", ( (cellYPositionLin(2) - cellYPositionLin(1) )/2 ) + "px");
 							
 					cellcover.selectAll("rect").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 					cellcover.selectAll("path").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
@@ -205,7 +205,7 @@ drct.directive('visHeatmap', [function() {
 					.call(xAxis)
 					.selectAll("text")  
 						.style("text-anchor", "start")
-						.attr("dy", (( -cellXPosition.rangeBand() )) + "px")
+						.attr("dy", ( -(cellXPositionLin(2) - cellXPositionLin(1) )/2 ) + "px")
 						.attr("dx", "20px")
 						.attr("transform", function(d) {
 							return "rotate(90)" 
@@ -215,8 +215,8 @@ drct.directive('visHeatmap', [function() {
 					.call(yAxis)
 					.selectAll("text")  
 							.style("text-anchor", "start")
-							.attr("dy", ( cellYPosition.rangeBand()/2 ) + "px");
-				
+							.attr("dy", ( (cellYPositionLin(2) - cellYPositionLin(1) )/2 ) + "px");
+							
 				cellcover.append("g")
 					.selectAll("rect")
 						.data(newdata.data)
@@ -225,10 +225,10 @@ drct.directive('visHeatmap', [function() {
 						.attr({
 							"class": "cells",
 							"height": function(d){
-								return .95*( cellYPosition.rangeBand() );
+								return 1*( cellYPosition.rangeBand() );
 							},
 							"width": function(d){
-								return .95*( cellXPosition.rangeBand() );
+								return 1*( cellXPosition.rangeBand() );
 							},
 							"x": function(d, i) { return cellXPositionLin( indexXMapper(d.col) ); },
 							"y": function(d, i) { return cellYPositionLin( indexYMapper(d.row) ); },

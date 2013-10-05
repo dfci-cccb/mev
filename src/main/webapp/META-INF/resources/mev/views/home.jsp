@@ -106,7 +106,7 @@
 				<div class="span3">
 				
 					<div class="row">
-						<input id="file" type="file" multiple name="upload" />
+						<input id="datasetfile" type="file" multiple name="upload" />
 					</div>
 					
 					<div class="row">
@@ -116,11 +116,6 @@
 						</div>
 					</div>
 					
-					<div class="row">
-						<button ng-click="sendFile(0)">Submit Files</button>
-						<div id="output"></div>
-					</div>
-					
 				</div>
 				
 			</div> 
@@ -128,7 +123,7 @@
 	  </div>
 	  
 	  <div class="modal-footer">
-		<button class="btn btn-warning" aria-hidden="true" ng-click="sendFile()">Upload</button>
+		<button class="btn" aria-hidden="true" ng-click="sendFile()">Upload</button>
 		<button class="btn btn-primary"  data-dismiss="modal" aria-hidden="true">Close</button>
 	  </div>
 	  
