@@ -153,6 +153,7 @@
             </connector>
           </connectors>
           <stopPort>${jetty.stop.port}</stopPort>
+          <stopKey>stop</stopKey>
         </configuration>
       </plugin>
 
