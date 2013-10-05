@@ -5,14 +5,14 @@ ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', '$q', func
 	$scope.matrixsummary = undefined;
 	$scope.headers = null;
 	$scope.dimension = "row";
-	$scope.page = 0;
+	$scope.currentpage = 0;
 	$scope.totalpages = 0;
 	
 	$scope.nearbypages = [0];
 	
 	$scope.range = [0, 100];
 	
-	$scope.totalrows = 100;
+	$scope.totalrows = 50;
 	
 	
 	function pullSummary() {
@@ -26,16 +26,17 @@ ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', '$q', func
 		})
 		.success( function(data) {
 			
+			
 			$scope.matrixsummary = data;
 			
-			if ($scope.totalrows%$scope.matrixsummary[($scope.dimension + "s")] > 0) {
-				$scope.totalpages = Math.floor( ($scope.totalrows/$scope.matrixsummary[($scope.dimension + "s")]) + 1 );
+			if ($scope.matrixsummary[($scope.dimension + "s")]%$scope.totalrows > 0) {
+				$scope.totalpages = Math.floor( ($scope.matrixsummary[($scope.dimension + "s")]/$scope.totalrows) + 1 );
+				
 			} else {
-				$scope.totalpages = ($scope.totalrows/$scope.matrixsummary[($scope.dimension + "s")] ) ;
-				$scope.nearbypages = d3.range($scope.totalpages - 1)
+				$scope.totalpages = ($scope.matrixsummary[($scope.dimension + "s")]/$scope.totalrows ) ;
 			};
-			
-			getPage(0);
+
+			$scope.getPage(0);
 			
 		});
 		
@@ -80,12 +81,13 @@ ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', '$q', func
 		
 	};
 	
-	function getPage(page) {
+	$scope.getPage = function(page) {
 		
+		console.log("Requested Page");
 		
 		var arr = [0, 0];
 		
-		if (page == 0) {
+		if (page <= 0) {
 			arr = d3.range(0, $scope.totalrows);
 		} else {
 			arr = d3.range( page * $scope.totalrows, (page + 1) * $scope.totalrows);
@@ -111,14 +113,23 @@ ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', '$q', func
 		}))
 		.then(function(datas){
 			
-			$scope.page = page;
+			$scope.currentpage = page;
 			
 			$scope.tuples = datas.map(function(data){
-				console.log(data)
 				return data.data;
 			});
 			
-			
+			if (page < 3) {
+				
+				$scope.nearbypages = [0, 1, 2, 3, 4]
+				
+				
+			} else {
+				$scope.nearbypages = d3.range($scope.totalpages - 1).filter(function(inpage) {
+					return (Math.abs(inpage - $scope.currentpage) <= 2)
+				});
+
+			}
 			
 		});
 		

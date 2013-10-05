@@ -8,31 +8,10 @@ angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives', 
 	$routeProvider.when('/home', {
 		templateUrl: '/views/partials/home',
 		});
-		
-	/*	Vestigial Pages. Will re-add later
-	$routeProvider.when('/about', {
-		templateUrl: '/views/partials/about'});
-		
-	$routeProvider.when('/features', {
-		templateUrl: '/views/partials/features'});
-		
-	$routeProvider.when('/news', {
-		templateUrl: '/views/partials/news'});
-		
-	$routeProvider.when('/help', {
-		templateUrl: '/views/partials/help'});
-		
-	$routeProvider.when('/tutorial', {
-		templateUrl: '/views/partials/tutorial'});
-	*/
 	
-	$routeProvider.when('/heatmap/:matrixLocation', {
+	$routeProvider.when('/heatmap/:dataset', {
 		templateUrl: '/views/partials/heatmap', 
 		controller: 'HeatmapCtrl'});
-		
-	$routeProvider.when('/filter/:dataset', {
-		templateUrl: '/views/partials/filter', 
-		controller: 'GeneSelectCtrl'});
 		
     $routeProvider.otherwise({redirectTo: '/home'});
 

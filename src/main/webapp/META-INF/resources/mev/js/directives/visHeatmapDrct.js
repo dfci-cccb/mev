@@ -24,15 +24,14 @@ drct.directive('visHeatmap', [function() {
 					top: scope.margintop,
 					bottom: scope.marginbottom
 				}
+				
 			var width = scope.width - margin.left - margin.right;
+			
 			var height = scope.height - margin.top - margin.bottom;
 			
-			var svg = d3.select(element[0])
-				.append("svg")
-				.attr("class", "chart")
-				.attr("pointer-events", "all")
-				.attr("width", width + margin.left + margin.right)
-				.attr("height", height + margin.top + margin.bottom);
+			var window = d3.select(element[0]);
+			
+			var firsttime = true;
 
 			scope.$watch('inputdata', function(newdata, olddata) {
 				
@@ -40,7 +39,26 @@ drct.directive('visHeatmap', [function() {
 					return;
 				}
 				
-				svg.selectAll('*').remove();
+				window.selectAll('*').remove();
+				
+				if (newdata.tree.top && firsttime) {
+					
+					firsttime = false;
+					
+					margin.top = margin.top + 150
+						
+					height = height + 150
+				
+				}
+				
+				var svg = window
+					.append("svg")
+					.attr("class", "chart")
+					.attr("pointer-events", "all")
+					.attr("width", width + margin.left + margin.right)
+					.attr("height", height + margin.top + margin.bottom);
+				
+				
 			
 				function zoom() {
 					
