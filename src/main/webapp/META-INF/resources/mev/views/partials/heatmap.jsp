@@ -171,7 +171,7 @@
   </div>
   
   <div class="modal-footer">
-    <button class="btn btn-warning" data-dismiss="modal" aria-hidden="true">Cancel</button>
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
     <button class="btn btn-primary"  data-dismiss="modal" aria-hidden="true" ng-click="analyzeClustering()">Analyze</button>
   </div>
   
@@ -207,7 +207,7 @@
   </div>
   
   <div class="modal-footer">
-    <button class="btn btn-warning" data-dismiss="modal" aria-hidden="true">Cancel</button>
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
     <button class="btn btn-primary"  data-dismiss="modal" aria-hidden="true" ng-click="analyzeLimmaRequester()">Analyze</button>
   </div>
   

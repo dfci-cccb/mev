@@ -50,7 +50,7 @@
 	  <li><a data-target="#UploadModal" data-toggle="modal">Upload New File</a></li>
     </ul>
     
-    <h4> Datasets: </h4>
+    <h4> Datasets </h4>
     <ul>
       <li ng-repeat="visualization in menuheatmaplist"><a href="#/heatmap/{{visualization}}">{{visualization}}</a></li>
     </ul>
