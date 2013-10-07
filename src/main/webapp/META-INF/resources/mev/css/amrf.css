@@ -1,0 +1,54 @@
+ body.ania{
+  background: #FFFFFF;
+  font-family: Sans-serif;
+  overflow-x: hidden;
+  padding: 0em 4rem 4rem 4rem;
+}
+
+.ania #heading .site-title{
+background-image:url("/resources/static/mev/img/Amrf_Header.jpg");
+background-repeat:no-repeat;height:80px;overflow:hidden;border-top:hidden;border-bottom:1px #0078ac solid;
+border-right:1px #0078ac solid;
+border-left:1px #0078ac solid;
+-moz-border-radius-bottomright:4px;-webkit-border-bottom-right-radius:4px;-moz-border-radius-bottomleft:4px;-webkit-border-bottom-left-radius:4px
+}
+.ania #heading .site-title .logo img {
+height: 131px;
+width: auto;
+opacity: .0;
+filter: alpha(opacity=0);
+}
+
+.ania img#analize {
+width: 97.77777777777778%;
+border: 1px #7fd8ff solid;
+border-radius: 4px;
+padding: 0;
+margin: 0;
+overflow: hidden;
+}
+
+.ania div#content{
+	margin-left:30px;
+}
+
+.ania a#back_to_amrf{
+float: right;
+padding: 5px;
+font-style: italic;
+}
+
+.ania .copyright{
+margin: 24px auto 0px;
+padding: 3px 0px;
+text-align: center;
+color: rgb(121, 121, 121);
+font-family: 'ArsenalRegular';
+font-size: 0.75em;
+font-weight: normal;
+float: left;
+width: 100%;
+}
+<!-- 
+border-top: thin solid rgb(198, 198, 198);
+-->
