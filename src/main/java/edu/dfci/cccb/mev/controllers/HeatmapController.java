@@ -30,17 +30,17 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletResponse;
 
 import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -73,17 +73,18 @@ import edu.dfci.cccb.mev.domain.MatrixSummary;
 @Controller
 @RequestMapping ("/heatmap")
 @Log4j
-public class HeatmapController {
+public class HeatmapController implements InitializingBean {
 
   private @Autowired Heatmaps heatmaps;
   private @Autowired Heatmap.Builder heatmapBuilder;
+  private Heatmaps global = new Heatmaps ();
 
   // Summary
 
   @RequestMapping (value = "/{id}/summary")
   @ResponseBody
   public MatrixSummary summary (@PathVariable ("id") String id) throws HeatmapNotFoundException {
-    return heatmaps.get (id).getSummary ();
+    return get (id).getSummary ();
   }
 
   // GET
@@ -91,7 +92,14 @@ public class HeatmapController {
   @RequestMapping (method = GET)
   @ResponseBody
   public Collection<String> get () {
-    return heatmaps.list ();
+    return new ArrayList<String> () {
+      private static final long serialVersionUID = 1L;
+
+      {
+        addAll (heatmaps.list ());
+        addAll (global.list ());
+      }
+    };
   }
 
   @RequestMapping (value = "/{id}/data/[{startRow:[0-9]+}:{endRow:[0-9]+},{startColumn:[0-9]+}:{endColumn:[0-9]+}]")
@@ -105,7 +113,7 @@ public class HeatmapController {
       log.debug ("Serving request for data for heatmap "
                  + id + " starting row " + startRow + " ending row " + endRow + " startingColumn " + startColumn
                  + " ending column " + endColumn);
-    return heatmaps.get (id).getData (startRow, endRow, startColumn, endColumn);
+    return get (id).getData (startRow, endRow, startColumn, endColumn);
   }
 
   @RequestMapping (value = "/{id}/data", method = GET)
@@ -122,12 +130,12 @@ public class HeatmapController {
                  + id + " starting row " + startRow + " ending row " + endRow + " startingColumn " + startColumn
                  + " ending column " + endColumn);
     return (startRow == null || endRow == null || startColumn == null || endColumn == null)
-                                                                                           ? heatmaps.get (id)
+                                                                                           ? get (id)
                                                                                                      .getData (0,
                                                                                                                MAX_VALUE,
                                                                                                                0,
                                                                                                                MAX_VALUE)
-                                                                                           : heatmaps.get (id)
+                                                                                           : get (id)
                                                                                                      .getData (startRow,
                                                                                                                endRow,
                                                                                                                startColumn,
@@ -140,9 +148,9 @@ public class HeatmapController {
                                              @PathVariable ("dimension") String dimension) throws HeatmapNotFoundException,
                                                                                           InvalidDimensionException {
     if (isRow (dimension))
-      return heatmaps.get (id).getRowAnnotationTypes ();
+      return get (id).getRowAnnotationTypes ();
     else if (isColumn (dimension))
-      return heatmaps.get (id).getColumnAnnotationTypes ();
+      return get (id).getColumnAnnotationTypes ();
     else
       throw new InvalidDimensionException (dimension);
   }
@@ -157,9 +165,9 @@ public class HeatmapController {
                                                                                   InvalidDimensionException,
                                                                                   AnnotationNotFoundException {
     if (isRow (dimension))
-      return heatmaps.get (id).getRowAnnotation (startIndex, endIndex, type);
+      return get (id).getRowAnnotation (startIndex, endIndex, type);
     else if (isColumn (dimension))
-      return heatmaps.get (id).getColumnAnnotation (startIndex, endIndex, type);
+      return get (id).getColumnAnnotation (startIndex, endIndex, type);
     else
       throw new InvalidDimensionException (dimension);
   }
@@ -172,9 +180,9 @@ public class HeatmapController {
                                                                                  InvalidDimensionException,
                                                                                  AnnotationNotFoundException {
     if (isRow (dimension))
-      return heatmaps.get (id).getRowAnnotation (index);
+      return get (id).getRowAnnotation (index);
     else if (isColumn (dimension))
-      return heatmaps.get (id).getColumnAnnotation (index);
+      return get (id).getColumnAnnotation (index);
     else
       throw new InvalidDimensionException (dimension);
   }
@@ -185,9 +193,9 @@ public class HeatmapController {
                                           @PathVariable ("dimension") String dimension) throws HeatmapNotFoundException,
                                                                                        InvalidDimensionException {
     if (isRow (dimension))
-      return heatmaps.get (id).getRowSelectionIds ();
+      return get (id).getRowSelectionIds ();
     else if (isColumn (dimension))
-      return heatmaps.get (id).getColumnSelectionIds ();
+      return get (id).getColumnSelectionIds ();
     else
       throw new InvalidDimensionException (dimension);
   }
@@ -201,9 +209,9 @@ public class HeatmapController {
                                     @RequestParam ("end") int end) throws HeatmapNotFoundException,
                                                                   InvalidDimensionException {
     if (isRow (dimension))
-      return heatmaps.get (heatmapId).getRowSelection (selectionId, start, end);
+      return get (heatmapId).getRowSelection (selectionId, start, end);
     else if (isColumn (dimension))
-      return heatmaps.get (heatmapId).getColumnSelection (selectionId, start, end);
+      return get (heatmapId).getColumnSelection (selectionId, start, end);
     else
       throw new InvalidDimensionException (dimension);
   }
@@ -214,7 +222,7 @@ public class HeatmapController {
   public Object cluster (@PathVariable ("id") String id,
                          @PathVariable ("dimension") String dimension) throws HeatmapNotFoundException,
                                                                       InvalidDimensionException, IOException {
-    Heatmap current = heatmaps.get (id);
+    Heatmap current = get (id);
     Heatmap clustered = null;
     if (isRow (dimension))
       clustered = current.clusterRows (ClusteringAlgorhythm.EUCLEDIAN);
@@ -245,7 +253,7 @@ public class HeatmapController {
                                                   InvalidDimensionException {
     response.setContentType ("text/plain");
     response.setHeader ("Content-Disposition", "attachment;filename=" + output + ".txt");
-    Heatmap heatmap = heatmaps.get (id);
+    Heatmap heatmap = get (id);
     File limma;
     if (isRow (dimension))
       limma = heatmap.limmaRows (experiment, control, LimmaOutput.valueOf (output.toUpperCase ()));
@@ -265,7 +273,7 @@ public class HeatmapController {
                                                                                      AnnotationNotFoundException {
     response.setContentType ("text/plain");
     response.setHeader ("Content-Disposition", "attachment;filename=" + id + ".txt");
-    heatmaps.get (id).toStream (response.getOutputStream ());
+    get (id).toStream (response.getOutputStream ());
     response.flushBuffer ();
   }
 
@@ -289,9 +297,9 @@ public class HeatmapController {
                         @RequestParam ("filedata") MultipartFile data) throws HeatmapNotFoundException,
                                                                       InvalidDimensionException, IOException {
     if (isRow (dimension))
-      heatmaps.get (id).setRowAnnotations (data.getInputStream ());
+      get (id).setRowAnnotations (data.getInputStream ());
     else if (isColumn (dimension))
-      heatmaps.get (id).setColumnAnnotations (data.getInputStream ());
+      get (id).setColumnAnnotations (data.getInputStream ());
     else
       throw new InvalidDimensionException (dimension);
   }
@@ -303,9 +311,9 @@ public class HeatmapController {
                                @RequestBody AnnotationSearchTerm[] search) throws HeatmapNotFoundException,
                                                                           InvalidDimensionException {
     if (isRow (dimension))
-      return heatmaps.get (id).findByRow (search);
+      return get (id).findByRow (search);
     else if (isColumn (dimension))
-      return heatmaps.get (id).findByColumn (search);
+      return get (id).findByColumn (search);
     else
       throw new InvalidDimensionException (dimension);
   }
@@ -347,9 +355,9 @@ public class HeatmapController {
                                                              InvalidDimensionException,
                                                              IndexOutOfBoundsException {
     if (isRow (dimension))
-      heatmaps.get (heatmapId).setRowSelection (selectionId, selection);
+      get (heatmapId).setRowSelection (selectionId, selection);
     else if (isColumn (dimension))
-      heatmaps.get (heatmapId).setColumnSelection (selectionId, selection);
+      get (heatmapId).setColumnSelection (selectionId, selection);
     else
       throw new InvalidDimensionException (dimension);
   }
@@ -370,9 +378,9 @@ public class HeatmapController {
                                                                 InvalidDimensionException,
                                                                 IndexOutOfBoundsException {
     if (isRow (dimension))
-      heatmaps.get (heatmapId).deleteRowSelection (selectionId);
+      get (heatmapId).deleteRowSelection (selectionId);
     else if (isColumn (dimension))
-      heatmaps.get (heatmapId).deleteColumnSelections (selectionId);
+      get (heatmapId).deleteColumnSelections (selectionId);
     else
       throw new InvalidDimensionException (dimension);
   }
@@ -412,5 +420,81 @@ public class HeatmapController {
 
   private boolean isColumn (String dimension) {
     return "column".equals (dimension);
+  }
+
+  private Heatmap get (String id) throws HeatmapNotFoundException {
+    try {
+      return heatmaps.get (id);
+    } catch (HeatmapNotFoundException e) {
+      try {
+        return global.get (id);
+      } catch (HeatmapNotFoundException e2) {
+        throw e;
+      }
+    }
+  }
+
+  /* (non-Javadoc)
+   * @see
+   * org.springframework.beans.factory.InitializingBean#afterPropertiesSet() */
+  @Override
+  public void afterPropertiesSet () throws Exception {
+    new Thread () {
+      public void run () {
+
+        Properties definitions = new Properties () {
+          private static final long serialVersionUID = 1L;
+
+          {
+            try {
+              load (Heatmaps.class.getResourceAsStream ("/configuration/heatmap.globals.properties"));
+            } catch (IOException e) {
+              log.warn ("Unable to load global heatmaps", e);
+            }
+          }
+        };
+
+        Properties annotations = new Properties () {
+          private static final long serialVersionUID = 1L;
+
+          {
+            try {
+              load (Heatmaps.class.getResourceAsStream ("/configuration/heatmap.globals.annotation.properties"));
+            } catch (NullPointerException | IOException e) {
+              log.warn ("Unable to load global heatmap annotations");
+            }
+          }
+        };
+
+        for (String key : definitions.stringPropertyNames ()) {
+          File data = new File (definitions.get (key).toString ());
+          log.debug ("Loading " + data + " as " + key);
+          if (!data.exists ())
+            continue;
+          else
+            try {
+              Heatmap heatmap;
+              global.put (key, heatmap = heatmapBuilder.build (new FileInputStream (data), data.length (), key));
+              String location;
+              try {
+                if ((location = annotations.getProperty (key + ".column")) != null && new File (location).exists ())
+                  heatmap.setColumnAnnotations (new FileInputStream (location));
+              } catch (IOException e) {
+                log.warn ("Unable to load column annotations for " + key, e);
+              }
+              try {
+                if ((location = annotations.getProperty (key + ".row")) != null && new File (location).exists ())
+                  heatmap.setRowAnnotations (new FileInputStream (location));
+              } catch (IOException e) {
+                log.warn ("Unable to load row annotations for " + key, e);
+              }
+            } catch (IOException e) {
+              log.warn ("Unable to load global heatmap " + key + " data at " + data, e);
+            }
+        }
+
+        log.info ("Finished loading global heatmaps");
+      }
+    }.start ();
   }
 }

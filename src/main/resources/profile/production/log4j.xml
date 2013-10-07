@@ -9,7 +9,7 @@
     </layout>
   </appender>
   <root>
-    <priority value="debug"></priority>
+    <priority value="info"></priority>
     <appender-ref ref="log" />
   </root>
 </log4j:configuration>

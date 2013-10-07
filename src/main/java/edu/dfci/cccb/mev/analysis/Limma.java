@@ -27,12 +27,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import javax.script.ScriptException;
 
@@ -49,7 +47,6 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import us.levk.util.io.implementation.Provisional;
 import edu.dfci.cccb.mev.domain.AnnotationNotFoundException;
 import edu.dfci.cccb.mev.domain.Heatmap;
-import edu.dfci.cccb.mev.domain.MatrixAnnotation;
 import edu.dfci.cccb.mev.domain.MatrixSelection;
 //import java.io.ByteArrayInputStream;
 //import java.io.ByteArrayOutputStream;
@@ -162,6 +159,8 @@ public class Limma {
         IOUtils.copy (r.getErrorStream (), listing);
         log.debug ("Return value " + r.exitValue () + " error output:\n" + listing.toString ());
       }
+      if (r.exitValue () != 0)
+        throw new RuntimeException ("Non zero return value from R process " + r.exitValue ());
       // r.eval (new InputStreamReader (new ByteArrayInputStream
       // (script.toByteArray ())));
     }
