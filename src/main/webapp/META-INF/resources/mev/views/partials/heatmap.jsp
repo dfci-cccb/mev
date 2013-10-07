@@ -16,13 +16,6 @@
 				<div class="row">
 					<p class="lead">{{matrixlocation}}</p>
 				</div>
-		
-				<div class="row">
-					<p>
-						<button class="btn btn-block" type="button" ng-click="pageUp()">Page Up <i class="icon-arrow-up"></i></button>
-						<button class="btn btn-block" type="button" ng-click="pageDown()">Page Down <i class="icon-arrow-down"></i></button>
-					</p>
-				</div>
 				
 				<hr>
 				
