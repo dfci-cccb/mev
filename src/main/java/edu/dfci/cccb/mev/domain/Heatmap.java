@@ -925,12 +925,11 @@ public class Heatmap implements Closeable {
     for (int column = 0; column < getSummary ().columns (); column++)
       out.write (("\t" + getColumnAnnotation (column).get (0).value ()).getBytes ());
     for (int row = 0; row < getSummary ().rows (); row++) {
-      out.write (String.valueOf (getRowAnnotation (row).get (0).value ()).getBytes ());
+      out.write (("\n" + getRowAnnotation (row).get (0).value ()).getBytes ());
       for (int column = 0; column < getSummary ().columns (); column++)
         out.write (("\t" + data.getEntry (row, column)).getBytes ());
       out.write ('\n');
     }
-    out.flush ();
   }
 
   private List<Integer> reorderedIndices (final Cluster cluster) {
