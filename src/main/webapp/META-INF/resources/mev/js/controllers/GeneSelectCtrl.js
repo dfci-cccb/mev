@@ -182,7 +182,7 @@ ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', '$q', func
 		
 		if ($scope.fieldFilters.length >= 1) {
 			$scope.fieldFilters = $scope.fieldFilters.filter( function(filt){
-				return filt.variable != input.variable
+				return filt.attribute != input.attribute
 			})
 		}
 		
@@ -190,23 +190,73 @@ ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', '$q', func
 	
 	$scope.addFilter = function(input){
 		
-		if ($scope.fieldFilters.filter(function(filt) {return filt.variable == input.variable}).length == 0) {
+		console.log(input, $scope.fieldFilters);
+		if ($scope.fieldFilters.filter(function(filt) {return filt.attribute == input.attribute}).length == 0) {
 			$scope.fieldFilters.push(input);
 		} else {
 			alert("You have already selected a filter for this attribute. Remove it first.");
 		}
 		
-		$scope.modalinput = {variable:undefined, value:"Insert Value", operator:"="};
+		$scope.modalinput = {attribute:undefined, operand:"Insert Value", operator:"="};
 		
 	};
 	
-	$scope.modalinput = {variable:undefined, value:"Insert Value", operator:"="};
+	$scope.modalinput = {attribute:undefined, operand:"Insert Value", operator:"="};
 	
 	$scope.selectfilter = function(input){
-		$scope.modalinput = {variable:input, value:"Insert Value", operator:"="};
+		$scope.modalinput = {attribute:input, operand:"Insert Value", operator:"="};
 	}
 	
 	$scope.reqQuery = function(reqPage) {
+		
+		$q.all([0].map(function(rowid){	
+			
+			return $http({
+				method:"PUT",
+				url:"heatmap/"+$routeParams.dataset+"/annotation/" + $scope.dimension + "/search",
+				data: $scope.fieldFilters,
+				params: {
+					format:"json",
+				}
+			})
+			.success( function(data) {
+				return data;
+			})
+			
+		})).then(function(indiceslist) {
+
+			console.log(indiceslist);
+
+			var arr = indiceslist[0].data;
+			
+			arr = arr.filter(function(obj, index) {
+				return (index < 50)	
+			})
+		
+			$q.all(arr.map(function(rowid){	
+				
+				return $http({
+					method:"GET",
+					url:"heatmap/"+$routeParams.dataset+"/annotation/" + $scope.dimension + "/"+ rowid,
+					params: {
+						format:"json",
+					}
+				})
+				.success( function(data) {
+					return data;
+				});
+				
+			}))
+			.then(function(datas){
+				$scope.tuples = datas.map(function(data){
+					return data.data;
+				});
+			});
+			
+		})
+		
+		
+		
 		
 	};
 	

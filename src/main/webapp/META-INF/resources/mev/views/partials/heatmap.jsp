@@ -83,9 +83,9 @@
 							<i class="icon-remove" ng-click="remFilter(field)"></i>
 						</a>
 						
-						<h4 class="media-heading">{{field.variable}}</h4>
+						<h4 class="media-heading">{{field.attribute}}</h4>
 						<hr>
-						<p>Query: {{field.value}}</p>
+						<p>Query: {{field.operand}}</p>
 						<p>Operator: {{field.operator}}</p>
 					
 					</div>
@@ -144,30 +144,32 @@
 			
 		</div>
 		
+		<!-- Modal -->
+		<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i></button>
+			<h3 id="myModalLabel">Add New Filter</h3>
+		  </div>
+		  
+		  <div class="modal-body">
+			<p>Select Filter Term</p>
+				<input ng-model='modalinput.operand' />
+			<p>Select Operator Term</p>
+				<input ng-model='modalinput.operator' />
+
+		  </div>
+		  
+		  <div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+			<button class="btn btn-primary"  data-dismiss="modal" aria-hidden="true" ng-click="addFilter( modalinput )">Save changes</button>
+		  </div>
+
+		</div>
+		
 	</div>
 
-	<!-- Modal -->
-	<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-
-	  <div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i></button>
-		<h3 id="myModalLabel">Add New Filter</h3>
-	  </div>
-	  
-	  <div class="modal-body">
-		<p>Select Filter Term</p>
-			<input ng-model='modalinput.value' />
-		<p>Select Operator Term</p>
-			<input ng-model='modalinput.operator' />
-
-	  </div>
-	  
-	  <div class="modal-footer">
-		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-		<button class="btn btn-primary"  data-dismiss="modal" aria-hidden="true" ng-click="addFilter( modalinput )">Save changes</button>
-	  </div>
-
-	</div>
+	
 
 	<div class="tab-pane" id="analysisview">
 
