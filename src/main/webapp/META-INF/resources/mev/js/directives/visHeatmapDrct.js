@@ -57,34 +57,10 @@ drct.directive('visHeatmap', [function() {
 					.attr("pointer-events", "all")
 					.attr("width", width + margin.left + margin.right)
 					.attr("height", height + margin.top + margin.bottom);
-				
-				
-			
-				function zoom() {
-					
-					
-					vis.select(".xAxis").call(xAxis)
-						.selectAll("text")  
-							.style("text-anchor", "start")
-							.attr("dy", ( -(cellXPositionLin(2) - cellXPositionLin(1) )/2 ) + "px")
-							.attr("dx", "20px")
-							.attr("transform", function(d) {
-								return "rotate(90)" 
-							});
-							
-					vis.select(".yAxis").call(yAxis)
-						.selectAll("text")  
-							.style("text-anchor", "start")
-							.attr("dy", ( (cellYPositionLin(2) - cellYPositionLin(1) )/2 ) + "px");
-							
-					cellcover.selectAll("rect").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-					cellcover.selectAll("path").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-					cellcover.selectAll("circle").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-				}
-				
+
 				var threshold = 150;
 				
-				var colorScaleForward = function(j) {
+				function colorScaleForward(j) {
 					
 					var value = d3.scale.linear()
 						.domain([newdata.matrixsummary.min, newdata.matrixsummary.max])
@@ -102,7 +78,7 @@ drct.directive('visHeatmap', [function() {
 					return output;
 				};
 			 
-				var colorScaleReverse = function(j) {	 
+				function colorScaleReverse(j) {	 
 					var value = d3.scale.linear()
 						.domain([newdata.matrixsummary.min, newdata.matrixsummary.max])
 						.rangeRound([255, 0]);
@@ -116,7 +92,7 @@ drct.directive('visHeatmap', [function() {
 					return output;
 				};
 			 
-				var redColorControl = function(j, code) {
+				function redColorControl(j, code) {
 					var output = 0;
 					if (code == "red") {
 						output = colorScaleForward(j);
@@ -126,7 +102,7 @@ drct.directive('visHeatmap', [function() {
 					return output;
 					};
 			 
-				var blueColorControl = function(j, code) {
+				function blueColorControl(j, code) {
 					var output = 0;
 					if (code == "blue") {
 						output = colorScaleReverse(j);
@@ -134,7 +110,7 @@ drct.directive('visHeatmap', [function() {
 					return output;
 				};
 			 
-				var greenColorControl = function(j, code) {
+				function greenColorControl(j, code) {
 					var output = 0;
 			 
 					if (code == "red") {
@@ -197,7 +173,12 @@ drct.directive('visHeatmap', [function() {
 								return invIndexYMapper(d);
 							}
 						});
-				
+						
+				var zoom = d3.behavior.zoom()
+						.y(cellYPositionLin)
+						.scaleExtent([1, 8])
+						.on("zoom", draw);
+						
 				var vis = svg.append("g")
 					.attr("class", "uncovered")
 						
@@ -205,19 +186,15 @@ drct.directive('visHeatmap', [function() {
 					.attr("id", "clip")
 					.append("svg:rect")
 					.attr("id", "clip-rect")
-					.attr("x", 0)
-					.attr("y", 0 )
-					.attr("width", width + margin.left)
-					.attr("height", height + margin.top );
+					.attr("x", margin.left)
+					.attr("y", margin.top  )
+					.attr("width", width)
+					.attr("height", height);
 				
 				var cellcover = svg.append("g")
 					.attr("class", "heatmapcells")
 					.attr("clip-path", "url(#clip)")
-					.call(d3.behavior.zoom()
-						.x(cellXPositionLin)
-						.y(cellYPositionLin)
-						.scaleExtent([1, 8])
-						.on("zoom", zoom));
+					.call(zoom);
 				
 				vis.append("g").attr("class", "xAxis").attr("transform", "translate(0," + (margin.top + height) + ")")
 					.call(xAxis)
@@ -235,18 +212,39 @@ drct.directive('visHeatmap', [function() {
 							.style("text-anchor", "start")
 							.attr("dy", ( (cellYPositionLin(2) - cellYPositionLin(1) )/2 ) + "px");
 							
-				cellcover.append("g")
+				var heatmapcells = cellcover.append("g")
 					.selectAll("rect")
 						.data(newdata.data)
 						.enter()
-						.append("rect")
+						.append("rect");
+						
+				draw();
+						
+				function draw() {
+					
+					
+					vis.select(".xAxis").call(xAxis)
+						.selectAll("text")  
+							.style("text-anchor", "start")
+							.attr("dy", ( -(cellXPositionLin(2) - cellXPositionLin(1) )/2 ) + "px")
+							.attr("dx", "20px")
+							.attr("transform", function(d) {
+								return "rotate(90)" 
+							});
+							
+					vis.select(".yAxis").call(yAxis)
+						.selectAll("text")  
+							.style("text-anchor", "start")
+							.attr("dy", ( (cellYPositionLin(2) - cellYPositionLin(1) )/2 ) + "px");
+
+					heatmapcells
 						.attr({
 							"class": "cells",
 							"height": function(d){
-								return 1*( cellYPosition.rangeBand() );
+								return cellYPositionLin(2) - cellYPositionLin(1); ;
 							},
 							"width": function(d){
-								return 1*( cellXPosition.rangeBand() );
+								return cellXPositionLin(2) - cellXPositionLin(1) ;
 							},
 							"x": function(d, i) { return cellXPositionLin( indexXMapper(d.col) ); },
 							"y": function(d, i) { return cellYPositionLin( indexYMapper(d.row) ); },
@@ -259,14 +257,10 @@ drct.directive('visHeatmap', [function() {
 							"row": function(d, i) { return d.row; },
 							"column": function(d, i) { return d.col; }
 						})
-						.on("click", function(d){
-							scope.$apply(function(){
-								scope.celllink = {
-									range: d3.extent(newdata.data, function(x){return x.value} ),
-									cell:{gene:d.row, sample:d.col, value:d.value}
-								};
-							})
-						});
+					
+					//cellcover.selectAll("path").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+					//cellcover.selectAll("circle").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+				}
 
 				if (newdata.tree.left) {
 					
@@ -539,7 +533,7 @@ drct.directive('visHeatmap', [function() {
 
 					var topnodes = topcluster.nodes(newdata.tree.top)//Create the nodes based on the tree structure.
 
-					var toptree = cellcover.append("g").attr("class", "toptree");
+					var toptree = vis.append("g").attr("class", "toptree");
 
 					var toplink = toptree.selectAll("path") //Create the branches.
 						.data(topcluster.links(topnodes))

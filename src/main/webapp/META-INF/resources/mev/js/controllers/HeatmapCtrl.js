@@ -4,7 +4,7 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', '$rootScope',
 	$scope.curstartrow = 0;
 	$scope.curendrow = 100;
 	$scope.curstartcol = 0;
-	$scope.curendcol = 80;
+	$scope.curendcol = 500;
 	var firstpull = true;
 	var pullallow = true;
 	$scope.matrixsummary = undefined;
