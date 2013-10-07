@@ -126,6 +126,8 @@ drct.directive('visHeatmap', [function() {
 				var xkeylabels = newdata.columnlabels.map( function(d, i){ return { key:d, val:i} } );
 				var ykeylabels = newdata.rowlabels.map( function(d, i){ return { key:d, val:i} } );
 				
+				log.debug(newdata.columnlabels, xkeylabels, newdata.rowlabels, ykeylabels);
+				
 				var indexXMapper = d3.scale.ordinal()
 						.domain( newdata.columnlabels.map(function(d, i) { return d; } ) )
 						.range( newdata.columnlabels.map(function(d, i){ return i; } ) );

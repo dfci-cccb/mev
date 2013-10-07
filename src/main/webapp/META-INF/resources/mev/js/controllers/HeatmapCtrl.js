@@ -41,6 +41,7 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', '$rootScope',
 
 		$scope.matrixsummary = data;
 		
+		console.log(data);
 		
 		$scope.pullSelections("column");
 		$scope.pullSelections("row");
@@ -87,22 +88,13 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', '$rootScope',
 	
 	$scope.analyzeLimmaRequester = function() {
 
-		$http({
-			method:"GET",
-			url:"heatmap/"+$scope.matrixlocation+"/analysis/limma" 
+		var inputurl = "heatmap/"+$scope.matrixlocation+"/analysis/limma" 
 				+ "(" +$scope.LimmaDimension + "," + $scope.LimmaSelection1 + "," + $scope.LimmaSelection2 + ")"
-				+ "/" + $scope.LimmaOutputOption,
-			params: {
-				format:"json",
-				
-			}
-		})
-		.success( function(data) {
-			alert("Success! Please wait for your analysis to complete.")
-		})
-		.error( function(data) {
-		    alert("Something went wrong, please contact us if the problem persists.");	
-		});
+				+ "/" + $scope.LimmaOutputOption;
+
+		
+			$("body").append("<iframe src='" + inputurl + "' style='display: none;' ></iframe>")
+		
 		
 	}
 	
@@ -244,40 +236,6 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', '$rootScope',
 		
 		
 	};
-	
-	
-	//Test Selections
-	$http({
-		method:"PUT",
-		url:"heatmap/"+$scope.matrixlocation+"/selection/"+"row"+"/"+"Test1",
-		params: {
-			format:"json"
-		},
-		data: '{"attributes": {"name":"'+ "test1" +'"}, "indices":['+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]+ ']}'
-	})
-	.success( function(data) {
-				
-		$scope.pullSelections(dimension);
-		$scope.selectionname = undefined;
-				
-	});
-	
-	$http({
-		method:"PUT",
-		url:"heatmap/"+$scope.matrixlocation+"/selection/"+"row"+"/"+"Test2",
-		params: {
-			format:"json"
-		},
-		data: '{"attributes": {"name":"'+ "test2" +'"}, "indices":['+[11, 12, 13, 14, 15, 16, 17, 18, 19, 20]+ ']}'
-	})
-	.success( function(data) {
-				
-		$scope.pullSelections(dimension);
-		$scope.selectionname = undefined;
-				
-	});
-	
-	//End of Test Selections
 	
 	//pull page function
 	$scope.pullPage = function() {
