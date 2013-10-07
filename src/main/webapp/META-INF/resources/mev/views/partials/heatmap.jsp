@@ -11,7 +11,7 @@
 
 	<div class="tab-pane active" id="heatmapview">
 		<div class="row">
-		<div class="span3 offset1">
+			<div class="span3">
 		
 				<div class="row">
 					<p class="lead">{{matrixlocation}}</p>

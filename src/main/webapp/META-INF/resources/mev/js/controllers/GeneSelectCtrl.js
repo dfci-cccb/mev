@@ -4,7 +4,7 @@ ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', '$q', func
 
 	$scope.matrixsummary = undefined;
 	$scope.headers = null;
-	$scope.dimension = "row";
+	$scope.dimension = "column";
 	$scope.currentpage = 0;
 	$scope.totalpages = 0;
 	
