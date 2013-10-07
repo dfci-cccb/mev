@@ -128,7 +128,7 @@ public class Limma {
         configureRows (new FileOutputStream (configuration), heatmap, selection1, selection2);
       else
         configureColumns (new FileOutputStream (configuration), heatmap, selection1, selection2);
-      dump (new FileOutputStream (input), heatmap);
+      heatmap.toStream (new FileOutputStream (input));
       if (log.isDebugEnabled ())
         try (BufferedReader readBack = new BufferedReader (new FileReader (input))) {
           log.debug ("Dump line 1: \"" + readBack.readLine () + "\"");
@@ -187,40 +187,5 @@ public class Limma {
       out.println (index + "\t"
                    + (first.getIndices ().contains (index) ? 1 : (second.getIndices ().contains (index) ? 0 : -1)));
     out.flush ();
-  }
-
-  private static void dump (final OutputStream data, final Heatmap heatmap) throws IOException,
-                                                                           AnnotationNotFoundException {
-    final String newline = System.getProperty ("line.separator", "\n"), tab = "\t";
-    StringBuffer header = new StringBuffer ();
-    for (MatrixAnnotation<?> column : heatmap.getColumnAnnotation (0, heatmap.getSummary ().columns () - 1, "COLUMN"))
-      header.append (tab).append (column.attribute ());
-    data.write (header.append (newline).toString ().getBytes ());
-    heatmap.toStream (newline,
-                      new Object () {
-                        private Iterator<MatrixAnnotation<?>> rows = heatmap.getRowAnnotation (0,
-                                                                                               heatmap.getSummary ()
-                                                                                                      .rows (),
-                                                                                               "annotation-0")
-                                                                            .iterator ();
-
-                        /* (non-Javadoc)
-                         * @see java.lang.Object#toString() */
-                        @Override
-                        public String toString () {
-                          return rows.next ().toString () + tab;
-                        }
-                      },
-                      new ObjectOutputStream () {
-                        /* (non-Javadoc)
-                         * @see
-                         * java.io.ObjectOutputStream#writeObjectOverride(java
-                         * .lang.Object) */
-                        @Override
-                        protected void writeObjectOverride (Object obj) throws IOException {
-                          data.write (obj.toString ().getBytes ());
-                        }
-                      });
-    data.flush ();
   }
 }

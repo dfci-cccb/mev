@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutput;
+import java.io.OutputStream;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -917,6 +918,19 @@ public class Heatmap implements Closeable {
         return 0;
       }
     });
+  }
+  
+  public void toStream (OutputStream out) throws IOException, AnnotationNotFoundException {
+    out.write ("id".getBytes ());
+    for (int column = 0; column < getSummary ().columns (); column++)
+      out.write (("\t" + getColumnAnnotation (column).get (0).value ()).getBytes ());
+    for (int row = 0; row < getSummary ().rows (); row++) {
+      out.write (String.valueOf (getRowAnnotation (row).get (0).value ()).getBytes ());
+      for (int column = 0; column < getSummary ().columns (); column++)
+        out.write (("\t" + data.getEntry (row, column)).getBytes ());
+      out.write ('\n');
+    }
+    out.flush ();
   }
 
   private List<Integer> reorderedIndices (final Cluster cluster) {

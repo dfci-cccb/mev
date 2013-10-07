@@ -30,7 +30,10 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -252,6 +255,17 @@ public class HeatmapController {
       throw new InvalidDimensionException (dimension);
     IOUtils.copy (new FileInputStream (limma),
                   response.getOutputStream ());
+    response.flushBuffer ();
+  }
+
+  @RequestMapping (value = "/{id}/download", method = GET)
+  @ResponseStatus (OK)
+  public void download (@PathVariable ("id") String id, HttpServletResponse response) throws HeatmapNotFoundException,
+                                                                                     IOException,
+                                                                                     AnnotationNotFoundException {
+    response.setContentType ("text/plain");
+    response.setHeader ("Content-Disposition", "attachment;filename=" + id + ".txt");
+    heatmaps.get (id).toStream (response.getOutputStream ());
     response.flushBuffer ();
   }
 
