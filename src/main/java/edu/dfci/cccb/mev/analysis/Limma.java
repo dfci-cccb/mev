@@ -26,6 +26,7 @@ import static us.levk.util.io.support.Provisionals.file;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 //import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -40,6 +41,7 @@ import javax.script.ScriptException;
 
 import lombok.extern.log4j.Log4j;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -60,7 +62,8 @@ import edu.dfci.cccb.mev.domain.MatrixSelection;
 @Log4j
 public class Limma {
 
-  //private static final ScriptEngine r = new ScriptEngineManager ().getEngineByName ("R");
+  // private static final ScriptEngine r = new ScriptEngineManager
+  // ().getEngineByName ("R");
   private static final String script = "edu/dfci/cccb/mev/analysis/limma.R.vm";
   private static final VelocityEngine velocity = new VelocityEngine () {
     {
@@ -117,7 +120,8 @@ public class Limma {
                                                AnnotationNotFoundException {
     try (final Provisional input = file ();
          final Provisional configuration = file ();
-         final Provisional script = file ()) {
+         final Provisional script = file ();
+         final OutputStreamWriter writer = new OutputStreamWriter (new FileOutputStream (script))) {
       if ("row".equals (dimension))
         configureRows (new FileOutputStream (configuration), heatmap, selection1, selection2);
       else
@@ -138,9 +142,21 @@ public class Limma {
           put ("rnk", rnk.getAbsolutePath ());
         }
       }),
-                                                 new OutputStreamWriter (new FileOutputStream (script)));
-      Runtime.getRuntime ().exec ("Rscript " + script.getAbsolutePath ());
-      //r.eval (new InputStreamReader (new ByteArrayInputStream (script.toByteArray ())));
+                                                 writer);
+      writer.flush ();
+      Process r = Runtime.getRuntime ().exec ("Rscript " + script.getAbsolutePath ());
+      try {
+        r.waitFor ();
+      } catch (InterruptedException e) {
+        log.error ("Interrupted while waiting for R", e);
+      }
+      if (log.isDebugEnabled ()) {
+        ByteArrayOutputStream listing = new ByteArrayOutputStream ();
+        IOUtils.copy (r.getErrorStream (), listing);
+        log.debug ("Return value " + r.exitValue () + " error output:\n" + listing.toString ());
+      }
+      // r.eval (new InputStreamReader (new ByteArrayInputStream
+      // (script.toByteArray ())));
     }
   }
 
