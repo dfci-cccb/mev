@@ -127,13 +127,18 @@ public class Limma {
         private static final long serialVersionUID = 1L;
 
         {
+          if (log.isDebugEnabled ())
+            log.debug ("Running LIMMA with input "
+                       + input.getAbsolutePath () + " configuration " + configuration.getAbsolutePath () + " output "
+                       + output.getAbsolutePath () + " significant " + significant);
           put ("input", input.getAbsolutePath ());
           put ("configuration", configuration.getAbsolutePath ());
           put ("output", output.getAbsolutePath ());
           put ("significant", significant.getAbsolutePath ());
           put ("rnk", rnk.getAbsolutePath ());
         }
-      }), new OutputStreamWriter (script));
+      }),
+                                                 new OutputStreamWriter (script));
       r.eval (new InputStreamReader (new ByteArrayInputStream (script.toByteArray ())));
     }
   }
