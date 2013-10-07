@@ -4,7 +4,7 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', '$rootScope',
 	$scope.curstartrow = 0;
 	$scope.curendrow = 100;
 	$scope.curstartcol = 0;
-	$scope.curendcol = 500;
+	$scope.curendcol = 50;
 	var firstpull = true;
 	var pullallow = true;
 	$scope.matrixsummary = undefined;
@@ -40,8 +40,6 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', '$rootScope',
 	.success( function(data) {
 
 		$scope.matrixsummary = data;
-		
-		console.log(data);
 		
 		$scope.pullSelections("column");
 		$scope.pullSelections("row");
@@ -280,6 +278,7 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', '$rootScope',
 				}
 			})
 			.success( function(columnData) {
+				
 				$scope.heatmapcolumns = columnData;
 				$scope.transformData();
 			});

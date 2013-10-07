@@ -1,8 +1,8 @@
 <div class="row">
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="#heatmapview" data-toggle="tab">Heatmap</a></li>
-		<li><a href="#filterview" data-toggle="tab">Filter</a></li>
-		<li><a href="#analysisview" data-toggle="tab">Analyze</a></li>
+		<li><a href="#filterview" data-toggle="tab">Annotations</a></li>
+		<li><a href="#analysisview" data-toggle="tab">Analysis</a></li>
 		<li><a href="#infopane" data-toggle="tab">Info</a></li>
 	</ul>
 </div>
@@ -12,6 +12,10 @@
 	<div class="tab-pane active" id="heatmapview">
 		<div class="row">
 		<div class="span3 offset1">
+		
+				<div class="row">
+					<p class="lead">{{matrixlocation}}</p>
+				</div>
 		
 				<div class="row">
 					<p>
@@ -25,6 +29,7 @@
 				<div class="row" ng-show="matrixsummary.columnClustered">
 					<p class="muted"> Selected Column Cells: {{selectedcells.column.length}} </p>
 					<p class="muted"> Selected Row Cells: {{selectedcells.row.length}} </p>
+					<hr>
 				</div>
 				
 				<div class="row" ng-show="matrixsummary.columnClustered">
@@ -41,6 +46,11 @@
 					</div>
 					
 					<button class="btn btn-block btn-primary" ng-click="pushSelections('column')">Submit Column Selections</button>
+					<hr>
+				</div>
+				
+				<div class="row">
+					<button class="btn btn-block btn-success" href="/heatmap/{{matrixlocation}}/download"><i class="icon-download"></i>Download Heatmap</button>
 				</div>
 							
 			</div>
@@ -49,7 +59,7 @@
 					inputdata="transformeddata"
 					inputcolor="red"
 					showlabels="true"
-					width="800"
+					width="1000"
 					height="900"
 					marginleft="80"
 					marginright="80"
@@ -196,34 +206,16 @@
 						</div>
 					</div>
 				</div>
-				
+
 				
 				
 				<div class="accordion-group">
 					<div class="accordion-heading">
 						<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
-							Selections
-						</a>
-					</div>
-					<div id="collapseTwo" class="accordion-body collapse">
-						<div class="accordion-inner">
-						
-							
-							
-							<button class="btn btn-block btn-primary" data-target="#myRowModal" data-toggle="modal">Add Row Selection </button>
-							<button class="btn btn-block btn-primary" data-target="#myColumnModal" data-toggle="modal">Add Column Selection </button>
-						</div>
-					</div>
-				</div>
-				
-				
-				<div class="accordion-group">
-					<div class="accordion-heading">
-						<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
 							LIMMA
 						</a>
 					</div>
-					<div id="collapseThree" class="accordion-body collapse">
+					<div id="collapseTwo" class="accordion-body collapse">
 						<div class="accordion-inner">
 						
 							<select ng-model="LimmaDimension"> 
