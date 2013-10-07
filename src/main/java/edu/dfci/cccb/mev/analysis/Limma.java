@@ -21,12 +21,12 @@ import static org.apache.log4j.Level.TRACE;
 import static org.apache.log4j.Level.WARN;
 import static us.levk.util.io.support.Provisionals.file;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+//import java.io.ByteArrayInputStream;
+//import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+//import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -34,8 +34,8 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+//import javax.script.ScriptEngine;
+//import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import lombok.extern.log4j.Log4j;
@@ -60,7 +60,7 @@ import edu.dfci.cccb.mev.domain.MatrixSelection;
 @Log4j
 public class Limma {
 
-  private static final ScriptEngine r = new ScriptEngineManager ().getEngineByName ("R");
+  //private static final ScriptEngine r = new ScriptEngineManager ().getEngineByName ("R");
   private static final String script = "edu/dfci/cccb/mev/analysis/limma.R.vm";
   private static final VelocityEngine velocity = new VelocityEngine () {
     {
@@ -117,7 +117,7 @@ public class Limma {
                                                AnnotationNotFoundException {
     try (final Provisional input = file ();
          final Provisional configuration = file ();
-         ByteArrayOutputStream script = new ByteArrayOutputStream ()) {
+         final Provisional script = file ()) {
       if ("row".equals (dimension))
         configureRows (new FileOutputStream (configuration), heatmap, selection1, selection2);
       else
@@ -138,8 +138,9 @@ public class Limma {
           put ("rnk", rnk.getAbsolutePath ());
         }
       }),
-                                                 new OutputStreamWriter (script));
-      r.eval (new InputStreamReader (new ByteArrayInputStream (script.toByteArray ())));
+                                                 new OutputStreamWriter (new FileOutputStream (script)));
+      Runtime.getRuntime ().exec ("Rscript " + script.getAbsolutePath ());
+      //r.eval (new InputStreamReader (new ByteArrayInputStream (script.toByteArray ())));
     }
   }
 
