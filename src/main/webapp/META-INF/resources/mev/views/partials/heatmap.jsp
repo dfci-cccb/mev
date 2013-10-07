@@ -50,7 +50,7 @@
 			<div class="span7">
 				<vis-Heatmap 
 					inputdata="transformeddata"
-					inputcolor="red"
+					inputcolor="{{heatmapcolor}}"
 					showlabels="true"
 					width="1000"
 					height="900"

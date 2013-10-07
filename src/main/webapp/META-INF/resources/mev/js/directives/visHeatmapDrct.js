@@ -5,7 +5,7 @@ drct.directive('visHeatmap', [function() {
 		restrict: 'E',
 		scope: {
 			inputdata:"=",
-			inputcolor:"=",
+			inputcolor:"@",
 			showlabels: "=",
 			width: "=",
 			height: "=",
@@ -125,8 +125,6 @@ drct.directive('visHeatmap', [function() {
 				
 				var xkeylabels = newdata.columnlabels.map( function(d, i){ return { key:d, val:i} } );
 				var ykeylabels = newdata.rowlabels.map( function(d, i){ return { key:d, val:i} } );
-				
-				log.debug(newdata.columnlabels, xkeylabels, newdata.rowlabels, ykeylabels);
 				
 				var indexXMapper = d3.scale.ordinal()
 						.domain( newdata.columnlabels.map(function(d, i) { return d; } ) )
@@ -251,7 +249,7 @@ drct.directive('visHeatmap', [function() {
 							"x": function(d, i) { return cellXPositionLin( indexXMapper(d.col) ); },
 							"y": function(d, i) { return cellYPositionLin( indexYMapper(d.row) ); },
 							"fill": function(d) {
-								return "rgb(" + redColorControl(d.value, "red") + "," + greenColorControl(d.value, "red") + ","+ blueColorControl(d.value, "red")+")";
+								return "rgb(" + redColorControl(d.value, scope.inputcolor) + "," + greenColorControl(d.value, scope.inputcolor) + ","+ blueColorControl(d.value, scope.inputcolor)+")";
 					
 							},
 							"value": function(d) { return d.value; },
@@ -577,26 +575,7 @@ drct.directive('visHeatmap', [function() {
 				
 			});
 		 
-			
-			scope.$watch('inputcolor', function(newdata, olddata) {
 
-				if (newdata == olddata | !newdata) {
-					return;
-				} else if (vis) {
-					
-					vis.selectAll('rect')
-						.transition()
-						.duration(500)
-						.attr({
-							"fill": function(d) {
-								return "rgb(" + redColorControl(d.value, scope.inputcolor) + "," + greenColorControl(d.value, scope.inputcolor) + ","+ blueColorControl(d.value, scope.inputcolor)+")";
-							}
-						});
-				}
-				
-				
-				
-			});
 		}
 	}
 }]);

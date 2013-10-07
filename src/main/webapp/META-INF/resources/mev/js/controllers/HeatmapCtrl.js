@@ -16,6 +16,17 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', '$rootScope',
 	$scope.selectedcells.column = [];
 	$scope.selections = new Object();
 	
+	$http({
+		method:"GET",
+		url:"/preferences/heatmap.color",
+		params: {
+			format:"json"
+		}
+	})
+	.success( function(data) {
+		$scope.heatmapcolor = data;
+	});
+
 	$scope.retrieveHeatmaps = function() {
 
 		$http({
@@ -184,8 +195,7 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', '$rootScope',
 		$scope.transformeddata.columnlabels = $scope.heatmapcolumns.map(function(d) { return d.value;});
 		$scope.transformeddata.rowlabels = $scope.heatmaprows.map(function(d) { return d.value;});
 		$scope.transformeddata.matrixsummary = $scope.matrixsummary;
-		$scope.transformeddata.tree.top = $scope.downloadedtree
-
+		$scope.transformeddata.tree.top = $scope.downloadedtree;
 		firstpull = false;
 
 	};
