@@ -43,7 +43,7 @@
 				</div>
 				
 				<div class="row">
-					<button class="btn btn-block btn-success" href="/heatmap/{{matrixlocation}}/download"><i class="icon-download"></i>Download Heatmap</button>
+					<button class="btn btn-block btn-success"><a href="/heatmap/{{matrixlocation}}/download"><i class="icon-download"></i>Download Heatmap</a></button>
 				</div>
 							
 			</div>
@@ -156,6 +156,8 @@
 		  </div>
 		  
 		  <div class="modal-body">
+		    <p>Selection Name</p>
+				<input ng-model="selectionname" type="text"/>
 			<p>Select Filter Term</p>
 				<input ng-model='modalinput.operand' />
 			<p>Select Operator Term</p>

@@ -83,8 +83,6 @@ ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', '$q', func
 	
 	$scope.getPage = function(page) {
 		
-		console.log("Requested Page");
-		
 		var arr = [0, 0];
 		
 		if (page <= 0) {
@@ -190,7 +188,7 @@ ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', '$q', func
 	
 	$scope.addFilter = function(input){
 		
-		console.log(input, $scope.fieldFilters);
+		
 		if ($scope.fieldFilters.filter(function(filt) {return filt.attribute == input.attribute}).length == 0) {
 			$scope.fieldFilters.push(input);
 		} else {
@@ -225,15 +223,30 @@ ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', '$q', func
 			
 		})).then(function(indiceslist) {
 
-			console.log(indiceslist);
+			
 
 			var arr = indiceslist[0].data;
 			
-			arr = arr.filter(function(obj, index) {
+			$http({
+				method:"PUT",
+				url:"heatmap/"+$scope.matrixlocation+"/selection/"+ $scope.dimension +"/"+$scope.selectionname,
+				params: {
+					format:"json"
+				},
+				data: '{"attributes": {"name":"'+ $scope.selectionname +'"}, "indices":['+ arr + ']}'
+			})
+			.success( function(data) {
+				
+				
+				$scope.selectionname = undefined;
+				
+			});
+			
+			var filtarr = arr.filter(function(obj, index) {
 				return (index < 50)	
 			})
 		
-			$q.all(arr.map(function(rowid){	
+			$q.all(filtarr.map(function(rowid){	
 				
 				return $http({
 					method:"GET",
