@@ -39,7 +39,6 @@ angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives', 
 			var input = document.getElementById("datasetfile");
 			var box = document.getElementById("progbox"); //DOM element of the growing progress bar
 			var bar = document.getElementById("progbar"); //DOM element of the growing progress bar
-			log.debug ("uploading files", input, input.files, input.files.length);
 			var files = [];
 			
 			for (var i=0; i<input.files.length; i++){
@@ -73,15 +72,13 @@ angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives', 
 						
 						});
 						
-						log.debug ("upload complete");
-						
 						bar.style.width = "0%";
 						//$scope.uploadName = undefined;
 						box.style.visibility = "hidden";
 						
 					} else if (xhr && xhr.readyState == 4 && xhr.status != 200) {
-					
-						alert(xhr.status + ": " + xhr.statusText);
+						
+						alert(xhr.status + ": " + xhr.statusText + "\n" + "\n" + "Error Details:" + "\n" + "\n" + xhr.responseText );
 						bar.style.width = "0%";
 						//$scope.uploadName = undefined;
 						box.style.visibility = "hidden";

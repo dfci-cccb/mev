@@ -224,6 +224,12 @@
 					<div id="collapseThree" class="accordion-body collapse">
 						<div class="accordion-inner">
 						
+							<select ng-model="LimmaDimension"> 
+							
+								<option ng-repeat="dimension in ['column', 'row']" value="{{dimension}}"> {{dimension}} </option>
+												
+							</select>
+						
 							<select ng-model="LimmaSelection1"> 
 							
 								<option ng-repeat="selection in selections.row.concat(selections.column)" value="{{selection}}"> {{selection}} </option>
