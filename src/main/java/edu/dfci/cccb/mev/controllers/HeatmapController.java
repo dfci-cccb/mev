@@ -27,6 +27,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.HEAD;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -73,7 +74,7 @@ import edu.dfci.cccb.mev.domain.MatrixSummary;
 @Controller
 @RequestMapping ("/heatmap")
 @Log4j
-public class HeatmapController implements InitializingBean {
+public class HeatmapController implements InitializingBean, Closeable {
 
   private @Autowired Heatmaps heatmaps;
   private @Autowired Heatmap.Builder heatmapBuilder;
@@ -496,5 +497,13 @@ public class HeatmapController implements InitializingBean {
         log.info ("Finished loading global heatmaps");
       }
     }.start ();
+  }
+  
+  /* (non-Javadoc)
+   * @see java.io.Closeable#close()
+   */
+  @Override
+  public void close () throws IOException {
+    global.close ();
   }
 }
