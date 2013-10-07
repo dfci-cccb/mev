@@ -658,8 +658,10 @@ public class Heatmap implements Closeable {
     }
 
     public Heatmap build (final MultipartFile file) throws IOException {
-      final InputStream input = file.getInputStream ();
-      final long size = file.getSize ();
+      return build (file.getInputStream (), file.getSize (), file.getOriginalFilename ());
+    }
+    
+    public Heatmap build (final InputStream input, final long size, final String name) throws IOException {
       log.debug ("Building heatmap from " + size + " bytes of uploaded data");
       BufferedReader reader = new BufferedReader (new InputStreamReader (new InputStream () {
         private final InputStream in = new BufferedInputStream (input);
@@ -683,14 +685,14 @@ public class Heatmap implements Closeable {
           if (result < 0) {
             if (!complete) {
               complete = true;
-              log.debug ("Processing uploaded file " + file.getOriginalFilename () + " is complete");
+              log.debug ("Processing uploaded file " + name + " is complete");
             }
           } else {
             count++;
             if (logUpdateThresholds.size () > 0)
               if (((double) count) * 100 / size > logUpdateThresholds.get (0)) {
                 log.debug ("Processing uploaded file "
-                           + file.getOriginalFilename () + " is " + logUpdateThresholds.get (0) + "% complete");
+                           + name + " is " + logUpdateThresholds.get (0) + "% complete");
                 logUpdateThresholds.remove (0);
               }
           }

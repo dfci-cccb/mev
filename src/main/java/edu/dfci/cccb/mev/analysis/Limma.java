@@ -21,13 +21,12 @@ import static org.apache.log4j.Level.TRACE;
 import static org.apache.log4j.Level.WARN;
 import static us.levk.util.io.support.Provisionals.file;
 
-//import java.io.ByteArrayInputStream;
-//import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.ByteArrayOutputStream;
-//import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -35,8 +34,6 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Iterator;
 
-//import javax.script.ScriptEngine;
-//import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import lombok.extern.log4j.Log4j;
@@ -54,6 +51,11 @@ import edu.dfci.cccb.mev.domain.AnnotationNotFoundException;
 import edu.dfci.cccb.mev.domain.Heatmap;
 import edu.dfci.cccb.mev.domain.MatrixAnnotation;
 import edu.dfci.cccb.mev.domain.MatrixSelection;
+//import java.io.ByteArrayInputStream;
+//import java.io.ByteArrayOutputStream;
+//import java.io.InputStreamReader;
+//import javax.script.ScriptEngine;
+//import javax.script.ScriptEngineManager;
 
 /**
  * @author levk
@@ -127,6 +129,11 @@ public class Limma {
       else
         configureColumns (new FileOutputStream (configuration), heatmap, selection1, selection2);
       dump (new FileOutputStream (input), heatmap);
+      if (log.isDebugEnabled ())
+        try (BufferedReader readBack = new BufferedReader (new FileReader (input))) {
+          log.debug ("Dump line 1: \"" + readBack.readLine () + "\"");
+          log.debug ("Dump line 2: \"" + readBack.readLine () + "\"");
+        }
       velocity.getTemplate (Limma.script).merge (new VelocityContext (new HashMap<String, String> () {
         private static final long serialVersionUID = 1L;
 
@@ -214,5 +221,6 @@ public class Limma {
                           data.write (obj.toString ().getBytes ());
                         }
                       });
+    data.flush ();
   }
 }

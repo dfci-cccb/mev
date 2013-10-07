@@ -23,6 +23,7 @@ import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.HEAD;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
@@ -229,7 +230,7 @@ public class HeatmapController {
       return clustered.getColumnClusters ();
   }
 
-  @RequestMapping (value = "/{id}/analysis/limma({dimension},{experiment},{control})/{output}", method = GET)
+  @RequestMapping (value = "/{id}/analysis/limma({dimension},{experiment},{control})/{output}", method = { GET, HEAD })
   @ResponseStatus (OK)
   public void limma (@PathVariable ("id") String id,
                      @PathVariable ("experiment") String experiment,
@@ -368,7 +369,7 @@ public class HeatmapController {
                       IndexOutOfBoundsException.class })
   @ResponseStatus (NOT_FOUND)
   @ResponseBody
-  public String handeNotFoundException (Exception e) {
+  public String handleNotFoundException (Exception e) {
     log.warn ("Unbound resource", e);
     return e.getLocalizedMessage ();
   }
@@ -376,7 +377,7 @@ public class HeatmapController {
   @ExceptionHandler (InvalidDimensionException.class)
   @ResponseStatus (BAD_REQUEST)
   @ResponseBody
-  public String handeBadRequestException (InvalidDimensionException e) {
+  public String handleBadRequestException (InvalidDimensionException e) {
     log.warn ("Bad REST call", e);
     return e.getLocalizedMessage ();
   }
