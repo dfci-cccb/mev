@@ -42,9 +42,7 @@
 					<hr>
 				</div>
 				
-				<div class="row">
-					<button class="btn btn-block btn-success"><a href="/heatmap/{{matrixlocation}}/download"><i class="icon-download"></i>Download Heatmap</a></button>
-				</div>
+				<button class="btn btn-block btn-success"><a href="/heatmap/{{matrixlocation}}/download"><i class="icon-download"></i>Download Heatmap</a></button>
 							
 			</div>
 			<div class="span7">
@@ -213,32 +211,25 @@
 					<div id="collapseTwo" class="accordion-body collapse">
 						<div class="accordion-inner">
 						
-							<select ng-model="LimmaDimension"> 
-							
-								<option ng-repeat="dimension in ['column', 'row']" value="{{dimension}}"> {{dimension}} </option>
-												
+							<select ng-model="LimmaDimension">
+								<option ng-repeat="dimension in ['column', 'row']" value="{{dimension}}"> {{dimension}} </option>		
 							</select>
 						
-							<select ng-model="LimmaSelection1"> 
-							
+							<select ng-model="LimmaSelection1">
 								<option ng-repeat="selection in selections.row.concat(selections.column)" value="{{selection}}"> {{selection}} </option>
-												
 							</select>
 							
-							<select ng-model="LimmaSelection2"> 
-												
+							<select ng-model="LimmaSelection2">	
 								<option ng-repeat="selection in selections.row.concat(selections.column)" value="{{selection}}"> {{selection}} </option>
-												
 							</select>
 							
-							<select ng-model="LimmaOutputOption"> 
-												
+							<input type='text' value="Significance Alpha" />
+							
+							<select ng-model="LimmaOutputOption">
 								<option ng-repeat="option in ['significant', 'full', 'rnk']" value="{{option}}"> {{option}} </option>
-												
 							</select>
 							
 							<button class="btn btn-primary" ng-click="analyzeLimmaRequester()">Analyze</button>
-							
 													
 						</div>
 					</div>
