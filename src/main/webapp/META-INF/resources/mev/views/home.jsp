@@ -55,7 +55,7 @@
   <nav class="effeckt-off-screen-nav effeckt-off-screen-nav-right-overlay effeckt-off-screen-nav-show" id="effeckt-off-screen-nav">
     <h4>
 	  Menu
-      <a href="" id="effeckt-off-screen-nav-close" class="effeckt-off-screen-nav-close"><i class="icon-resize-small icon-white"></i></a>
+      <a href="" id="effeckt-off-screen-nav-close" class="effeckt-off-screen-nav-close"><i class="icon-remove icon-white"></i></a>
     </h4>
 
     <ul>
