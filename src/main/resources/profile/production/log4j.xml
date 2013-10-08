@@ -8,6 +8,15 @@
       <param name="ConversionPattern" value="${log4j.pattern}" />
     </layout>
   </appender>
+  <logger name="org.eobjects.metamodel">
+    <level value="warn" />
+  </logger>
+  <logger name="org.springframework">
+    <level value="warn" />
+  </logger>
+  <logger name="org.hibernate">
+    <level value="warn" />
+  </logger>
   <root>
     <priority value="debug"></priority>
     <appender-ref ref="log" />

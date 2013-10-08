@@ -64,6 +64,7 @@ public class Limma {
   // private static final ScriptEngine r = new ScriptEngineManager
   // ().getEngineByName ("R");
   private static final String script = "edu/dfci/cccb/mev/analysis/limma.R.vm";
+  private static final String r = System.getProperty (Limma.class.getCanonicalName () + ".r", "Rscript");
   private static final VelocityEngine velocity = new VelocityEngine () {
     {
       setProperty (RESOURCE_LOADER, "classpath");
@@ -148,7 +149,7 @@ public class Limma {
       }),
                                                  writer);
       writer.flush ();
-      Process r = Runtime.getRuntime ().exec ("Rscript " + script.getAbsolutePath ());
+      Process r = Runtime.getRuntime ().exec (Limma.r + " " + script.getAbsolutePath ());
       try {
         r.waitFor ();
       } catch (InterruptedException e) {

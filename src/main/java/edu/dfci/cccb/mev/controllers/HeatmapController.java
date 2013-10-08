@@ -61,6 +61,7 @@ import edu.dfci.cccb.mev.domain.Heatmap.LimmaOutput;
 import edu.dfci.cccb.mev.domain.HeatmapNotFoundException;
 import edu.dfci.cccb.mev.domain.Heatmaps;
 import edu.dfci.cccb.mev.domain.InvalidDimensionException;
+import edu.dfci.cccb.mev.domain.LimmaResult;
 import edu.dfci.cccb.mev.domain.MatrixAnnotation;
 import edu.dfci.cccb.mev.domain.MatrixData;
 import edu.dfci.cccb.mev.domain.MatrixSelection;
@@ -256,15 +257,33 @@ public class HeatmapController implements InitializingBean, Closeable {
     response.setHeader ("Content-Disposition", "attachment;filename=" + output + ".txt");
     Heatmap heatmap = get (id);
     File limma;
-    if (isRow (dimension))
+    if (isRow (dimension)) {
       limma = heatmap.limmaRows (experiment, control, LimmaOutput.valueOf (output.toUpperCase ()));
-    else if (isColumn (dimension))
+    } else if (isColumn (dimension)) {
       limma = heatmap.limmaColumns (experiment, control, LimmaOutput.valueOf (output.toUpperCase ()));
-    else
+    } else
       throw new InvalidDimensionException (dimension);
     IOUtils.copy (new FileInputStream (limma),
                   response.getOutputStream ());
     response.flushBuffer ();
+  }
+
+  @RequestMapping (value = "/{id}/analysis/limmaView({dimension},{experiment},{control})/{output}",
+                   method = { GET, HEAD })
+  @ResponseBody
+  public List<LimmaResult> limmaView (@PathVariable ("id") String id,
+                                      @PathVariable ("experiment") String experiment,
+                                      @PathVariable ("control") String control,
+                                      @PathVariable ("output") String output,
+                                      @PathVariable ("dimension") String dimension) throws HeatmapNotFoundException,
+                                                                                   IOException,
+                                                                                   InvalidDimensionException {
+    if (isRow (dimension))
+      return heatmaps.get (id).limmaRowsData (experiment, control, LimmaOutput.valueOf (output.toUpperCase ()));
+    else if (isColumn (dimension))
+      return heatmaps.get (id).limmaColumnsData (experiment, control, LimmaOutput.valueOf (output.toUpperCase ()));
+    else
+      throw new InvalidDimensionException (dimension);
   }
 
   @RequestMapping (value = "/{id}/download", method = GET)
@@ -470,22 +489,27 @@ public class HeatmapController implements InitializingBean, Closeable {
         for (String key : definitions.stringPropertyNames ()) {
           File data = new File (definitions.get (key).toString ());
           log.debug ("Loading " + data + " as " + key);
-          if (!data.exists ())
+          if (!data.exists ()) {
+            log.debug ("File " + data + " not found");
             continue;
-          else
+          } else
             try {
+              log.debug (data + " found");
               Heatmap heatmap;
               global.put (key, heatmap = heatmapBuilder.build (new FileInputStream (data), data.length (), key));
+              log.debug ("Loaded " + data);
               String location;
               try {
                 if ((location = annotations.getProperty (key + ".column")) != null && new File (location).exists ())
                   heatmap.setColumnAnnotations (new FileInputStream (location));
+                log.debug ("Loaded column annotations for " + key + " from " + location);
               } catch (IOException e) {
                 log.warn ("Unable to load column annotations for " + key, e);
               }
               try {
                 if ((location = annotations.getProperty (key + ".row")) != null && new File (location).exists ())
                   heatmap.setRowAnnotations (new FileInputStream (location));
+                log.debug ("Loaded row annotations for " + key + " from " + location);
               } catch (IOException e) {
                 log.warn ("Unable to load row annotations for " + key, e);
               }
@@ -498,10 +522,9 @@ public class HeatmapController implements InitializingBean, Closeable {
       }
     }.start ();
   }
-  
+
   /* (non-Javadoc)
-   * @see java.io.Closeable#close()
-   */
+   * @see java.io.Closeable#close() */
   @Override
   public void close () throws IOException {
     global.close ();

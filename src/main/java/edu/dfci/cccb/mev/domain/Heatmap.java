@@ -28,6 +28,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -77,6 +78,8 @@ import us.levk.math.linear.EucledianDistanceClusterer.Cluster;
 import us.levk.math.linear.HugeRealMatrix;
 import us.levk.util.io.implementation.Provisional;
 import us.levk.util.io.support.Provisionals;
+
+import ch.lambdaj.Lambda;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.cache.CacheBuilder;
@@ -178,75 +181,213 @@ public class Heatmap implements Closeable {
                                                                                                                              }
                                                                                                                            });
   private final LoadingCache<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> limmaColumns =
-          CacheBuilder.newBuilder ()
-                      .maximumSize (100)
-                      .expireAfterWrite (20,
-                                         TimeUnit.MINUTES)
-                      .removalListener (new RemovalListener<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> () {
+                                                                                                                  CacheBuilder.newBuilder ()
+                                                                                                                              .maximumSize (100)
+                                                                                                                              .expireAfterWrite (20,
+                                                                                                                                                 TimeUnit.MINUTES)
+                                                                                                                              .removalListener (new RemovalListener<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> () {
 
-                        @Override
-                        public void onRemoval (RemovalNotification<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> arg0) {
-                          log.debug ("Ejecting limma analysis "
-                                     + Heatmap.this
-                                     + "("
-                                     + arg0.getKey ()
-                                     + ") from cache");
-                          Provisional p =
-                                          null;
-                          for (Iterator<Object> iterator =
-                                                           arg0.getValue ()
-                                                               .iterator (); iterator.hasNext ();)
-                            try {
-                              p =
-                                  (Provisional) iterator.next ();
-                              p.close ();
-                            } catch (RuntimeException | Error | IOException e) {
-                              log.warn ("Unable to close provisional "
-                                                + p
-                                                + " for "
-                                                + Heatmap.this,
-                                        e);
-                            }
-                        }
-                      })
-                      .build (new CacheLoader<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> () {
+                                                                                                                                @Override
+                                                                                                                                public void onRemoval (RemovalNotification<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> arg0) {
+                                                                                                                                  log.debug ("Ejecting limma analysis "
+                                                                                                                                             + Heatmap.this
+                                                                                                                                             + "("
+                                                                                                                                             + arg0.getKey ()
+                                                                                                                                             + ") from cache");
+                                                                                                                                  Provisional p =
+                                                                                                                                                  null;
+                                                                                                                                  for (Iterator<Object> iterator =
+                                                                                                                                                                   arg0.getValue ()
+                                                                                                                                                                       .iterator (); iterator.hasNext ();)
+                                                                                                                                    try {
+                                                                                                                                      p =
+                                                                                                                                          (Provisional) iterator.next ();
+                                                                                                                                      p.close ();
+                                                                                                                                    } catch (RuntimeException | Error | IOException e) {
+                                                                                                                                      log.warn ("Unable to close provisional "
+                                                                                                                                                        + p
+                                                                                                                                                        + " for "
+                                                                                                                                                        + Heatmap.this,
+                                                                                                                                                e);
+                                                                                                                                    }
+                                                                                                                                }
+                                                                                                                              })
+                                                                                                                              .build (new CacheLoader<Pair<String, String>, Triplet<Provisional, Provisional, Provisional>> () {
 
-                        @Override
-                        public Triplet<Provisional, Provisional, Provisional> load (Pair<String, String> key) throws Exception {
-                          Provisional output =
-                                               null,
-                          significant =
-                                        null,
-                          rnk =
-                                null;
-                          try {
-                            output =
-                                     Provisionals.file ();
-                            significant =
-                                          Provisionals.file ();
-                            rnk =
-                                  Provisionals.file ();
-                            Limma.execute (Heatmap.this,
-                                           key.getValue0 (),
-                                           key.getValue1 (),
-                                           output,
-                                           significant,
-                                           rnk,
-                                           "column");
-                            return new Triplet<Provisional, Provisional, Provisional> (output,
-                                                                                       significant,
-                                                                                       rnk);
-                          } catch (RuntimeException | Error | IOException e) {
-                            if (output != null)
-                              output.close ();
-                            if (significant != null)
-                              significant.close ();
-                            if (rnk != null)
-                              rnk.close ();
-                            throw e;
-                          }
-                        }
-                      });
+                                                                                                                                @Override
+                                                                                                                                public Triplet<Provisional, Provisional, Provisional> load (Pair<String, String> key) throws Exception {
+                                                                                                                                  Provisional output =
+                                                                                                                                                       null,
+                                                                                                                                  significant =
+                                                                                                                                                null,
+                                                                                                                                  rnk =
+                                                                                                                                        null;
+                                                                                                                                  try {
+                                                                                                                                    output =
+                                                                                                                                             Provisionals.file ();
+                                                                                                                                    significant =
+                                                                                                                                                  Provisionals.file ();
+                                                                                                                                    rnk =
+                                                                                                                                          Provisionals.file ();
+                                                                                                                                    Limma.execute (Heatmap.this,
+                                                                                                                                                   key.getValue0 (),
+                                                                                                                                                   key.getValue1 (),
+                                                                                                                                                   output,
+                                                                                                                                                   significant,
+                                                                                                                                                   rnk,
+                                                                                                                                                   "column");
+                                                                                                                                    return new Triplet<Provisional, Provisional, Provisional> (output,
+                                                                                                                                                                                               significant,
+                                                                                                                                                                                               rnk);
+                                                                                                                                  } catch (RuntimeException | Error | IOException e) {
+                                                                                                                                    if (output != null)
+                                                                                                                                      output.close ();
+                                                                                                                                    if (significant != null)
+                                                                                                                                      significant.close ();
+                                                                                                                                    if (rnk != null)
+                                                                                                                                      rnk.close ();
+                                                                                                                                    throw e;
+                                                                                                                                  }
+                                                                                                                                }
+                                                                                                                              });
+
+  public Heatmap exportColumnSelections (final String... selections) throws IOException {
+    List<Integer> remap = new ArrayList<Integer> (new HashSet<Integer> () {
+      private static final long serialVersionUID = 1L;
+
+      {
+        for (String selection : selections)
+          for (List<Integer> indices : Lambda.extract (getColumnSelection (selection,
+                                                                           0,
+                                                                           data.getColumnDimension ()),
+                                                       Lambda.on (MatrixSelection.class).getIndices ()))
+            addAll (indices);
+      }
+    });
+    Heatmap result = builder.reorderColumns (this, remap);
+    result.summary = new MatrixSummary (result.data.getRowDimension (),
+                                        summary.columns (),
+                                        data.walkInOptimizedOrder (new RealMatrixPreservingVisitor () {
+
+                                          private double max;
+
+                                          @Override
+                                          public void visit (int row, int column, double value) {
+                                            if (max < value)
+                                              max = value;
+                                          }
+
+                                          @Override
+                                          public void start (int rows,
+                                                             int columns,
+                                                             int startRow,
+                                                             int endRow,
+                                                             int startColumn,
+                                                             int endColumn) {
+                                            max = -Double.MAX_VALUE;
+                                          }
+
+                                          @Override
+                                          public double end () {
+                                            return max;
+                                          }
+                                        }),
+                                        data.walkInOptimizedOrder (new RealMatrixPreservingVisitor () {
+
+                                          private double min;
+
+                                          @Override
+                                          public void visit (int row, int column, double value) {
+                                            if (min > value)
+                                              min = value;
+                                          }
+
+                                          @Override
+                                          public void start (int rows,
+                                                             int columns,
+                                                             int startRow,
+                                                             int endRow,
+                                                             int startColumn,
+                                                             int endColumn) {
+                                            min = Double.MAX_VALUE;
+                                          }
+
+                                          @Override
+                                          public double end () {
+                                            return min;
+                                          }
+                                        }), false, false);
+    return result;
+  }
+
+  public Heatmap exportRowSelections (final String... selections) throws IOException {
+    List<Integer> remap = new ArrayList<Integer> (new HashSet<Integer> () {
+      private static final long serialVersionUID = 1L;
+
+      {
+        for (String selection : selections)
+          for (List<Integer> indices : Lambda.extract (getRowSelection (selection,
+                                                                        0,
+                                                                        data.getRowDimension ()),
+                                                       Lambda.on (MatrixSelection.class).getIndices ()))
+            addAll (indices);
+      }
+    });
+    Heatmap result = builder.reorderRows (this, remap);
+    result.summary = new MatrixSummary (result.data.getRowDimension (),
+                                        summary.columns (),
+                                        data.walkInOptimizedOrder (new RealMatrixPreservingVisitor () {
+
+                                          private double max;
+
+                                          @Override
+                                          public void visit (int row, int column, double value) {
+                                            if (max < value)
+                                              max = value;
+                                          }
+
+                                          @Override
+                                          public void start (int rows,
+                                                             int columns,
+                                                             int startRow,
+                                                             int endRow,
+                                                             int startColumn,
+                                                             int endColumn) {
+                                            max = -Double.MAX_VALUE;
+                                          }
+
+                                          @Override
+                                          public double end () {
+                                            return max;
+                                          }
+                                        }),
+                                        data.walkInOptimizedOrder (new RealMatrixPreservingVisitor () {
+
+                                          private double min;
+
+                                          @Override
+                                          public void visit (int row, int column, double value) {
+                                            if (min > value)
+                                              min = value;
+                                          }
+
+                                          @Override
+                                          public void start (int rows,
+                                                             int columns,
+                                                             int startRow,
+                                                             int endRow,
+                                                             int startColumn,
+                                                             int endColumn) {
+                                            min = Double.MAX_VALUE;
+                                          }
+
+                                          @Override
+                                          public double end () {
+                                            return min;
+                                          }
+                                        }), false, false);
+    return result;
+  }
 
   /**
    * Constructs empty heatmap; this is not very useful as the Heatmap object is
@@ -436,6 +577,12 @@ public class Heatmap implements Closeable {
       RealMatrix data = transpose (this.data);
       Cluster root = cluster (data, algorhythm);
       Heatmap result = builder.reorderColumns (this, reorderedIndices (root));
+      result.summary = new MatrixSummary (summary.rows (),
+                                          summary.columns (),
+                                          summary.max (),
+                                          summary.min (),
+                                          summary.rowClustered (),
+                                          true);
       result.columnClusters = JsonCluster.from (root);
       return result;
     } else
@@ -446,6 +593,12 @@ public class Heatmap implements Closeable {
     if (rowClusters == null) {
       Cluster root = cluster (data, algorhythm);
       Heatmap result = builder.reorderRows (this, reorderedIndices (root));
+      result.summary = new MatrixSummary (summary.rows (),
+                                          summary.columns (),
+                                          summary.max (),
+                                          summary.min (),
+                                          true,
+                                          summary.columnClustered ());
       rowClusters = JsonCluster.from (root);
       return result;
     } else
@@ -453,17 +606,41 @@ public class Heatmap implements Closeable {
   }
 
   public enum LimmaOutput {
-    FULL, SIGNIFICANT, RNK
+    FULL, SIGNIFICANT
   }
 
-  public File limmaRows (String experiment, String control, LimmaOutput type) {
+  public List<LimmaResult> limmaRowsData (String experiment, String control, LimmaOutput type) throws IOException {
+    try (BufferedReader reader = new BufferedReader (new FileReader (limmaRows (experiment, control, type)))) {
+      reader.readLine (); // skip header
+      List<LimmaResult> result = new ArrayList<> ();
+      for (String line; (line = reader.readLine ()) != null;) {
+        String[] entry = line.split ("\t");
+        result.add (new LimmaResult (entry[0], entry[1], entry[2], entry[3], entry[4]));
+      }
+      return result;
+    }
+  }
+  
+  public List<LimmaResult> limmaColumnsData (String experiment, String control, LimmaOutput type) throws IOException {
+    try (BufferedReader reader = new BufferedReader (new FileReader (limmaColumns (experiment, control, type)))) {
+      reader.readLine (); // skip header
+      List<LimmaResult> result = new ArrayList<> ();
+      for (String line; (line = reader.readLine ()) != null;) {
+        String[] entry = line.split ("\t");
+        result.add (new LimmaResult (entry[0], entry[1], entry[2], entry[3], entry[4]));
+      }
+      return result;
+    }
+  }
+
+  public File limmaRows (String experiment, String control, LimmaOutput type) throws IOException {
     try {
       return (File) limmaRows.get (new Pair<String, String> (experiment, control)).getValue (type.ordinal ());
     } catch (ExecutionException e) {
       throw new RuntimeException (e.getCause ());
     }
   }
-  
+
   public File limmaColumns (String experiment, String control, LimmaOutput type) {
     try {
       return (File) limmaColumns.get (new Pair<String, String> (experiment, control)).getValue (type.ordinal ());
@@ -471,11 +648,11 @@ public class Heatmap implements Closeable {
       throw new RuntimeException (e.getCause ());
     }
   }
-  
+
   public List<Integer> findByRow (AnnotationSearchTerm[] terms) {
     return rowAnnotations.find (terms);
   }
-  
+
   public List<Integer> findByColumn (AnnotationSearchTerm[] terms) {
     return columnAnnotations.find (terms);
   }
@@ -585,12 +762,6 @@ public class Heatmap implements Closeable {
         }
       });
       result.builder = this;
-      result.summary = new MatrixSummary (other.summary.rows (),
-                                          other.summary.columns (),
-                                          other.summary.max (),
-                                          other.summary.min (),
-                                          other.summary.rowClustered (),
-                                          true);
       return result;
     }
 
@@ -661,7 +832,7 @@ public class Heatmap implements Closeable {
     public Heatmap build (final MultipartFile file) throws IOException {
       return build (file.getInputStream (), file.getSize (), file.getOriginalFilename ());
     }
-    
+
     public Heatmap build (final InputStream input, final long size, final String name) throws IOException {
       log.debug ("Building heatmap from " + size + " bytes of uploaded data");
       BufferedReader reader = new BufferedReader (new InputStreamReader (new InputStream () {
@@ -919,13 +1090,14 @@ public class Heatmap implements Closeable {
       }
     });
   }
-  
+
   public void toStream (OutputStream out) throws IOException, AnnotationNotFoundException {
-    out.write ("id".getBytes ());
-    for (int column = 0; column < getSummary ().columns (); column++)
-      out.write (("\t" + getColumnAnnotation (column).get (0).value ()).getBytes ());
+    // out.write ("id".getBytes ());
+    // for (int column = 0; column < getSummary ().columns (); column++)
+    // out.write (("\t" + getColumnAnnotation (column).get (0).value
+    // ()).getBytes ());
     for (int row = 0; row < getSummary ().rows (); row++) {
-      out.write (("\n" + getRowAnnotation (row).get (0).value ()).getBytes ());
+      out.write (("" + getRowAnnotation (row).get (0).value ()).getBytes ());
       for (int column = 0; column < getSummary ().columns (); column++)
         out.write (("\t" + data.getEntry (row, column)).getBytes ());
       out.write ('\n');
