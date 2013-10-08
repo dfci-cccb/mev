@@ -91,7 +91,7 @@ public class AnnotationDataAccessLayer implements Closeable {
   }
 
   public boolean setAnnotations (InputStream data) {
-    DataContext csvDataContext = DataContextFactory.createCsvDataContext (data, '\t', ' ');
+    DataContext csvDataContext = DataContextFactory.createCsvDataContext (data, '\t', '\"');
     log.debug ("csvDataContext=" + csvDataContext);
 
     // get the one and only table (csv)
