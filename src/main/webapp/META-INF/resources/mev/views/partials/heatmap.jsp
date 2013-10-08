@@ -13,9 +13,7 @@
 		<div class="row">
 			<div class="span3">
 		
-				<div class="row">
-					<p class="lead">{{matrixlocation}}</p>
-				</div>
+				<p class="lead">{{matrixlocation}}</p>
 				
 				<hr>
 				
@@ -42,7 +40,7 @@
 					<hr>
 				</div>
 				
-				<button class="btn btn-block btn-success"><a href="/heatmap/{{matrixlocation}}/download"><i class="icon-download"></i>Download Heatmap</a></button>
+				<button class="btn btn-block btn-success"><a href="/heatmap/{{matrixlocation}}/download"><i class="icon-download"></i> Download Data Matrix</a></button>
 							
 			</div>
 			<div class="span7">
@@ -76,9 +74,9 @@
 		<div class="span3">
 
 			<ul class="thumbnails">
-				<li class="span3" ng-repeat="field in fieldFilters">
+				<li class="span2" ng-repeat="field in fieldFilters">
 				
-					<div class="alert alert-info">
+					<div class="well well-small">
 					
 						<a class="pull-right">
 							<i class="icon-remove" ng-click="remFilter(field)"></i>
@@ -95,13 +93,50 @@
 				
 			</ul>
 			
-			<button class="btn btn-primary" ng-click="reqQuery(1)">Filter</button>
-			<button class="btn btn-danger" ng-click="remAll()">Clear</button>
+			<div class="row">
+				<button class="btn btn-primary" ng-click="reqQuery(1)">Filter</button>
+				<button class="btn btn-danger" ng-click="remAll()">Clear</button>
+			</div>
+			
+			<hr>
+			
+			
+			<div class="accordion" id="accordion2">
+		
+				<div class="accordion-group">
+					<div class="accordion-heading">
+						<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+							Upload Annotations
+						</a>
+					</div>
+					<div id="collapseOne" class="accordion-body collapse">
+						<div class="accordion-inner">
+						
+							<input id="file" type="file" multiple name="upload" />
+
+							<div class="progress progress-striped active" id="progbox" style="visibility: hidden;">
+								<div class="bar" id="progbar"></div>
+							</div>
+							
+							<div id="rowoutput"></div>
+							<div id="coloutput"></div>
+						
+							<button class="btn btn-primary btn-block" ng-click="sendRowFile()">Submit Row Annotations</button>
+							<button class="btn btn-primary btn-block" ng-click="sendColFile()">Submit Column Annotations</button>
+							
+						</div>
+					</div>
+				</div>
+				
+			</div>
+			
+				
+				
 			
 		</div>
 		
 		<!-- Data Table -->
-		<div class="span9">
+		<div class="span9 offset1">
 			
 			<div class = "row">
 			
@@ -251,22 +286,11 @@
 			
 			<p>Your Column Selections:</p>
 			<p ng-repeat="selection in selections['column']">{{selection}}</p>
-			
-		
-		<input id="file" type="file" multiple name="upload" />
 
-		<div class="progress progress-striped active" id="progbox" style="visibility: hidden;">
-			<div class="bar" id="progbar"></div>
-			
-		</div>
-	
-		<button class="btn btn-primary" ng-click="sendRowFile()">Submit Row Annotations</button>
-		<button class="btn btn-primary" ng-click="sendColFile()">Submit Column Annotations</button>
 		
 		
 		
-		<div id="rowoutput"></div>
-		<div id="coloutput"></div>
+		
 		
 						
 
