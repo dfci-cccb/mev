@@ -17,13 +17,13 @@
 				
 				<hr>
 				
-				<div class="row" ng-show="matrixsummary.columnClustered">
+				<div ng-show="matrixsummary.columnClustered">
 					<p class="muted"> Selected Column Cells: {{selectedcells.column.length}} </p>
 					<p class="muted"> Selected Row Cells: {{selectedcells.row.length}} </p>
 					<hr>
 				</div>
 				
-				<div class="row" ng-show="matrixsummary.columnClustered">
+				<div ng-show="matrixsummary.columnClustered">
 					<!-- <button class="btn btn-block btn-primary" ng-click="pushSelections('row')">Submit Row Selections</button> -->
 					
 					<div class="control-group">
@@ -101,15 +101,15 @@
 			<hr>
 			
 			
-			<div class="accordion" id="accordion2">
+			<div class="accordion" id="filteraccordion">
 		
 				<div class="accordion-group">
 					<div class="accordion-heading">
-						<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+						<a class="accordion-toggle" data-toggle="collapse" data-parent="#filteraccordion" href="#filtercollapseOne">
 							Upload Annotations
 						</a>
 					</div>
-					<div id="collapseOne" class="accordion-body collapse">
+					<div id="filtercollapseOne" class="accordion-body collapse">
 						<div class="accordion-inner">
 						
 							<input id="file" type="file" multiple name="upload" />
