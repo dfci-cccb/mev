@@ -200,6 +200,11 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', '$rootScope',
 
 	};
 	
+	$scope.pullAllSelections = function() {
+		$scope.pullSelections('row');
+		$scope.pullSelections('column');	
+	}
+	
 	$scope.pullSelections = function(inputdimension) {
 
 		$http({

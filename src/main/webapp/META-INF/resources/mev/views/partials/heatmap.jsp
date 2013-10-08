@@ -2,8 +2,8 @@
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="#heatmapview" data-toggle="tab">Heatmap</a></li>
 		<li><a href="#filterview" data-toggle="tab">Annotations</a></li>
-		<li><a href="#analysisview" data-toggle="tab">Analysis</a></li>
-		<li><a href="#infopane" data-toggle="tab">Info</a></li>
+		<li><a href="#analysisview" data-toggle="tab" ng-click="pullAllSelections()">Analysis</a></li>
+		<li><a href="#infopane" data-toggle="tab" ng-click="pullAllSelections()">Info</a></li>
 	</ul>
 </div>
 
