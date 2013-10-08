@@ -80,6 +80,7 @@ import us.levk.util.io.implementation.Provisional;
 import us.levk.util.io.support.Provisionals;
 
 import ch.lambdaj.Lambda;
+import ch.lambdaj.function.convert.Converter;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.cache.CacheBuilder;
@@ -647,6 +648,26 @@ public class Heatmap implements Closeable {
     } catch (ExecutionException e) {
       throw new RuntimeException (e.getCause ());
     }
+  }
+  
+  public Collection<LimmaParameter> limmaCalculatedRows () {
+    return Lambda.convert (limmaRows.asMap ().keySet (), new Converter<Pair<String, String>, LimmaParameter>() {
+
+      @Override
+      public LimmaParameter convert (Pair<String, String> from) {
+        return new LimmaParameter (from.getValue0 (), from.getValue1 ());
+      }
+    });
+  }
+  
+  public Collection<LimmaParameter> limmaCalculatedColumns () {
+    return Lambda.convert (limmaColumns.asMap ().keySet (), new Converter<Pair<String, String>, LimmaParameter>() {
+
+      @Override
+      public LimmaParameter convert (Pair<String, String> from) {
+        return new LimmaParameter (from.getValue0 (), from.getValue1 ());
+      }
+    });
   }
 
   public List<Integer> findByRow (AnnotationSearchTerm[] terms) {

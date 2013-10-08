@@ -53,6 +53,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
+import ch.lambdaj.Lambda;
+
 import edu.dfci.cccb.mev.domain.AnnotationNotFoundException;
 import edu.dfci.cccb.mev.domain.AnnotationSearchTerm;
 import edu.dfci.cccb.mev.domain.Heatmap;
@@ -61,6 +63,7 @@ import edu.dfci.cccb.mev.domain.Heatmap.LimmaOutput;
 import edu.dfci.cccb.mev.domain.HeatmapNotFoundException;
 import edu.dfci.cccb.mev.domain.Heatmaps;
 import edu.dfci.cccb.mev.domain.InvalidDimensionException;
+import edu.dfci.cccb.mev.domain.LimmaParameter;
 import edu.dfci.cccb.mev.domain.LimmaResult;
 import edu.dfci.cccb.mev.domain.MatrixAnnotation;
 import edu.dfci.cccb.mev.domain.MatrixData;
@@ -279,9 +282,22 @@ public class HeatmapController implements InitializingBean, Closeable {
                                                                                    IOException,
                                                                                    InvalidDimensionException {
     if (isRow (dimension))
-      return heatmaps.get (id).limmaRowsData (experiment, control, LimmaOutput.valueOf (output.toUpperCase ()));
+      return get (id).limmaRowsData (experiment, control, LimmaOutput.valueOf (output.toUpperCase ()));
     else if (isColumn (dimension))
-      return heatmaps.get (id).limmaColumnsData (experiment, control, LimmaOutput.valueOf (output.toUpperCase ()));
+      return get (id).limmaColumnsData (experiment, control, LimmaOutput.valueOf (output.toUpperCase ()));
+    else
+      throw new InvalidDimensionException (dimension);
+  }
+
+  @RequestMapping (value = "/{id}/analysis/limma/{dimension}", method = GET)
+  @ResponseBody
+  public Collection<LimmaParameter> limmaList (@PathVariable ("id") String id,
+                                               @PathVariable ("dimension") String dimension) throws HeatmapNotFoundException,
+                                                                                            InvalidDimensionException {
+    if (isRow (dimension))
+      return get (id).limmaCalculatedRows ();
+    else if (isColumn (dimension))
+      return get (id).limmaCalculatedColumns ();
     else
       throw new InvalidDimensionException (dimension);
   }
@@ -298,6 +314,25 @@ public class HeatmapController implements InitializingBean, Closeable {
   }
 
   // POST
+
+  @RequestMapping (value = "/{id}/export/{dimension}", method = POST)
+  @ResponseBody
+  public String export (@PathVariable ("id") String id,
+                        @PathVariable ("dimension") String dimension,
+                        @RequestParam ("selection") String[] selections) throws HeatmapNotFoundException,
+                                                                        IOException,
+                                                                        InvalidDimensionException {
+    Heatmap source = get (id), result;
+    if (isRow (dimension))
+      result = source.exportRowSelections (selections);
+    else if (isColumn (dimension))
+      result = source.exportColumnSelections (selections);
+    else
+      throw new InvalidDimensionException (dimension);
+    String name;
+    heatmaps.put (name = id + "-" + Lambda.join (selections, "-"), result);
+    return name;
+  }
 
   @RequestMapping (params = "format=tsv", method = POST)
   @ResponseBody
