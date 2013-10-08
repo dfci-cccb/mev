@@ -289,6 +289,22 @@ public class HeatmapController implements InitializingBean, Closeable {
       throw new InvalidDimensionException (dimension);
   }
 
+  @RequestMapping (value = "/{id}/analysis/limma({dimension},{experiment},{control})", method = HEAD)
+  @ResponseStatus (OK)
+  public void launchLimma (@PathVariable ("id") String id,
+                           @PathVariable ("dimension") String dimension,
+                           @PathVariable ("experiment") String experiment,
+                           @PathVariable ("control") String control) throws HeatmapNotFoundException,
+                                                                    IOException,
+                                                                    InvalidDimensionException {
+    if (isRow (dimension))
+      get (id).limmaRows (experiment, control, LimmaOutput.values ()[0]);
+    else if (isColumn (dimension))
+      get (id).limmaColumns (experiment, control, LimmaOutput.values ()[0]);
+    else
+      throw new InvalidDimensionException (dimension);
+  }
+
   @RequestMapping (value = "/{id}/analysis/limma/{dimension}", method = GET)
   @ResponseBody
   public Collection<LimmaParameter> limmaList (@PathVariable ("id") String id,
