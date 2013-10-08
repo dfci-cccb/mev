@@ -40,13 +40,78 @@
 					<hr>
 				</div>
 				
+				<p class="muted">Analysis Options</p>
+				
+				<div class="accordion" id="heatmapaccordion">
+		
+						<div class="accordion-group">
+							<div class="accordion-heading">
+								<a class="accordion-toggle" data-toggle="collapse" data-parent="#heatmapaccordion" href="#heatmapcollapseOne">
+									Clustering
+								</a>
+							</div>
+							<div id="heatmapcollapseOne" class="accordion-body collapse in">
+								<div class="accordion-inner">
+								
+									<select ng-model="ClusterType">
+										<option ng-repeat="clustertype in ['Euclidian']" value="{{clustertype}}"> {{clustertype}} </option> 
+									</select> <p> by </p>
+									<select ng-model="ClusterDimension"> 
+										<option ng-repeat="selection in ['column']" value="{{selection}}"> {{selection}} </option>
+									</select>
+									
+									<button class="btn btn-primary" ng-click="analyzeClustering()">Analyze</button>
+									
+								</div>
+							</div>
+						</div>
+
+						
+						
+						<div class="accordion-group">
+							<div class="accordion-heading">
+								<a class="accordion-toggle" data-toggle="collapse" data-parent="#heatmapaccordion" href="#heatmapcollapseTwo">
+									LIMMA
+								</a>
+							</div>
+							<div id="heatmapcollapseTwo" class="accordion-body collapse">
+								<div class="accordion-inner">
+								
+									<select ng-model="LimmaDimension">
+										<option ng-repeat="dimension in ['column', 'row']" value="{{dimension}}"> {{dimension}} </option>		
+									</select>
+								
+									<select ng-model="LimmaSelection1">
+										<option ng-repeat="selection in selections.row.concat(selections.column)" value="{{selection}}"> {{selection}} </option>
+									</select>
+									
+									<select ng-model="LimmaSelection2">	
+										<option ng-repeat="selection in selections.row.concat(selections.column)" value="{{selection}}"> {{selection}} </option>
+									</select>
+									
+									<input type='text' value="Significance Alpha" />
+									
+									<select ng-model="LimmaOutputOption">
+										<option ng-repeat="option in ['significant', 'full', 'rnk']" value="{{option}}"> {{option}} </option>
+									</select>
+									
+									<button class="btn btn-primary" ng-click="analyzeLimmaRequester()">Analyze</button>
+															
+								</div>
+							</div>
+						</div>			
+					
+				</div>
+				
+				<hr>
+				
 				<button class="btn btn-block btn-success"><a href="/heatmap/{{matrixlocation}}/download"><i class="icon-download"></i> Download Data Matrix</a></button>
 							
 			</div>
 			<div class="span7">
 				<vis-Heatmap 
 					inputdata="transformeddata"
-					inputcolor="{{heatmapcolor}}"
+					inputcolor="blue"
 					showlabels="true"
 					width="1000"
 					height="900"
@@ -105,11 +170,11 @@
 		
 				<div class="accordion-group">
 					<div class="accordion-heading">
-						<a class="accordion-toggle" data-toggle="collapse" data-parent="#filteraccordion" href="#filtercollapseOne">
+						<a class="accordion-toggle" data-toggle="collapse" data-parent="#filteraccordion" href="#filterCollapseOne">
 							Upload Annotations
 						</a>
 					</div>
-					<div id="filtercollapseOne" class="accordion-body collapse">
+					<div id="filterCollapseOne" class="accordion-body collapse">
 						<div class="accordion-inner">
 						
 							<input id="file" type="file" multiple name="upload" />
@@ -127,6 +192,40 @@
 						</div>
 					</div>
 				</div>
+				
+				<div class="accordion-group">
+					<div class="accordion-heading">
+						<a class="accordion-toggle" data-toggle="collapse" data-parent="#filteraccordion" href="#filterCollapseTwo">
+							LIMMA
+						</a>
+					</div>
+					<div id="filterCollapseTwo" class="accordion-body collapse">
+						<div class="accordion-inner">
+						
+							<select ng-model="LimmaDimension">
+								<option ng-repeat="dimension in ['column', 'row']" value="{{dimension}}"> {{dimension}} </option>		
+							</select>
+						
+							<select ng-model="LimmaSelection1">
+								<option ng-repeat="selection in selections.row.concat(selections.column)" value="{{selection}}"> {{selection}} </option>
+							</select>
+							
+							<select ng-model="LimmaSelection2">	
+								<option ng-repeat="selection in selections.row.concat(selections.column)" value="{{selection}}"> {{selection}} </option>
+							</select>
+							
+							<input type='text' value="Significance Alpha" />
+							
+							<select ng-model="LimmaOutputOption">
+								<option ng-repeat="option in ['significant', 'full', 'rnk']" value="{{option}}"> {{option}} </option>
+							</select>
+							
+							<button class="btn btn-primary btn-block" ng-click="analyzeLimmaRequester()">Analyze</button>
+													
+						</div>
+					</div>
+				</div>
+				
 				
 			</div>
 			

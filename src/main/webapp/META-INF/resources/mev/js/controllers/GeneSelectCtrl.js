@@ -14,6 +14,8 @@ ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', '$q', func
 	
 	$scope.totalrows = 50;
 	
+	$scope.selections = new Object();
+	
 	
 	function pullSummary() {
 
@@ -160,6 +162,36 @@ ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', '$q', func
 	};
 	
 	
+	$scope.analyzeLimmaRequester = function() {
+
+		var inputurl = "heatmap/"+$routeParams.dataset+"/analysis/limma" 
+				+ "(" +$scope.LimmaDimension + "," + $scope.LimmaSelection1 + "," + $scope.LimmaSelection2 + ")"
+				+ "/" + $scope.LimmaOutputOption;
+
+		
+			$("body").append("<iframe src='" + inputurl + "' style='display: none;' ></iframe>")
+		
+	}
+	
+	$scope.pullAllSelections = function() {
+		$scope.pullSelections('row');
+		$scope.pullSelections('column');
+	}
+	
+	$scope.pullSelections = function(inputdimension) {
+
+		$http({
+			method:"GET",
+			url:"heatmap/"+$scope.matrixlocation+"/selection/" + inputdimension,
+			params: {
+				format:"json"
+			}
+		})
+		.success( function(data) {
+			$scope.selections[inputdimension] = data;
+		});
+
+	};
 	
 	$scope.changeDimension = function(input){
 
@@ -237,7 +269,7 @@ ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', '$q', func
 			})
 			.success( function(data) {
 				
-				
+				$scope.pullAllSelections()
 				$scope.selectionname = undefined;
 				
 			});
@@ -275,6 +307,7 @@ ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', '$q', func
 	
 	
 	//Initial Page Load
+	$scope.pullAllSelections()
 	annotations.get();
 	pullSummary();
 	
