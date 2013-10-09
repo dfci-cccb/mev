@@ -728,7 +728,7 @@ public class Heatmap implements Closeable {
       Heatmap result = new Heatmap ();
       result.data = new HugeRealMatrix (new Iterator<Double> () {
         private final int rows = other.data.getRowDimension ();
-        private final int columns = other.data.getColumnDimension ();
+        private final int columns = newOrder.size ();
         private final int entries = rows * columns;
         private int index = 0;
 
@@ -812,7 +812,7 @@ public class Heatmap implements Closeable {
 
         @Override
         public void remove () {}
-      }, other.data.getColumnDimension ());
+      }, newOrder.size ());
       result.columnAnnotations = other.columnAnnotations;
       result.rowAnnotations = new Annotations (result.universalId, AnnotationDimension.COLUMN, restDataSource);
       result.rowAnnotations.setAnnotations (new AbstractList<Map<String, ?>> () {
