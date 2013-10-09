@@ -116,14 +116,13 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', '$rootScope',
 	
 	$scope.createNewHeatmap = function(LimmaDimension, LimmaSelection1, LimmaSelection2) {
 		
+		console.log("heatmap/"+$scope.matrixlocation+"/export/"+ LimmaDimension
+			+ "?format=json&selection=" + LimmaSelection1 + "&selection=" + LimmaSelection2);
+		
 		$http({
 			method:"POST",
-			url:"heatmap/"+$scope.matrixlocation+"/export/"+ LimmaDimension,
-			params: {
-				format:"json",
-				selection: LimmaSelection1,
-				selection2: LimmaSelection2
-			}
+			url:"heatmap/"+$scope.matrixlocation+"/export/"+ LimmaDimension
+			+ "?format=json&selection=" + LimmaSelection1 + "&selection=" + LimmaSelection2
 		})
 		.success(function(data){
 			alert("New Heatmap Created with "+ LimmaSelection1 + " and " + LimmaSelection2+ "!");

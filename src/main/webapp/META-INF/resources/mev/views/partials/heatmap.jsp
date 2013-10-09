@@ -360,16 +360,26 @@
 										<div class="accordion-heading">
 											<a class="accordion-toggle" data-toggle="collapse" ng-click="analyzeLimmaViewRequester('{{analysis.dimension}}', '{{analysis.experiment}}', '{{analysis.control}}')" data-parent="#limmaAccordion" href="#filterCollapse{{analysis.experiment}}{{analysis.control}}">
 												Experiment: {{analysis.experiment}} Control: {{analysis.control}} Dimension: {{analysis.dimension}} 
-												<button class="btn btn-success pull-right btn-small" ng-click="downloadLimmaRequester('{{analysis.dimension}}', '{{analysis.experiment}}', '{{analysis.control}}')">
-													<i class="icon-download icon-white"></i>
-												</button>
-												<button class="btn btn-success pull-right btn-small" ng-click="createNewHeatmap('{{analysis.dimension}}', '{{analysis.experiment}}', '{{analysis.control}}')">
-													<i class="icon-th icon-white"></i>
-												</button>
+												
 											</a>
 										</div>
 										<div id="filterCollapse{{analysis.experiment}}{{analysis.control}}" class="accordion-body collapse">
 											<div class="accordion-inner">
+											
+												<div class="row">
+												
+												<button class="btn btn-success pull-right btn-small" 
+													title="Download Full Limma Results" 
+													ng-click="downloadLimmaRequester('{{analysis.dimension}}', '{{analysis.experiment}}', '{{analysis.control}}')">
+													<i class="icon-download icon-white"></i>
+												</button>
+												<button class="btn btn-success pull-right btn-small"
+													title="Generate New Heatmap" 
+													ng-click="createNewHeatmap('{{analysis.dimension}}', '{{analysis.experiment}}', '{{analysis.control}}')">
+													<i class="icon-th icon-white"></i>
+												</button>
+												
+												</div>
 												
 												<div id="limmaResultsTable">
 													<table class="table table-hover table-bordered">
