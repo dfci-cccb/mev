@@ -754,7 +754,7 @@ public class Heatmap implements Closeable {
 
         @Override
         public void remove () {}
-      }, other.data.getColumnDimension ());
+      }, newOrder.size ());
       result.rowAnnotations = other.rowAnnotations;
       result.columnAnnotations = new Annotations (result.universalId, AnnotationDimension.COLUMN, restDataSource);
       result.columnAnnotations.setAnnotations (new AbstractList<Map<String, ?>> () {
