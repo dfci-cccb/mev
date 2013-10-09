@@ -71,7 +71,7 @@ angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives', 
 							$rootScope.retrieveHeatmaps();
 						
 						});
-						
+						alert( file.name + " has been uploaded");
 						bar.style.width = "0%";
 						//$scope.uploadName = undefined;
 						box.style.visibility = "hidden";

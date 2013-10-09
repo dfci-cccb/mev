@@ -31,7 +31,7 @@
 						<div class="controls">
 							<div class="input-prepend">
 								<span class="add-on"><i class="icon-folder-open"></i></span>
-								<input class="span2" ng-model='selectionname' value="Selection Name" type="text">
+								<input class="span2" ng-model='selectionname' placeholder="Selection Name" type="text">
 							</div>
 						</div>
 					</div>
@@ -60,7 +60,7 @@
 										<option ng-repeat="selection in ['column']" value="{{selection}}"> {{selection}} </option>
 									</select>
 									
-									<button class="btn btn-primary" ng-click="analyzeClustering()">Analyze</button>
+									<button class="btn btn-primary btn-block" ng-click="analyzeClustering()">Cluster</button>
 									
 								</div>
 							</div>
@@ -89,13 +89,9 @@
 										<option ng-repeat="selection in selections.row.concat(selections.column)" value="{{selection}}"> {{selection}} </option>
 									</select>
 									
-									<input type='text' value="Significance Alpha" />
+									<input type='text' placeholder="0.2" />
 									
-									<select ng-model="LimmaOutputOption">
-										<option ng-repeat="option in ['significant', 'full', 'rnk']" value="{{option}}"> {{option}} </option>
-									</select>
-									
-									<button class="btn btn-primary" ng-click="analyzeLimmaRequester()">Analyze</button>
+									<button class="btn btn-primary btn-block" ng-click="analyzeLimmaRequester()">Analyze</button>
 															
 								</div>
 							</div>
@@ -130,10 +126,6 @@
 
 	</div>
 	
-	<div class="tab-pane" id="selectionsview">
-	
-	</div>
-
 	<div class="tab-pane" id="filterview" ng-controller="GeneSelectCtrl">
 
 		<div class="span3">
@@ -195,7 +187,7 @@
 				
 				<div class="accordion-group">
 					<div class="accordion-heading">
-						<a class="accordion-toggle" data-toggle="collapse" data-parent="#filteraccordion" href="#filterCollapseTwo">
+						<a class="accordion-toggle" ng-click="pullAllSelections()" data-toggle="collapse" data-parent="#filteraccordion" href="#filterCollapseTwo">
 							LIMMA
 						</a>
 					</div>
@@ -214,11 +206,7 @@
 								<option ng-repeat="selection in selections.row.concat(selections.column)" value="{{selection}}"> {{selection}} </option>
 							</select>
 							
-							<input type='text' value="Significance Alpha" />
-							
-							<select ng-model="LimmaOutputOption">
-								<option ng-repeat="option in ['significant', 'full', 'rnk']" value="{{option}}"> {{option}} </option>
-							</select>
+							<input type='text' value="0.2" />
 							
 							<button class="btn btn-primary btn-block" ng-click="analyzeLimmaRequester()">Analyze</button>
 													
@@ -328,7 +316,7 @@
 								<option ng-repeat="selection in ['column']" value="{{selection}}"> {{selection}} </option>
 							</select>
 							
-							<button class="btn btn-primary" ng-click="analyzeClustering()">Analyze</button>
+							<button class="btn btn-primary" ng-click="analyzeClustering()">Cluster</button>
 							
 						</div>
 					</div>
@@ -338,33 +326,87 @@
 				
 				<div class="accordion-group">
 					<div class="accordion-heading">
-						<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+						<a class="accordion-toggle" ng-click="pullLimmaAnalysis()" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
 							LIMMA
 						</a>
 					</div>
 					<div id="collapseTwo" class="accordion-body collapse">
 						<div class="accordion-inner">
-						
-							<select ng-model="LimmaDimension">
-								<option ng-repeat="dimension in ['column', 'row']" value="{{dimension}}"> {{dimension}} </option>		
-							</select>
-						
-							<select ng-model="LimmaSelection1">
-								<option ng-repeat="selection in selections.row.concat(selections.column)" value="{{selection}}"> {{selection}} </option>
-							</select>
+							<div class="span3">
+								<select ng-model="LimmaDimension">
+									<option ng-repeat="dimension in ['column', 'row']" value="{{dimension}}"> {{dimension}} </option>		
+								</select>
 							
-							<select ng-model="LimmaSelection2">	
-								<option ng-repeat="selection in selections.row.concat(selections.column)" value="{{selection}}"> {{selection}} </option>
-							</select>
+								<select ng-model="LimmaSelection1">
+									<option ng-repeat="selection in selections.row.concat(selections.column)" value="{{selection}}"> {{selection}} </option>
+								</select>
+								
+								<select ng-model="LimmaSelection2">	
+									<option ng-repeat="selection in selections.row.concat(selections.column)" value="{{selection}}"> {{selection}} </option>
+								</select>
+								
+								<input type='text' placeholder="0.2" />
+								
+								<button class="btn btn-primary btn-block" ng-click="analyzeLimmaRequester()">Analyze</button>
 							
-							<input type='text' value="Significance Alpha" />
+							</div>
 							
-							<select ng-model="LimmaOutputOption">
-								<option ng-repeat="option in ['significant', 'full', 'rnk']" value="{{option}}"> {{option}} </option>
-							</select>
+							<div class="span8">
+								<p class="lead">Previous Results (Significant)</p>
+								<hr>
+								<div class="accordion" id="limmaAccordion">
 							
-							<button class="btn btn-primary" ng-click="analyzeLimmaRequester()">Analyze</button>
-													
+									<div class="accordion-group" ng-repeat="analysis in limmaPreviousAnalysis">
+										<div class="accordion-heading">
+											<a class="accordion-toggle" data-toggle="collapse" ng-click="analyzeLimmaViewRequester('{{analysis.dimension}}', '{{analysis.experiment}}', '{{analysis.control}}')" data-parent="#limmaAccordion" href="#filterCollapse{{analysis.experiment}}{{analysis.control}}">
+												Experiment: {{analysis.experiment}} Control: {{analysis.control}} Dimension: {{analysis.dimension}} 
+												<button class="btn btn-success pull-right btn-small" ng-click="downloadLimmaRequester('{{analysis.dimension}}', '{{analysis.experiment}}', '{{analysis.control}}')">
+													<i class="icon-download icon-white"></i>
+												</button>
+												<button class="btn btn-success pull-right btn-small" ng-click="createNewHeatmap('{{analysis.dimension}}', '{{analysis.experiment}}', '{{analysis.control}}')">
+													<i class="icon-th icon-white"></i>
+												</button>
+											</a>
+										</div>
+										<div id="filterCollapse{{analysis.experiment}}{{analysis.control}}" class="accordion-body collapse">
+											<div class="accordion-inner">
+												
+												<div id="limmaResultsTable">
+													<table class="table table-hover table-bordered">
+														<thead>
+															<tr>
+															  <th ng-repeat="header in ['ID', 'Log-Fold-Change', 'Average Expression', 'P-Value', 'Q-Value']">{{header}}</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr ng-repeat="row in limmaviewtablerows ">
+																<td>
+																	{{row["id"]}}
+																</td>
+																<td>
+																	{{row["logFoldChange"]}}
+																</td>
+																<td>
+																	{{row["averageExpression"]}}
+																</td>
+																<td>
+																	{{row["pValue"]}}
+																</td>
+																<td>
+																	{{row["qValue"]}}
+																</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+												
+											</div>
+										</div>
+									</div>
+									
+								</div>
+							<!--End Span Div -->
+							</div>						
 						</div>
 					</div>
 				</div>

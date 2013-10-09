@@ -445,7 +445,8 @@ drct.directive('visHeatmap', [function() {
 				
 
 					var topclick = function(d){
-
+						
+						
 						var nColor = '#ffffff'; //Initial nonselected color of a node.
 						var pColor = '#cccccc'; //Initial nonselected color of a branch.
 						
@@ -461,7 +462,7 @@ drct.directive('visHeatmap', [function() {
 							});
 							
 						//Check the state of the clicked node. If 'active' (color is green) swap to inactive colors and pass those colors down to all children and vice versa.
-						if(cir.style('fill') == '#00ff00'){
+						if(cir.style('fill') == '#00ff00' || cir.style('fill') == 'rgb(0, 255, 0)'){
 						
 							cir.style('fill', nColor)
 								.transition().attr('r', 2).duration(500); //Change radius of nonactive nodes.

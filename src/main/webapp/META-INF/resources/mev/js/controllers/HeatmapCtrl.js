@@ -75,7 +75,13 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', '$rootScope',
 		
 	});
 	
-	$scope.analyzeClustering = function(dimension) {
+	$scope.analyzeClustering = function() {
+		
+		var matrixlocation = $scope.matrixlocation;
+		var ClusterType = $scope.ClusterType;
+		var ClusterDimension = $scope.ClusterDimension;
+		
+		alert("Clustering on " + ClusterDimension + ". Please wait. Your dataset will be generated soon.")
 		
 		$http({
 			method:"GET",
@@ -86,7 +92,8 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', '$rootScope',
 			}
 		})
 		.success( function(data) {
-			alert("Clustering analysis complete!")
+			alert("Clustering analysis on " + ClusterDimension + " complete!\n\n"+
+			"Cluster Type: "+ClusterType + "\n\n" + "Your heatmap has been generated.")
 			$scope.retrieveHeatmaps();
 		})
 		.error( function(data) {
@@ -95,17 +102,158 @@ ctrl.controller('HeatmapCtrl', ['$scope', '$routeParams', '$http', '$rootScope',
 		
 	};
 	
-	$scope.analyzeLimmaRequester = function() {
+	$scope.downloadLimmaRequester = function(LimmaDimension, LimmaSelection1, LimmaSelection2) {
 
-		var inputurl = "heatmap/"+$scope.matrixlocation+"/analysis/limma" 
-				+ "(" +$scope.LimmaDimension + "," + $scope.LimmaSelection1 + "," + $scope.LimmaSelection2 + ")"
-				+ "/" + $scope.LimmaOutputOption;
+		var inputurl = "heatmap/"+$routeParams.dataset+"/analysis/limma" 
+				+ "(" +LimmaDimension + "," + LimmaSelection1 + "," + LimmaSelection2 + ")"
+				+ "/" + "full";
 
 		
 			$("body").append("<iframe src='" + inputurl + "' style='display: none;' ></iframe>")
 		
 		
 	}
+	
+	$scope.createNewHeatmap = function(LimmaDimension, LimmaSelection1, LimmaSelection2) {
+		
+		$http({
+			method:"POST",
+			url:"heatmap/"+$scope.matrixlocation+"/export/"+ LimmaDimension,
+			params: {
+				format:"json",
+				selection: LimmaSelection1,
+				selection2: LimmaSelection2
+			}
+		})
+		.success(function(data){
+			alert("New Heatmap Created with "+ LimmaSelection1 + " and " + LimmaSelection2+ "!");
+			$scope.retrieveHeatmaps();
+		})
+		.error(function(data){
+			alert("New Heatmap Creation Failed with "+ LimmaSelection1 + " and " + LimmaSelection2+ "!");
+		});
+		
+	};
+	
+	$scope.analyzeLimmaRequester = function() {
+		
+		
+		var matrixLocation = $scope.matrixlocation;
+		var limmaDimension = $scope.LimmaDimension;
+		var limmaSelection1 = $scope.LimmaSelection1;
+		var limmaSelection2 = $scope.LimmaSelection2;
+		
+
+		var inputurl = "heatmap/"+$scope.matrixlocation+"/analysis/limma" 
+				+ "(" +$scope.LimmaDimension + "," + $scope.LimmaSelection1 + "," + $scope.LimmaSelection2 + ")";
+
+		alert('Your analysis will complete soon.\n\n'+
+				'Experiment: '+limmaSelection1 + '\n' +
+				'Control: '+ limmaSelection2 + '\n' +
+				'Dimension: '+ limmaDimension + '\n');
+		
+		$http({
+			method:"HEAD",
+			url: inputurl,
+		})
+		.success( function(data) {
+			alert('Your analysis has completed. \n\n'+
+				'Experiment: '+limmaSelection1 + '\n' +
+				'Control: '+ limmaSelection2 + '\n' +
+				'Dimension: '+ limmaDimension + '\n'
+			);
+			$scope.pullLimmaAnalysis()
+		})
+		.error(function(data){
+			
+			alert('Your analysis has failed! \n\n'+
+				'Experiment: '+limmaSelection1 + '\n' +
+				'Control: '+ limmaSelection2 + '\n' +
+				'Dimension: '+ limmaDimension + '\n'
+			);
+			
+		})
+	}
+	
+	$scope.pullLimmaAnalysis = function() {
+	
+		$scope.limmaPreviousAnalysis = []
+	
+		$http({
+			method:"GET",
+			url:"heatmap/"+$scope.matrixlocation+"/analysis/limma/"+"column",
+			params: {
+				format:"json"
+			}
+			
+		})
+		.success( function(data) {
+			
+			if (data.length >0) {
+				data.map(function(columnLimma, index){
+					$scope.limmaPreviousAnalysis.push({
+						control: columnLimma.control,
+						experiment: columnLimma.experiment,
+						dimension: "column"
+					});
+				});
+			}
+			
+			
+		});
+		
+		$http({
+			method:"GET",
+			url:"heatmap/"+$scope.matrixlocation+"/analysis/limma/"+"row",
+			params: {
+				format:"json"
+			}
+			
+		})
+		.success( function(data) {
+					
+			if (data.length >0) {
+				data.map(function(columnLimma){
+					$scope.limmaPreviousAnalysis.push({
+						control: columnLimma.control,
+						experiment: columnLimma.experiment,
+						dimension: "row"
+					});
+				});
+				
+			}
+			
+		});
+	};
+	
+	
+	
+	$scope.analyzeLimmaViewRequester = function(LimmaDimension, LimmaSelection1, LimmaSelection2) {
+		
+		$http({
+				method:"GET",
+				url:"heatmap/"+$scope.matrixlocation+"/analysis/limmaView" 
+				+ "(" +LimmaDimension + "," + LimmaSelection1 + "," + LimmaSelection2 + ")"
+				+ "/" + "significant",
+				params: {
+					format:"json"
+				}
+			})
+			.success( function(data) {
+				
+				$scope.limmaviewtablerows = data;
+				
+			})
+			.error(function(data){
+			
+				alert("There was an error pulling your Limma significant request. \n\n"+
+				'Experiment: '+limmaSelection1 + '\n' +
+				'Control: '+ limmaSelection2 + '\n' +
+				'Dimension: '+ limmaDimension + '\n')
+				
+			});
+		
+	};
 	
 	$scope.pageUp = function() {
 		

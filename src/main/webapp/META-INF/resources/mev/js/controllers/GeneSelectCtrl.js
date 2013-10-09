@@ -164,12 +164,42 @@ ctrl.controller('GeneSelectCtrl', ['$scope', '$http', '$routeParams', '$q', func
 	
 	$scope.analyzeLimmaRequester = function() {
 
-		var inputurl = "heatmap/"+$routeParams.dataset+"/analysis/limma" 
-				+ "(" +$scope.LimmaDimension + "," + $scope.LimmaSelection1 + "," + $scope.LimmaSelection2 + ")"
-				+ "/" + $scope.LimmaOutputOption;
-
+		var matrixLocation = $scope.matrixlocation;
+		var limmaDimension = $scope.LimmaDimension;
+		var limmaSelection1 = $scope.LimmaSelection1;
+		var limmaSelection2 = $scope.LimmaSelection2;
 		
-			$("body").append("<iframe src='" + inputurl + "' style='display: none;' ></iframe>")
+
+		var inputurl = "heatmap/"+$scope.matrixlocation+"/analysis/limma" 
+				+ "(" +$scope.LimmaDimension + "," + $scope.LimmaSelection1 + "," + $scope.LimmaSelection2 + ")";
+
+		alert('Your analysis will complete soon.\n\n'+
+				'Experiment: '+limmaSelection1 + '\n' +
+				'Control: '+ limmaSelection2 + '\n' +
+				'Dimension: '+ limmaDimension + '\n');
+		
+		$http({
+			method:"HEAD",
+			url: inputurl,
+		})
+		.success( function(data) {
+			
+			alert('Your analysis has completed. \n\n'+
+				'Experiment: '+limmaSelection1 + '\n' +
+				'Control: '+ limmaSelection2 + '\n' +
+				'Dimension: '+ limmaDimension + '\n'
+			);
+			
+		})
+		.error(function(data){
+			
+			alert('Your analysis has failed! \n\n'+
+				'Experiment: '+limmaSelection1 + '\n' +
+				'Control: '+ limmaSelection2 + '\n' +
+				'Dimension: '+ limmaDimension + '\n'
+			);
+			
+		})
 		
 	}
 	
