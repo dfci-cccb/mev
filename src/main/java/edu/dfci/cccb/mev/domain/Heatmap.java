@@ -258,11 +258,9 @@ public class Heatmap implements Closeable {
 
       {
         for (String selection : selections)
-          for (List<Integer> indices : Lambda.extract (getColumnSelection (selection,
-                                                                           0,
-                                                                           data.getColumnDimension ()),
-                                                       Lambda.on (MatrixSelection.class).getIndices ()))
-            addAll (indices);
+          addAll (getColumnSelection (selection,
+                                      0,
+                                      data.getColumnDimension ()).getIndices ());
       }
     });
     Heatmap result = builder.reorderColumns (this, remap);
@@ -327,11 +325,9 @@ public class Heatmap implements Closeable {
 
       {
         for (String selection : selections)
-          for (List<Integer> indices : Lambda.extract (getRowSelection (selection,
-                                                                        0,
-                                                                        data.getRowDimension ()),
-                                                       Lambda.on (MatrixSelection.class).getIndices ()))
-            addAll (indices);
+          addAll (getRowSelection (selection,
+                                   0,
+                                   data.getRowDimension ()).getIndices ());
       }
     });
     Heatmap result = builder.reorderRows (this, remap);
@@ -621,7 +617,7 @@ public class Heatmap implements Closeable {
       return result;
     }
   }
-  
+
   public List<LimmaResult> limmaColumnsData (String experiment, String control, LimmaOutput type) throws IOException {
     try (BufferedReader reader = new BufferedReader (new FileReader (limmaColumns (experiment, control, type)))) {
       reader.readLine (); // skip header
@@ -649,9 +645,9 @@ public class Heatmap implements Closeable {
       throw new RuntimeException (e.getCause ());
     }
   }
-  
+
   public Collection<LimmaParameter> limmaCalculatedRows () {
-    return Lambda.convert (limmaRows.asMap ().keySet (), new Converter<Pair<String, String>, LimmaParameter>() {
+    return Lambda.convert (limmaRows.asMap ().keySet (), new Converter<Pair<String, String>, LimmaParameter> () {
 
       @Override
       public LimmaParameter convert (Pair<String, String> from) {
@@ -659,9 +655,9 @@ public class Heatmap implements Closeable {
       }
     });
   }
-  
+
   public Collection<LimmaParameter> limmaCalculatedColumns () {
-    return Lambda.convert (limmaColumns.asMap ().keySet (), new Converter<Pair<String, String>, LimmaParameter>() {
+    return Lambda.convert (limmaColumns.asMap ().keySet (), new Converter<Pair<String, String>, LimmaParameter> () {
 
       @Override
       public LimmaParameter convert (Pair<String, String> from) {
