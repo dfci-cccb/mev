@@ -435,17 +435,21 @@ drct.directive('visHeatmap', [function() {
 						.separation(function(a,b){ //Define a separation of neighboring nodes. Make neighbor distances equidistant so they can align with heatmap.
 							return a.parent == b.parent ? 5:5;
 					});
+					
+					//Scaling function to fit the dimensions of the tree within its svg window
+					var topscaling = d3.scale.linear()
+										.domain([0, newdata.tree.top.d])
+										.range([toptreeheight, 0]); //In reversed order due to svg coordinate system. 0 distance nodes should be along the bottom, which would be the height of that window.
 
 					var topelbow = function(d, i){
 						
-						return "M" + (d.target.x + margin.left )  + "," + (toptreeheight - (d.target.d * 1) )
-						+ "V" + (toptreeheight - (d.source.d * 1) ) + "H" +  ( d.source.x + margin.left  );
+						return "M" + (d.target.x + margin.left )  + "," + (topscaling(d.target.d))
+						+ "V" + (topscaling(d.source.d)) + "H" +  ( d.source.x + margin.left  );
 					};
 					
 				
 
 					var topclick = function(d){
-						
 						
 						var nColor = '#ffffff'; //Initial nonselected color of a node.
 						var pColor = '#cccccc'; //Initial nonselected color of a branch.
@@ -549,12 +553,12 @@ drct.directive('visHeatmap', [function() {
 						.attr("class","topnode")
 						.attr("cy", function(d) {
 							if( !(d.parent) ){
-								return Math.floor( (toptreeheight - (d.d )) );
+								return Math.floor(topscaling(d.d));
 							} else  {
 								if( !(d.children) ){
 									return  Math.floor(toptreeheight) ;
 								} else {
-									return Math.floor(toptreeheight - (d.d ));
+									return Math.floor(topscaling(d.d));
 								}
 							}
 						})
