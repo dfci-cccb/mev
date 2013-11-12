@@ -210,22 +210,22 @@ define (
               ['API', function (API) {
 
                 return {
-                  restrict : 'E',
+                  restrict : 'A',
                   scope : {
                     url : '@',
                     diameter : '@'
 
                   },
-                  template : '<div></div>', // requires
+                  template : '<div id="vis"></div>', // requires
                   // css
                   // location
                   link : function (scope, elems, attr) {
 
                     
-                    var cluster = API.hcl.get.linear();
-                    
-                    cluster.then(function(data){
-
+                    var cluster = API.hcl.radial.get("mock/cluster");
+                    //cluster.then(function(data){
+                    d3.text('heatmap/mock/cluster?format=newick', function(data){
+                              
                               var r = scope.diameter / 2;
 
                               var cluster = d3.layout.cluster ().size (
@@ -259,8 +259,8 @@ define (
                                     + r + " 0 0," + sweep + " " + m[0] + ","
                                     + m[1] + "L" + t[0] + "," + t[1]);
                               }
-
-                              var wrap = d3.select (elems[0].childNodes[1])
+                              
+                              var wrap = d3.select (elems[0])
                                   .append ("svg").attr ("width", r * 2).attr (
                                       "height", r * 2).style (
                                       "-webkit-backface-visibility", "hidden");
@@ -414,6 +414,7 @@ define (
               //templateUrl : "/container/view/elements/visHeatmap",
               link: function(scope, elems, attr){
             	  
+                
             	scope.width = 400;
             	scope.height = 700;
             	scope.marginleft = 20;
@@ -424,6 +425,7 @@ define (
             	API.heatmap.get('mock/data')
             	  .then(function(data){
             		  
+            	    
             		  var cellwidth = 10;
             		  
             		  var margin = {

@@ -64,11 +64,13 @@ define ([ 'angular', 'd3' ], function (angular, d3) {
                 
                 var params = {
                     method : 'GET',
-                    url : 'heatmap/' + url + '?format=json',
+                    url : 'heatmap/' + url + '?format=newick',
                     format : 'json'
                   };
                   return QHTTP (params, function (d, s) {
-                    return d;
+                    
+                    return d3.text('heatmap/' + url + '?format=newick', function(data) {return data})
+                    
                   }, function (d, s) {
                     return d, s;
                   });

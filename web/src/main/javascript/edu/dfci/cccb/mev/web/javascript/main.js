@@ -31,6 +31,9 @@ require
         'bootstrap-css' : {
           deps : [ 'bootstrap' ]
         },
+        'newick':{
+          exports: 'newick'
+        }
 
       },
       waitSeconds : "2"

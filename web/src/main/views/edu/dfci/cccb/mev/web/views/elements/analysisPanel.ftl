@@ -52,7 +52,7 @@
 	    </div>
 	    <div id="collapseTwo" class="accordion-body collapse">
 	      <div class="accordion-inner">
-	        <img src="http://revolution-computing.typepad.com/.a/6a010534b1db25970b0120a56d0b8f970b-800wi" width='300' height='300'></img>
+	        <div d3-Radial-Tree diameter='400'></div>
 	      </div>
 	    </div>
 	  </div>
