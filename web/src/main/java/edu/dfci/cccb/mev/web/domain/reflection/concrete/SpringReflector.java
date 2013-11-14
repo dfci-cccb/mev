@@ -14,6 +14,7 @@
  */
 package edu.dfci.cccb.mev.web.domain.reflection.concrete;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableCollection;
 
 import java.lang.reflect.Method;
@@ -59,8 +60,11 @@ public class SpringReflector implements Reflection {
       final RequestMappingInfo info = mapping.getKey ();
       final HandlerMethod handler = mapping.getValue ();
       if (handler.getMethodAnnotation (ResponseBody.class) != null
-          || handler.getBeanType ().getAnnotation (RestController.class) != null)
-        for (final RequestMethod method : info.getMethodsCondition ().getMethods ())
+          || handler.getBeanType ().getAnnotation (RestController.class) != null) {
+        Collection<RequestMethod> methods = info.getMethodsCondition ().getMethods ();
+        if (methods.isEmpty ())
+          methods = asList (RequestMethod.values ());
+        for (final RequestMethod method : methods)
           for (final String url : info.getPatternsCondition ().getPatterns ())
             services.add (new RestService () {
 
@@ -80,7 +84,8 @@ public class SpringReflector implements Reflection {
 
                       @Override
                       public String name () {
-                        return parameter.getParameterAnnotation (RequestParam.class).value ();
+                        return parameter.getParameterAnnotation (RequestParam.class)
+                                        .value ();
                       }
                     });
                 this.parameters = unmodifiableCollection (parameters);
@@ -116,6 +121,7 @@ public class SpringReflector implements Reflection {
                 return throwing;
               }
             });
+      }
 
       this.services = unmodifiableCollection (services);
     }

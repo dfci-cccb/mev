@@ -39,11 +39,10 @@ import java.util.Properties;
 import org.json.JSONException;
 import org.json.JSONWriter;
 
-import au.com.bytecode.opencsv.CSVParser;
-
 import com.google.refine.expr.EvalError;
 import com.google.refine.grel.ControlFunctionRegistry;
 import com.google.refine.grel.Function;
+import com.google.refine.util.csv.CSVParser;
 
 public class SmartSplit implements Function {
 

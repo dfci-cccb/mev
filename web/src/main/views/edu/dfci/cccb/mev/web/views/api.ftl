@@ -17,7 +17,7 @@
         <td><#list service.parameters() as parameter>${parameter.type().simpleName} ${parameter.name()}<br/></#list></td>
         <td>${service.handler().declaringClass.simpleName}.${service.handler().name}</td>
         <td>${service.handler().returnType.simpleName}</td>
-        <td><#list service.throwing() as throwing>${throwing.simpleName}</#list></td>
+        <td><#list service.throwing() as throwing>${throwing.simpleName}<br/></#list></td>
       </tr></#list>
     </table>
   </body>

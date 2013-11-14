@@ -73,6 +73,17 @@
       <version>BAYLIE-SNAPSHOT</version>
     </dependency>
 
+    <dependency>
+      <groupId>edu.dfci.cccb</groupId>
+      <artifactId>mev-heatmap-client</artifactId>
+      <version>BAYLIE-SNAPSHOT</version>
+    </dependency>
+
+	<dependency>
+      <groupId>edu.dfci.cccb</groupId>
+      <artifactId>mev-heatmap-test</artifactId>
+      <version>BAYLIE-SNAPSHOT</version>
+    </dependency>
     <!-- Servlet API -->
 
     <dependency>
