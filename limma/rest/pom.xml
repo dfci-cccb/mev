@@ -15,10 +15,6 @@
     <version>BAYLIE-SNAPSHOT</version>
   </parent>
 
-  <properties>
-    <spring.version>4.0.0.M3</spring.version>
-  </properties>
-
   <dependencies>
 
     <dependency>

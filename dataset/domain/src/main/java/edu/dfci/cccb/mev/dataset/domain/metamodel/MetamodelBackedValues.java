@@ -27,7 +27,7 @@ import org.eobjects.metamodel.query.SelectItem;
 import org.eobjects.metamodel.schema.Table;
 
 import edu.dfci.cccb.mev.dataset.domain.contract.InvalidCoordinateException;
-import edu.dfci.cccb.mev.dataset.domain.prototype.AbstractValues;
+import edu.dfci.cccb.mev.dataset.domain.prototype.AbstractDataSourceValues;
 
 /**
  * @author levk
@@ -35,11 +35,7 @@ import edu.dfci.cccb.mev.dataset.domain.prototype.AbstractValues;
  */
 @ToString (of = "values")
 @EqualsAndHashCode (callSuper = true)
-public class MetamodelBackedValues extends AbstractValues {
-
-  public static final String ROW_FIELD_NAME = "mev_row";
-  public static final String COLUMN_FIELD_NAME = "mev_column";
-  public static final String VALUE_FIELD_NAME = "mev_value";
+public class MetamodelBackedValues extends AbstractDataSourceValues {
 
   private final Table values;
   private final UpdateableDataContext context;
@@ -97,6 +93,13 @@ public class MetamodelBackedValues extends AbstractValues {
    * @see java.lang.Object#finalize() */
   @Override
   protected void finalize () throws Throwable {
+    close ();
+  }
+
+  /* (non-Javadoc)
+   * @see java.lang.AutoCloseable#close() */
+  @Override
+  public void close () throws Exception {
     context.executeUpdate (new DropTable (values));
   }
 }

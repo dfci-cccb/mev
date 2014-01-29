@@ -16,6 +16,7 @@ package edu.dfci.cccb.mev.dataset.domain.prototype;
 
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import edu.dfci.cccb.mev.dataset.domain.contract.Dataset;
 import edu.dfci.cccb.mev.dataset.domain.contract.Workspace;
 
 /**
@@ -24,4 +25,23 @@ import edu.dfci.cccb.mev.dataset.domain.contract.Workspace;
  */
 @EqualsAndHashCode
 @ToString
-public abstract class AbstractWorkspace implements Workspace {}
+public abstract class AbstractWorkspace implements Workspace, AutoCloseable {
+
+  /* (non-Javadoc)
+   * @see java.lang.AutoCloseable#close() */
+  @Override
+  public void close () throws Exception {
+    Exception toThrow = null;
+    for (String name : list ())
+      try {
+        Dataset dataset = get (name);
+        if (dataset instanceof AutoCloseable)
+          ((AutoCloseable) dataset).close ();
+      } catch (Exception e) {
+        if (toThrow == null)
+          toThrow = e;
+        else
+          toThrow.addSuppressed (e);
+      }
+  }
+}

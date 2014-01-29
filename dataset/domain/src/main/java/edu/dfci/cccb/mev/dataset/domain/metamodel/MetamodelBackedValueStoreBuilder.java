@@ -16,9 +16,9 @@ package edu.dfci.cccb.mev.dataset.domain.metamodel;
 
 import static edu.dfci.cccb.mev.dataset.domain.contract.Dimension.Type.COLUMN;
 import static edu.dfci.cccb.mev.dataset.domain.contract.Dimension.Type.ROW;
-import static edu.dfci.cccb.mev.dataset.domain.metamodel.MetamodelBackedValues.COLUMN_FIELD_NAME;
-import static edu.dfci.cccb.mev.dataset.domain.metamodel.MetamodelBackedValues.ROW_FIELD_NAME;
-import static edu.dfci.cccb.mev.dataset.domain.metamodel.MetamodelBackedValues.VALUE_FIELD_NAME;
+import static edu.dfci.cccb.mev.dataset.domain.prototype.AbstractDataSourceValues.COLUMN_FIELD_NAME;
+import static edu.dfci.cccb.mev.dataset.domain.prototype.AbstractDataSourceValues.ROW_FIELD_NAME;
+import static edu.dfci.cccb.mev.dataset.domain.prototype.AbstractDataSourceValues.VALUE_FIELD_NAME;
 import static java.util.UUID.randomUUID;
 import static org.eobjects.metamodel.DataContextFactory.createJdbcDataContext;
 import static org.eobjects.metamodel.schema.ColumnType.DOUBLE;
@@ -42,7 +42,6 @@ import edu.dfci.cccb.mev.dataset.domain.contract.ValueStoreBuilder;
 import edu.dfci.cccb.mev.dataset.domain.contract.ValueStoreException;
 import edu.dfci.cccb.mev.dataset.domain.contract.Values;
 import edu.dfci.cccb.mev.dataset.domain.prototype.AbstractValueStoreBuilder;
-import edu.dfci.cccb.mev.dataset.domain.simple.CachedValues;
 
 /**
  * @author levk
@@ -90,6 +89,6 @@ public class MetamodelBackedValueStoreBuilder extends AbstractValueStoreBuilder 
   @Override
   @Synchronized
   public Values build () {
-    return new CachedValues (store);
+    return store;
   }
 }

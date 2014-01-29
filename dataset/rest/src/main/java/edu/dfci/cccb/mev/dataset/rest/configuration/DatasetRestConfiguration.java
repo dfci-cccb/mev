@@ -27,6 +27,8 @@ import static org.springframework.web.servlet.HandlerMapping.URI_TEMPLATE_VARIAB
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import lombok.ToString;
 
 import org.springframework.context.annotation.Bean;
@@ -51,8 +53,9 @@ import edu.dfci.cccb.mev.dataset.domain.contract.Selection;
 import edu.dfci.cccb.mev.dataset.domain.contract.SelectionBuilder;
 import edu.dfci.cccb.mev.dataset.domain.contract.ValueStoreBuilder;
 import edu.dfci.cccb.mev.dataset.domain.contract.Workspace;
-import edu.dfci.cccb.mev.dataset.domain.metamodel.MetamodelBackedValueStoreBuilder;
+import edu.dfci.cccb.mev.dataset.domain.jooq.JooqBasedDatasourceValueStoreBuilder;
 import edu.dfci.cccb.mev.dataset.domain.simple.ArrayListWorkspace;
+import edu.dfci.cccb.mev.dataset.domain.simple.SharedCachedValueStoreBuilder;
 import edu.dfci.cccb.mev.dataset.domain.simple.SimpleDatasetBuilder;
 import edu.dfci.cccb.mev.dataset.domain.simple.SimpleSelectionBuilder;
 import edu.dfci.cccb.mev.dataset.domain.supercsv.SuperCsvComposerFactory;
@@ -116,9 +119,8 @@ public class DatasetRestConfiguration extends MevRestConfigurerAdapter {
 
   @Bean
   @Scope (value = SCOPE_REQUEST, proxyMode = INTERFACES)
-  public ValueStoreBuilder valueFactory () {
-    return new MetamodelBackedValueStoreBuilder ();// MapBackedValueStoreBuilder
-                                                   // ();
+  public ValueStoreBuilder valueFactory (DataSource dataSource) throws Exception {
+    return new SharedCachedValueStoreBuilder (new JooqBasedDatasourceValueStoreBuilder (dataSource));
   }
 
   @Bean

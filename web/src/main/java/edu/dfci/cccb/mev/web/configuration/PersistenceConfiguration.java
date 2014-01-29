@@ -49,7 +49,9 @@ public class PersistenceConfiguration {
     dataSource.setUrl (environment.getProperty ("database.url",
                                                 "jdbc:h2:file:"
                                                         + getProperty ("java.io.tmpdir") + separator
-                                                        + "mev;DB_CLOSE_DELAY\\=-1"));
+                                                        + "mev"
+                                                        + ";QUERY_CACHE_SIZE=100000"
+                                                        + ";CACHE_SIZE=1048576"));
     dataSource.setUsername (environment.getProperty ("database.username", "sa"));
     dataSource.setPassword (environment.getProperty ("database.password", ""));
     return dataSource;

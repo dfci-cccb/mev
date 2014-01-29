@@ -45,9 +45,9 @@ public abstract class AbstractHcl extends AbstractAnalysis<AbstractHcl> implemen
   @Override
   public Dimension apply () throws DatasetException {
     Dimension result = new SimpleHierarchicallyClusteredDimension (dimension.type (),
-                                                             root,
-                                                             dimension.selections (),
-                                                             dimension.annotation ());
+                                                                   root,
+                                                                   dimension.selections (),
+                                                                   dimension.annotation ());
     dataset.set (result);
     return result;
   }

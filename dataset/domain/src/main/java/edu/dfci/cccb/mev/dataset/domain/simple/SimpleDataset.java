@@ -31,7 +31,7 @@ import edu.dfci.cccb.mev.dataset.domain.prototype.AbstractDataset;
  */
 @EqualsAndHashCode (callSuper = true)
 @ToString
-public class SimpleDataset extends AbstractDataset {
+public class SimpleDataset extends AbstractDataset implements AutoCloseable {
 
   private Values values;
   private Analyses analyses;
@@ -95,5 +95,13 @@ public class SimpleDataset extends AbstractDataset {
   @Override
   public Analyses analyses () {
     return analyses;
+  }
+
+  /* (non-Javadoc)
+   * @see java.lang.AutoCloseable#close() */
+  @Override
+  public void close () throws Exception {
+    if (values instanceof AutoCloseable)
+      ((AutoCloseable) values).close ();
   }
 }

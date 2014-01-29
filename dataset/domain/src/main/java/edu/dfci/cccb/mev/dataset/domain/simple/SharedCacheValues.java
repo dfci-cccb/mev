@@ -20,7 +20,10 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.javatuples.Pair;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+
+import org.javatuples.Triplet;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -33,32 +36,27 @@ import edu.dfci.cccb.mev.dataset.domain.prototype.AbstractValues;
  * @author levk
  * 
  */
-public class CachedValues extends AbstractValues {
+@ToString
+@RequiredArgsConstructor
+public class SharedCacheValues extends AbstractValues {
 
-  private static final int CACHE_SIZE = 100000;
-  private static final TimeUnit CACHE_AGE_UNIT = MINUTES;
-  private static final long CACHE_AGE = 20;
+  private static final TimeUnit DURATION_UNIT = MINUTES;
+  private static final long DURATION = 10;
+  private static final LoadingCache<Triplet<Values, String, String>, Double> CACHE;
 
-  private final LoadingCache<Pair<String, String>, Double> cache;
+  static {
+    CACHE = newBuilder ().expireAfterAccess (DURATION, DURATION_UNIT)
+                         .maximumSize (100000)
+                         .build (new CacheLoader<Triplet<Values, String, String>, Double> () {
 
-  /**
-   * 
-   * @param values
-   */
-  public CachedValues (final Values values) {
-    cache = newBuilder ().expireAfterWrite (CACHE_AGE, CACHE_AGE_UNIT)
-                         .maximumSize (CACHE_SIZE)
-                         .build (new CacheLoader<Pair<String, String>, Double> () {
-                           /* (non-Javadoc)
-                            * @see
-                            * com.google.common.cache.CacheLoader#load(java
-                            * .lang.Object) */
                            @Override
-                           public Double load (Pair<String, String> key) throws Exception {
-                             return values.get (key.getValue0 (), key.getValue1 ());
+                           public Double load (Triplet<Values, String, String> key) throws Exception {
+                             return key.getValue0 ().get (key.getValue1 (), key.getValue2 ());
                            }
                          });
   }
+
+  private final Values values;
 
   /* (non-Javadoc)
    * @see
@@ -67,12 +65,9 @@ public class CachedValues extends AbstractValues {
   @Override
   public double get (String row, String column) throws InvalidCoordinateException {
     try {
-      return cache.get (new Pair<String, String> (row, column));
+      return CACHE.get (new Triplet<Values, String, String> (values, row, column));
     } catch (ExecutionException e) {
-      if (e.getCause () instanceof InvalidCoordinateException)
-        throw (InvalidCoordinateException) e.getCause ();
-      else
-        throw new InvalidCoordinateException (e); // shouldn't happen
+      throw (InvalidCoordinateException) e.getCause ();
     }
   }
 }
