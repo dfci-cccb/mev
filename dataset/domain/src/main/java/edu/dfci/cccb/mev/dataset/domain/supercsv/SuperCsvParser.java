@@ -57,7 +57,9 @@ public class SuperCsvParser extends AbstractParser implements Closeable {
                                                             return POSITIVE_INFINITY;
                                                           else if ("-Inf".equals (value))
                                                             return NEGATIVE_INFINITY;
-                                                          else if ("NA".equals (NaN))
+                                                          else if ("NA".equals (value))
+                                                            return NaN;
+                                                          else if ("null".equals (value))
                                                             return NaN;
                                                           else
                                                             return next.execute (value,

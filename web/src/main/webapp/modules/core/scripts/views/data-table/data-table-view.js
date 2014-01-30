@@ -461,8 +461,9 @@ DataTableView.prototype._adjustDataTables = function() {
       Math.min(headerTd.width(), 100),
       dataTd.width()
     );
-    headerTd.width('1%').find('> div').width(commonWidth);
-    dataTd.children().first().width(commonWidth);
+    //ap:orig
+    //headerTd.width('1%').find('> div').width(commonWidth);
+    //dataTd.children().first().width(commonWidth);        
   }
   
   this._adjustDataTableScroll();

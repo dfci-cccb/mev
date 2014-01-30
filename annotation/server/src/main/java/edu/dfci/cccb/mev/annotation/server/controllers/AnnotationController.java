@@ -32,6 +32,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.support.WebApplicationObjectSupport;
 import org.springframework.web.servlet.ModelAndView;
@@ -51,6 +52,9 @@ import edu.dfci.cccb.mev.dataset.domain.mock.MockTsvInput;
 import edu.dfci.cccb.mev.dataset.domain.simple.ArrayListSelections;
 import edu.dfci.cccb.mev.dataset.domain.simple.SimpleDataset;
 import edu.dfci.cccb.mev.dataset.domain.simple.SimpleDimension;
+import edu.dfci.cccb.mev.presets.contract.Preset;
+import edu.dfci.cccb.mev.presets.contract.Presets;
+import edu.dfci.cccb.mev.presets.contract.exceptions.PresetNotFoundException;
 import freemarker.template.TemplateModelException;
 
 @Controller
@@ -58,12 +62,13 @@ import freemarker.template.TemplateModelException;
 @Log4j
 public class AnnotationController extends WebApplicationObjectSupport {
 
-  private RefineServlet refineServlet;
+  private RefineServlet refineServlet;  
   private @Inject Environment environment;
   private @Inject Workspace workspace;
   private @Inject FileProjectManager projectManager;
   private @Inject DatasetBuilder datasetBuilder;
-
+  private @Inject Presets presets;
+  
   @PostConstruct
   private void createRefineServlet () throws ServletException {
     refineServlet = new RefineServlet ();
@@ -156,7 +161,8 @@ public class AnnotationController extends WebApplicationObjectSupport {
   }
   
   @RequestMapping(method={GET, POST, PUT, DELETE}, value="/import-dataset/**")
-  public void importDataset(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+  public void importDataset(@RequestParam(value="import-preset", required=false) String presetName,
+                            HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, PresetNotFoundException{
     
     HttpServletRequest wrappedRequest = new HttpServletRequestWrapper (request) {
       @Override
@@ -165,6 +171,10 @@ public class AnnotationController extends WebApplicationObjectSupport {
       }
     };
     
+    if(presetName!=null && presetName.equals ("")==false){
+      Preset preset = presets.get (presetName);
+      wrappedRequest.setAttribute ("descriptor", preset.descriptor ());
+    }
     this.refineServlet.service (wrappedRequest, response);
   }
   

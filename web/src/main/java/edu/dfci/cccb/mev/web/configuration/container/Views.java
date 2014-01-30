@@ -150,10 +150,10 @@ public class Views {
     return builder.setUrl ("/edu/dfci/cccb/mev/web/views/elements/mainpanel/MainPanel.ftl").build ();
   }
 
-  
-  @Bean (name="elements/fcuk")
-  public FreeMarkerView fcuk(FreeMarkerViewBuilder builder){    
-    return builder.setUrl ("/edu/dfci/cccb/mev/web/views/elements/fcuk.ftl").build ();
+  //Presets templates
+  @Bean(name="elements/presets/presetList")
+  public FreeMarkerView presetList(FreeMarkerViewBuilder builder){
+    return builder.setUrl ("/edu/dfci/cccb/mev/web/views/elements/presets/presetList.ftl").build ();
   }
   
   

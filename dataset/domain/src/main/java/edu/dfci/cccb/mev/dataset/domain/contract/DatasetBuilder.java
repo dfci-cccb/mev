@@ -23,4 +23,9 @@ public interface DatasetBuilder {
   Dataset build (RawInput content) throws DatasetBuilderException,
                                   InvalidDatasetNameException,
                                   InvalidDimensionTypeException;
+
+  Dataset build (RawInput content, Selection columnSelection) throws DatasetBuilderException,
+                                                             InvalidDatasetNameException,
+                                                             InvalidDimensionTypeException;
+
 }

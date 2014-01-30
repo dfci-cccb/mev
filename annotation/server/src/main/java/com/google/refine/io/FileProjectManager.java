@@ -70,8 +70,7 @@ import com.google.refine.model.Project;
 import com.google.refine.preference.TopList;
 
 import edu.dfci.cccb.mev.dataset.domain.contract.Dataset;
-import edu.dfci.cccb.mev.dataset.domain.contract.DatasetBuilder;
-import edu.dfci.cccb.mev.dataset.domain.contract.Workspace;
+import edu.dfci.cccb.mev.presets.contract.Presets;
 
 public class FileProjectManager extends ProjectManager {
   final static public String REQUEST_ATTEIBUTE_DATASET = "dataset";
@@ -115,21 +114,25 @@ public class FileProjectManager extends ProjectManager {
   }
 
     
-  @Autowired(required=false) private Dataset requestHeatmap;
+  @Autowired(required=false) private Dataset dataset;
   public Dataset getRequestHeatmap () {
-    return requestHeatmap;
+    return dataset;
   }
   public void setRequestHeatmap (Dataset requestHeatmap) {
-    this.requestHeatmap = requestHeatmap;
+    this.dataset = requestHeatmap;
   }
-  
-  
+  @Inject Presets presets;
+    
   @Override
   public Map<Long, ProjectMetadata> getAllProjectMetadata () {
     Map<Long, ProjectMetadata> heatmapMetadata = new HashMap<Long, ProjectMetadata> ();
     for (Entry<Long, ProjectMetadata> entry : _projectsMetadata.entrySet ()) {
-      if (entry.getValue ().getName ().startsWith (requestHeatmap.name ())) {
+      if (dataset!=null && entry.getValue ().getName ().startsWith (dataset.name ())) {
         heatmapMetadata.put (entry.getKey (), entry.getValue ());
+      }else{
+        /*if(presets!=null && presets.list ().contains (entry.getValue().getName())==false){
+          heatmapMetadata.put (entry.getKey (), entry.getValue ());
+        }*/
       }
 
     }

@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <packaging>jar</packaging>
+  
+  <artifactId>mev-presets-domain</artifactId>
+  <name>MeV PREloaded DataSETS - Domain</name>
+  
+  <parent>
+    <groupId>edu.dfci.cccb</groupId>
+    <artifactId>mev-presets</artifactId>
+    <version>BAYLIE-SNAPSHOT</version>
+  </parent>
+  <properties>
+  	<jackson.version>2.2.2</jackson.version>
+  </properties>
+  
+  <dependencies>
+      <!-- MetaModel -->
+
+    <dependency>
+      <groupId>edu.dfci.cccb</groupId>
+      <artifactId>mev-dataset-domain</artifactId>
+      <version>BAYLIE-SNAPSHOT</version>
+    </dependency>
+    
+    <!-- Jackson 2 -->
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+  </dependencies>
+</project>

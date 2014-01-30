@@ -38,7 +38,7 @@
     <dependency>
       <groupId>org.eobjects.metamodel</groupId>
       <artifactId>MetaModel-full</artifactId>
-      <version>3.4.5</version>
+      <version>3.4.8</version>
     </dependency>
 
   </dependencies>

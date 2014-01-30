@@ -42,6 +42,7 @@ import edu.dfci.cccb.mev.dataset.domain.contract.InvalidDimensionTypeException;
 import edu.dfci.cccb.mev.dataset.domain.contract.Parser;
 import edu.dfci.cccb.mev.dataset.domain.contract.ParserFactory;
 import edu.dfci.cccb.mev.dataset.domain.contract.RawInput;
+import edu.dfci.cccb.mev.dataset.domain.contract.Selection;
 import edu.dfci.cccb.mev.dataset.domain.contract.SelectionBuilder;
 import edu.dfci.cccb.mev.dataset.domain.contract.Selections;
 import edu.dfci.cccb.mev.dataset.domain.contract.UnparsableContentTypeException;
@@ -80,6 +81,26 @@ public abstract class AbstractDatasetBuilder implements DatasetBuilder {
         rows.add (parser.projection (ROW));
       if (!columns.contains (parser.projection (COLUMN)))
         columns.add (parser.projection (COLUMN));
+    }
+    return aggregate (content.name (), valueStoreBuilder.build (), analyses (),
+                      dimension (ROW, rows, selections (), annotation ()),
+                      dimension (COLUMN, columns, selections (), annotation ()));
+  }
+
+  @Override
+  public Dataset build (RawInput content, Selection columnSelection) throws DatasetBuilderException,
+                                                                    InvalidDatasetNameException,
+                                                                    InvalidDimensionTypeException {
+    List<String> rows = new ArrayList<> ();
+    List<String> columns = new ArrayList<> ();
+    for (Parser parser = parser (content); parser.next ();) {
+      if(columnSelection.keys ().contains (parser.projection (COLUMN))){
+        valueStoreBuilder.add (parser.value (), parser.projection (ROW), parser.projection (COLUMN));
+        if (!rows.contains (parser.projection (ROW)))
+          rows.add (parser.projection (ROW));
+        if (!columns.contains (parser.projection (COLUMN)))
+          columns.add (parser.projection (COLUMN));
+      }
     }
     return aggregate (content.name (), valueStoreBuilder.build (), analyses (),
                       dimension (ROW, rows, selections (), annotation ()),

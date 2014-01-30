@@ -24,4 +24,16 @@ import edu.dfci.cccb.mev.dataset.domain.contract.RawInput;
  */
 @EqualsAndHashCode
 @ToString
-public abstract class AbstractRawInput implements RawInput {}
+public abstract class AbstractRawInput implements RawInput {
+  private String name=null;
+  
+  @Override
+  public RawInput name(String name){
+    this.name = name;
+    return this;
+  }
+  @Override
+  public String name(){
+    return this.name;
+  }
+}

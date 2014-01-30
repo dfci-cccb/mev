@@ -1,8 +1,5 @@
 package com.google.refine.commands.project;
 
-import static com.google.refine.io.FileProjectManager.REQUEST_ATTEIBUTE_DATASET;
-import static com.google.refine.io.FileProjectManager.REQUEST_ATTEIBUTE_DIMENSION;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -37,10 +34,12 @@ import edu.dfci.cccb.mev.dataset.domain.contract.DatasetBuilderException;
 import edu.dfci.cccb.mev.dataset.domain.contract.Dimension;
 import edu.dfci.cccb.mev.dataset.domain.contract.InvalidDatasetNameException;
 import edu.dfci.cccb.mev.dataset.domain.contract.InvalidDimensionTypeException;
+import edu.dfci.cccb.mev.dataset.domain.contract.RawInput;
 import edu.dfci.cccb.mev.dataset.domain.contract.Selection;
 import edu.dfci.cccb.mev.dataset.domain.contract.Workspace;
 import edu.dfci.cccb.mev.dataset.domain.simple.SimpleSelection;
 import edu.dfci.cccb.mev.dataset.rest.assembly.tsv.UrlTsvInput;
+import edu.dfci.cccb.mev.presets.contract.PresetDescriptor;
 
 public class ImportPresetDatasetCommand extends Command {
   final static protected Logger logger = LoggerFactory.getLogger("ImportPresetDatasetCommand");
@@ -48,27 +47,24 @@ public class ImportPresetDatasetCommand extends Command {
   private @Getter @Setter @Inject DatasetBuilder builder;
 
   @Override
-  public void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+  public void doPost (final HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 
     logger.info (String.format ("******************* Import Dataset: %s *******************",
-                                request.getParameter ("selectionName")));
+                                request.getParameter ("import-preset")));
     ProjectManager.getSingleton ().setBusy (true);
     try {
 
       Project project = getProject (request);
-
       Engine engine = getEngine (request, project);      
-      Dimension.Type dimensionType = Dimension.Type.COLUMN;
       
-      final String setName = request.getParameter ("selectionName");
-      final Properties properties = new Properties ();
-      properties.put ("selectionDescription", request.getParameter ("selectionDescription"));      
-      properties.put ("selectionFacetLink", request.getParameter ("selectionFacetLink"));
+      Dimension.Type dimensionType = Dimension.Type.COLUMN;
+      final String sourceDatasetName = request.getParameter ("import-preset");
+      final String newDatasetName = request.getParameter ("newDatasetName");
+      final Properties properties = new Properties ();      
       final List<String> keys = new ArrayList<String> ();
-
       RowVisitor visitor = new RowVisitor () {
-                int rowCount = 0;
+        int rowCount = 0;
         Column theIdColumn;
 
         @Override
@@ -99,20 +95,16 @@ public class ImportPresetDatasetCommand extends Command {
 
         @Override
         public void end (Project project) {
-          Selection selection = new SimpleSelection (setName, properties, keys);
+          Selection sourceSelection = new SimpleSelection (newDatasetName, properties, keys);
           Dataset dataset=null;
-          File datafile = new File("/tmp/textxxx/presets/"+setName+"/"+setName+".tsv");
-          URL dataurl=null;
-          try {
-            dataurl = datafile.toURI ().toURL ();
-          } catch (MalformedURLException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-          }
-          logger.info (String.format ("***Import Dataset: %s *******************", dataurl.toString ()));
-                                      
-          try {
-            dataset = ProjectManager.getSingleton ().getDatasetBuilder ().build (new UrlTsvInput (dataurl));
+          //File datafile = new File("/tmp/textxxx/presets/"+sourceDatasetName+"/"+sourceDatasetName+".tsv");
+          PresetDescriptor descriptor = (PresetDescriptor)request.getAttribute ("descriptor");
+          try {            
+            RawInput newDatasetContent = new UrlTsvInput (descriptor.dataUrl ());            
+            newDatasetContent.name (newDatasetName);
+            logger.info (String.format ("***Import Dataset: %s *******************", descriptor.dataUrl ().toString ()));
+            dataset = ProjectManager.getSingleton ().getDatasetBuilder ().build (newDatasetContent, sourceSelection);
+            
           } catch (DatasetBuilderException | InvalidDatasetNameException | InvalidDimensionTypeException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

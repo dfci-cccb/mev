@@ -22,6 +22,7 @@ import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Synchronized;
 import lombok.ToString;
+import lombok.extern.log4j.Log4j;
 import edu.dfci.cccb.mev.dataset.domain.contract.Dataset;
 import edu.dfci.cccb.mev.dataset.domain.contract.DatasetNotFoundException;
 import edu.dfci.cccb.mev.dataset.domain.prototype.AbstractWorkspace;
@@ -32,6 +33,7 @@ import edu.dfci.cccb.mev.dataset.domain.prototype.AbstractWorkspace;
  */
 @EqualsAndHashCode (callSuper = true)
 @ToString
+@Log4j
 public class ArrayListWorkspace extends AbstractWorkspace {
 
   private final ArrayList<Dataset> datasets = new ArrayList<> ();
@@ -43,9 +45,12 @@ public class ArrayListWorkspace extends AbstractWorkspace {
   @Override
   @Synchronized
   public void put (Dataset dataset) {
-    for (Iterator<Dataset> datasets = this.datasets.iterator (); datasets.hasNext ();)
-      if (dataset.name ().equals (datasets.next ().name ()))
+    log.debug ("*************************************************Adding dataset " + dataset);
+    for (Iterator<Dataset> datasets = this.datasets.iterator (); datasets.hasNext ();){
+      Dataset curDataset = datasets.next ();
+      if (curDataset!=null && dataset.name ().equals (curDataset.name ()))
         datasets.remove ();
+    }
     datasets.add (0, dataset);
   }
 

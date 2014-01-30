@@ -47,6 +47,7 @@ require ([ 'jquery',
           'bootstrap-css',
           'bootstrap',
           'setmanager/SetManager',
+          'presets/PresetManager',
           'mainpanel/MainPanel',
           'retina' ], function (jquery, angular, app, orb) {
 
