@@ -92,4 +92,9 @@ public class WorkspaceController {
       log.debug ("Loaded " + dataset);
     workspace.put (dataset);
   }
+  
+  @RequestMapping (value="/presets", method=GET)
+  public void getPresets(){
+    
+  }
 }

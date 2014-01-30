@@ -28,6 +28,8 @@ public interface RawInput {
   String contentType ();
 
   String name ();
+  
+  RawInput name(String name);
 
   InputStream input () throws IOException;
 

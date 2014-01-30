@@ -180,9 +180,9 @@ public class RefineServlet extends Butterfly {
           if (!logger.isTraceEnabled () && command.logRequests ()) {
             logger.info ("POST {}", request.getPathInfo ());
           }
-          logger.trace ("> POST {}", commandKey);
+          logger.debug ("> POST {}", commandKey);
           command.doPost (request, response);
-          logger.trace ("< POST {}", commandKey);
+          logger.debug ("< POST {}", commandKey);
         } else if (request.getMethod ().equals ("PUT")) {
           if (!logger.isTraceEnabled () && command.logRequests ()) {
             logger.info ("PUT {}", request.getPathInfo ());

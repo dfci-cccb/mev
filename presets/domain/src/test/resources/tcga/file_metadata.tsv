@@ -1,0 +1,9 @@
+filename	path	disease	disease name	platform	platform name	data level
+BRCA.MDA_RPPA_Core.Level_3.tsv	BRCA/Level_3	BRCA	Breast invasive carcinoma	MDA_RPPA_Core	M.D. Anderson Reverse Phase Protein Array Core	Level_3
+BRCA.AgilentG4502A_07_3.Level_3.tsv	BRCA/Level_3	BRCA	Breast invasive carcinoma	AgilentG4502A_07_3	Agilent 244K Custom Gene Expression G4502A-07-3	Level_3
+ACC.IlluminaHiSeq_miRNASeq.Level_3.Expression-miRNA.readsPerMillionMapped.tsv	ACC/Level_3	ACC	Adrenocortical carcinoma	IlluminaHiSeq_miRNASeq	Illumina HiSeq 2000 miRNA Sequencing	Level_3
+BRCA.IlluminaGA_miRNASeq.Level_3.Expression-miRNA.readsPerMillionMapped.tsv	BRCA/Level_3	BRCA	Breast invasive carcinoma	IlluminaGA_miRNASeq	Illumina Genome Analyzer miRNA Sequencing	Level_3
+BRCA.IlluminaHiSeq_RNASeq.Level_3.Expression-Exon.RPKM.tsv	BRCA/Level_3	BRCA	Breast invasive carcinoma	IlluminaHiSeq_RNASeq	Illumina HiSeq 2000 RNA Sequencing	Level_3
+BRCA.IlluminaHiSeq_RNASeq.Level_3.Expression-Gene.RPKM.tsv	BRCA/Level_3	BRCA	Breast invasive carcinoma	IlluminaHiSeq_RNASeq	Illumina HiSeq 2000 RNA Sequencing	Level_3
+BRCA.IlluminaHiSeq_miRNASeq.Level_3.Expression-miRNA.readsPerMillionMapped.tsv	BRCA/Level_3	BRCA	Breast invasive carcinoma	IlluminaHiSeq_miRNASeq	Illumina HiSeq 2000 miRNA Sequencing	Level_3
+BRCA.AgilentG4502A_07_3.Level_2.tsv	BRCA/Level_2	BRCA	Breast invasive carcinoma	AgilentG4502A_07_3	Agilent 244K Custom Gene Expression G4502A-07-3	Level_2

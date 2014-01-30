@@ -33,7 +33,7 @@
         <li><a href="#googleDrive" data-toggle="tab">Google Drive</a></li>
         <li><a href="#tcga" data-toggle="tab">TCGA</a></li>
       </ul>
- 
+ 	  
       <div class="tab-content">
       
          <div class="tab-pane active" id="current">
@@ -49,8 +49,8 @@
          </div>
         
         <div class="tab-pane" id="tcga">
-
-          <a href="" onclick="$.ajax({ type: 'POST',
+		  <div preset-manager ng-controller="PresetManagerController"></div>
+          <!-- <a href="" onclick="$.ajax({ type: 'POST',
                                        url: '/dataset?load=Ovarian Agilent G4502A 07 2 Level 3',
                                        contentType: 'application/json;charset=UTF-8',
                                        onSuccess: function() {
@@ -58,7 +58,7 @@
                                          alert('Ovarian Agilent G4502A 07 2 Level 3 loaded');
                                        }
                                      });">Ovarian Agilent G4502A 07 2 Level 3</a>
-          
+           -->
         </div>
        
         

@@ -19,6 +19,8 @@ import com.google.refine.commands.Command;
 import com.google.refine.model.Project;
 import com.google.refine.util.ParsingUtilities;
 
+import edu.dfci.cccb.mev.presets.contract.Preset;
+import edu.dfci.cccb.mev.presets.contract.PresetDescriptor;
 import freemarker.template.utility.NullArgumentException;
 
 public class ViewPresetAnnotationsCommand extends Command {
@@ -31,13 +33,16 @@ public class ViewPresetAnnotationsCommand extends Command {
     ProjectManager.getSingleton().setBusy(true);
     try {
         Properties options = ParsingUtilities.parseUrlParameters(request);
-        if(!options.containsKey ("dataset-name"))
-          throw new NullArgumentException ("dataset-name");
+        if(!options.containsKey ("import-preset"))
+          throw new NullArgumentException ("import-preset");
         
-        String datasetName = options.getProperty ("dataset-name");
+        String datasetName = options.getProperty ("import-preset");
         long projectID = Project.generateID();
         logger.info("Importing existing project using new ID {}", projectID);
-        File file = new File("/tmp/textxxx/presets/"+datasetName+"/"+datasetName+".annotations.gz");
+        //File file = new File("/tmp/textxxx/presets/"+datasetName+"/"+datasetName+".annotations.gz");
+        PresetDescriptor descriptor = (PresetDescriptor)request.getAttribute ("descriptor");
+        File file = new File( descriptor.columnUrl ().getFile() );
+        
         String fileName = file.getName().toLowerCase();
         InputStream stream = new FileInputStream (file);
         
@@ -52,7 +57,6 @@ public class ViewPresetAnnotationsCommand extends Command {
                     pm.setName(projectName);
                 }
             }
-
             redirect(response, "/annotations/import-dataset/project?"
                      +"import-preset="+datasetName+"&project=" + projectID);
         } else {

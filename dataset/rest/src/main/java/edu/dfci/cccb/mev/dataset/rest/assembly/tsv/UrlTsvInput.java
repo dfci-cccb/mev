@@ -46,8 +46,8 @@ public class UrlTsvInput extends AbstractRawInput {
   /* (non-Javadoc)
    * @see edu.dfci.cccb.mev.dataset.domain.contract.RawInput#name() */
   @Override
-  public String name () {
-    return getBaseName (url.toString ());
+  public String name () {    
+    return super.name ()!=null ? super.name() : getBaseName (url.toString ());
   }
 
   /* (non-Javadoc)
