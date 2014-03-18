@@ -32,6 +32,7 @@ import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.h2.tools.Server;
+import org.mozilla.javascript.ContextFactory;
 import org.springframework.context.Lifecycle;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,6 +57,7 @@ public class PersistenceConfiguration {
 
   @Bean (name = "mev-datasource")
   public DataSource dataSource () {
+	
     BasicDataSource dataSource = new BasicDataSource ();
     dataSource.setDriverClassName (environment.getProperty ("database.driver.class", "org.h2.Driver"));
     dataSource.setUrl (environment.getProperty ("database.url",

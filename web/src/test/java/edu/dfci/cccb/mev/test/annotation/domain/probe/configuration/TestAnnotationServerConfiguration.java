@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mozilla.javascript.ContextFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -46,6 +47,7 @@ public class TestAnnotationServerConfiguration {
 
   @Inject @Named("probe-annotations-platforms-loader") ProbeAnnotationsLoader loader;
   @Inject ProbeAnnotationPlatforms probeAnnotationPlatforms;
+  ContextFactory blah = new ContextFactory();
   
   @Test
   public void test () {
