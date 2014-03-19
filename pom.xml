@@ -28,6 +28,7 @@
     <module>presets</module>
     <module>t-test</module>
     <module>anova</module>
+    <module>kmeans</module>
     
 
     <module>web</module>
