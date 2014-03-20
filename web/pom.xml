@@ -29,7 +29,7 @@
   </properties>
 
   <dependencies>
-
+  
 	<dependency>
 	    <groupId>org.springframework</groupId>
 	    <artifactId>spring-test</artifactId>
@@ -223,8 +223,6 @@
       <version>${requirejs.version}</version>
     </dependency>
 
-	
-	
   </dependencies>
 
   <build>

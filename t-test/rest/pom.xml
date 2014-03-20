@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>mev-t-test-rest</artifactId>
+  <packaging>jar</packaging>
+
+  <name>MeV t-Test Plugin REST Component</name>
+  <url>http://github.com/dfci-cccb/mev</url>
+
+  <parent>
+    <groupId>edu.dfci.cccb</groupId>
+    <artifactId>mev-t-test</artifactId>
+    <version>BAYLIE-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>edu.dfci.cccb</groupId>
+      <artifactId>mev-dataset-rest</artifactId>
+      <version>BAYLIE-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>edu.dfci.cccb</groupId>
+      <artifactId>mev-t-test-domain</artifactId>
+      <version>BAYLIE-SNAPSHOT</version>
+    </dependency>
+
+    <!-- Servlet API -->
+
+    <dependency>
+      <groupId>javax</groupId>
+      <artifactId>javaee-web-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+  </dependencies>
+</project>

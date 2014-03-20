@@ -56,6 +56,7 @@ public class PersistenceConfiguration {
 
   @Bean (name = "mev-datasource")
   public DataSource dataSource () {
+	
     BasicDataSource dataSource = new BasicDataSource ();
     dataSource.setDriverClassName (environment.getProperty ("database.driver.class", "org.h2.Driver"));
     dataSource.setUrl (environment.getProperty ("database.url",
