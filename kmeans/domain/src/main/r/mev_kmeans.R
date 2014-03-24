@@ -1,13 +1,5 @@
 #K means clustering
 
-INFILE<-"k_means_data.tsv"
-OUTFILE<-"kmeans_results.txt"
-CLUSTER_COUNT<-3
-CLUSTER_NUM<-"cluster_num"
-X="x"
-Y="y"
-GENE_ID="gene_id"
-
 #a helper method for finding the 2-norm (simple euclidean length) of a vector:
 norm_vec <- function(x) sqrt(sum(x^2))
 
@@ -16,6 +8,11 @@ data_mtx<-read.table(INFILE, sep='\t', header=T)
 rownames(data_mtx)<-data_mtx[,1]  #name the rows by the genes, which occupy the first column
 data_mtx<-na.omit(data_mtx[,-1]) #remove the first column containing the gene names, skipping any incomplete rows
 data_mtx<-data.matrix(data_mtx)
+
+#specify which samples to include in the analysis:
+sample_mtx<-read.table(SAMPLE_FILE, header=F, sep="\t")
+sample_mtx<-sample_mtx[(sample_mtx[,2]!=-1),]  #parse out the samples we do NOT want to include (marked with -1)
+data_mtx<-data_mtx[,as.character(sample_mtx[,1])]  #retain only the samples we care about
 
 #run the k-means algorithm:
 results<-kmeans(data_mtx, CLUSTER_COUNT)
@@ -47,42 +44,28 @@ centroid_projections<-centers%*%e_vectors
 datapoint_projections<-data_mtx%*%e_vectors
 
 #write the output to a file:
-#file.create(OUTFILE)
-#file_obj<-file(OUTFILE)
 sink(OUTFILE)
 
-
-#write(paste(CLUSTER_COUNT,"\n",sep=''), file=file_obj, append=T)
 cat(paste(CLUSTER_COUNT,"\n",sep=''))
 
 rn=rownames(data_mtx)
 
 rownames(datapoint_projections)<-rn
 names(cluster_assignments)<-rn
-#print(cluster_assignments)
 #write centroid info:
 for(i in 1:CLUSTER_COUNT)
 {
-	#print(i)
-	#write(paste(i,"\t",centroid_projections[i,1],"\t",centroid_projections[i,2],"\n", sep=''), file=file_obj, append=T)
-	cat(paste(i,"\t",centroid_projections[i,1],"\t",centroid_projections[i,2],"\n", sep=''))
-
+	cat(paste("Cluster ",i,"\t",i,"\t",centroid_projections[i,1],"\t",centroid_projections[i,2],"\n", sep=''))
 }
-#write(paste(N,"\n",sep=''), file=file_obj, append=T)
 cat(paste(N,"\n",sep=''))
 
 #write projected gene info:
 for (name in rn)
 {
-	#write(paste(name,"\t",cluster_assignments[name],"\t",datapoint_projections[name,1],"\t",datapoint_projections[name,2],sep=''), file=file_obj, append=T)
-		cat(paste(name,"\t",cluster_assignments[name],"\t",datapoint_projections[name,1],"\t",datapoint_projections[name,2],"\n",sep=''))
+	cat(paste(name,"\t",cluster_assignments[name],"\t",datapoint_projections[name,1],"\t",datapoint_projections[name,2],"\n",sep=''))
 
-	#print(name)
-	#print(cluster_assignments[name])
-	#print(datapoint_projections[name,])
 }
 
-#close(file_obj)
 sink()
 
 
