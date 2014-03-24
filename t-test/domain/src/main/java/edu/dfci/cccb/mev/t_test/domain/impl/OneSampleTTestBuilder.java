@@ -77,6 +77,8 @@ public class OneSampleTTestBuilder extends AbstractTTestBuilder {
         try (ByteArrayOutputStream script = new ByteArrayOutputStream ();
              PrintStream printScript = new PrintStream (script)) {
           printScript.println ("ONE_SAMPLE=\"" + ONE_SAMPLE_T_TEST+ "\"");
+          printScript.println ("TWO_SAMPLE=\"" + TWO_SAMPLE_T_TEST+ "\"");
+          printScript.println ("PAIRED=\"" + PAIRED_T_TEST+ "\"");
           printScript.println ("INFILE=\"" + datasetFile.getAbsolutePath () + "\"");
           printScript.println ("SAMPLE_FILE=\"" + configFile.getAbsolutePath () + "\"");
           printScript.println ("OUTFILE=\"" + fullOutputFile.getAbsolutePath () + "\"");

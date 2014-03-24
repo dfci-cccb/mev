@@ -25,12 +25,10 @@ if(TEST_TYPE==ONE_SAMPLE)
       function(x)
       {
         #t.test(x, mu=USER_MU, alternative=HYPOTHESIS_STYLE) #if different alternative hypotheses desired.
-        t.test(x, mu=USER_MU)
+        t.test(x, mu=USER_MU)$p.value
       }
      )
 	
-
-
 } else {
 	#only import the library if doing a two-sample or paired test
 	suppressMessages(library(multtest))
@@ -56,13 +54,14 @@ if(TEST_TYPE==ONE_SAMPLE)
 		#using mt.teststat gets the t-statistics very quickly (much quicker than apply(...))
 		if(EQUAL_VARIANCE)
 		{
-			t_stats<-mt.teststat(exp_data, labels, test="t.equalvar")
+			t_stats<-abs(mt.teststat(exp_data, labels, test="t.equalvar"))
 			
 			#now calculate the p-vals (not yet adjusted for multiple testing)
 			p_vals<-2*(1-pt(t_stats,size_a+size_b-2)) 
 
 		} else  #Welch's t-test (unequal variance)
 		{
+			print('unequal var')
 			t_stats<-abs(mt.teststat(exp_data, labels, test="t")) #take absolute value for calculating p-value later
 			#since this is Welch's t-test, have to estimate the degrees of freedom by the Welch–Satterthwaite equation:
 			sa_sqd<-rowVars(exp_data[,1:size_a])  #calculate the sample variance for each row/gene in group A
@@ -73,16 +72,17 @@ if(TEST_TYPE==ONE_SAMPLE)
 			p_vals<-2*(1-pt(t_stats,dof)) #two-tailed p vals
 
 		}
+#print(p_vals)
 		
 		#test:
-# 		p_vals_test<-apply(exp_data,1,
-# 		  function(x)
-#		  {
-# 			t.test(x[1:size_a],x[(size_a+1):(size_a+size_b)])$p.value
-# 		  }
-#		 )
-# 		 print(p_vals_test)
-# 		 print(p_vals)
+ 		p_vals_test<-apply(exp_data,1,
+ 		  function(x)
+		  {
+ 			t.test(x[1:size_a],x[(size_a+1):(size_a+size_b)],var.equal=F)$p.value
+ 		  }
+		 )
+ 		 print(p_vals_test)
+ 		 print(p_vals)
 	
 	} else if (TEST_TYPE==PAIRED)
 	{
@@ -106,17 +106,20 @@ if(TEST_TYPE==ONE_SAMPLE)
 		p_vals<-2*(1-pt(t_stats,num_pairs-1))
 		
 		#test
-#		evens=seq(2,2*num_pairs,2)
-#		odds=seq(1,2*num_pairs,2)
-#		p_vals_test<-apply(exp_data,1,function(x){
-#		t.test(x[evens],x[odds],paired=T)$p.value
-#		})
-#		print(p_vals_test)
+		evens=seq(2,2*num_pairs,2)
+		odds=seq(1,2*num_pairs,2)
+		p_vals_test<-apply(exp_data,1,function(x){
+		t.test(x[evens],x[odds],paired=T)$p.value
+		})
+		print(p_vals_test)
+		print(p_vals)
 	} else
 	{
 		#error!  did not specify the test type
 	}
 }
+
+
 
 #adjust the p-vals for multiple testing, if desired:
 if(CORRECT_FOR_MULTIPLE_TESTING)
@@ -125,5 +128,4 @@ if(CORRECT_FOR_MULTIPLE_TESTING)
 }
 
 results=data.frame(rownames(exp_data),p_vals)
-
 write.table(results, OUTFILE, sep='\t', row.names=F, col.names=F, quote=F)

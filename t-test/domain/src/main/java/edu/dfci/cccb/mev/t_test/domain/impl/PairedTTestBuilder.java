@@ -95,8 +95,9 @@ public class PairedTTestBuilder extends AbstractTTestBuilder {
         //write lines with paths, etc. to the appropriate file locations INTO the R file (injection of a different style...)
         try (ByteArrayOutputStream script = new ByteArrayOutputStream ();
              PrintStream printScript = new PrintStream (script)) {
-          printScript.println ("PAIRED=\"" + PAIRED_T_TEST+ "\"");
-          printScript.println ("INFILE=\"" + datasetFile.getAbsolutePath () + "\"");
+          printScript.println ("ONE_SAMPLE=\"" + ONE_SAMPLE_T_TEST+ "\"");
+          printScript.println ("TWO_SAMPLE=\"" + TWO_SAMPLE_T_TEST+ "\"");
+          printScript.println ("PAIRED=\"" + PAIRED_T_TEST+ "\"");          printScript.println ("INFILE=\"" + datasetFile.getAbsolutePath () + "\"");
           printScript.println ("SAMPLE_FILE=\"" + configFile.getAbsolutePath () + "\"");
           printScript.println ("OUTFILE=\"" + fullOutputFile.getAbsolutePath () + "\"");
           printScript.println ("TEST_TYPE=\"" + PAIRED_T_TEST + "\"");

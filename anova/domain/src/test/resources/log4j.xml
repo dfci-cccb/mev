@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd" >
+<log4j:configuration>
+  <appender name="stderr" class="org.apache.log4j.ConsoleAppender">
+    <param name="threshold" value="info" />
+    <param name="target" value="System.err" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="[%p] : %m%n" />
+    </layout>
+  </appender>
+  <appender name="stdout" class="org.apache.log4j.ConsoleAppender">
+    <param name="threshold" value="debug" />
+    <param name="target" value="System.out" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="[%p] : %m%n" />
+    </layout>
+    <filter class="org.apache.log4j.varia.LevelRangeFilter">
+      <param name="LevelMin" value="debug" />
+      <param name="LevelMax" value="debug" />
+    </filter>
+  </appender>
+  <logger name="org.springframework">
+    <level value="info"></level>
+  </logger>
+  <logger name="org.hibernate">
+    <level value="info"></level>
+  </logger>
+  <root>
+    <priority value="debug"></priority>
+    <appender-ref ref="stderr" />
+    <appender-ref ref="stdout" />
+  </root>
+</log4j:configuration>
