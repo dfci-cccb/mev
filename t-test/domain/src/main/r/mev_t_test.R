@@ -1,5 +1,19 @@
 
-######### read in expression data matrix ##############
+############### helper method ##############################
+#method for calculating the variance in each ROW of the matrix X
+#assumes that X does not have missing rows (matrix has already been "cleaned" prior)
+#assumes each row has the same number of cols (not a jagged matrix)
+rowVars<-function(X)
+{
+	n<-ncol(X)
+	dX<-X-rowMeans(X)
+	s2<-rowSums(dX*dX)
+	return(s2/(n-1))
+}
+
+##############################################################
+
+######### read in expression data matrix #####################
 exp_data<-read.table(INFILE, header=T, sep="\t")
 
 rownames(exp_data)<-exp_data[,1]  #name the rows by the genes, which occupy the first column
@@ -18,8 +32,8 @@ exp_data<-exp_data[,as.character(sample_mtx[,1])]  #retain only the samples we c
 
 if(TEST_TYPE==ONE_SAMPLE)
 {
-	#one-sample t-test.  User supplies a mean to test against.  Allows
-	#for two-tailed and one-tailed alternate hypotheses.
+	#one-sample t-test.  User supplies a mean to test against.  
+	#Could allow for two-tailed and one-tailed alternate hypotheses.
 	
 	p_vals<-apply(exp_data,1,
       function(x)
@@ -32,7 +46,6 @@ if(TEST_TYPE==ONE_SAMPLE)
 } else {
 	#only import the library if doing a two-sample or paired test
 	suppressMessages(library(multtest))
-	suppressMessages(library(genefilter))
 	
 	if (TEST_TYPE==TWO_SAMPLE)
 	{
@@ -61,7 +74,6 @@ if(TEST_TYPE==ONE_SAMPLE)
 
 		} else  #Welch's t-test (unequal variance)
 		{
-			print('unequal var')
 			t_stats<-abs(mt.teststat(exp_data, labels, test="t")) #take absolute value for calculating p-value later
 			#since this is Welch's t-test, have to estimate the degrees of freedom by the Welch–Satterthwaite equation:
 			sa_sqd<-rowVars(exp_data[,1:size_a])  #calculate the sample variance for each row/gene in group A
@@ -72,17 +84,16 @@ if(TEST_TYPE==ONE_SAMPLE)
 			p_vals<-2*(1-pt(t_stats,dof)) #two-tailed p vals
 
 		}
-#print(p_vals)
 		
-		#test:
- 		p_vals_test<-apply(exp_data,1,
- 		  function(x)
-		  {
- 			t.test(x[1:size_a],x[(size_a+1):(size_a+size_b)],var.equal=F)$p.value
- 		  }
-		 )
- 		 print(p_vals_test)
- 		 print(p_vals)
+#		#test:
+# 		p_vals_test<-apply(exp_data,1,
+# 		  function(x)
+#		  {
+# 			t.test(x[1:size_a],x[(size_a+1):(size_a+size_b)],var.equal=F)$p.value
+# 		  }
+#		 )
+# 		 print(p_vals_test)
+# 		 print(p_vals)
 	
 	} else if (TEST_TYPE==PAIRED)
 	{
@@ -105,14 +116,14 @@ if(TEST_TYPE==ONE_SAMPLE)
 		t_stats<-abs(mt.teststat(exp_data, labels, test="pairt"))
 		p_vals<-2*(1-pt(t_stats,num_pairs-1))
 		
-		#test
-		evens=seq(2,2*num_pairs,2)
-		odds=seq(1,2*num_pairs,2)
-		p_vals_test<-apply(exp_data,1,function(x){
-		t.test(x[evens],x[odds],paired=T)$p.value
-		})
-		print(p_vals_test)
-		print(p_vals)
+#		#test
+#		evens=seq(2,2*num_pairs,2)
+#		odds=seq(1,2*num_pairs,2)
+#		p_vals_test<-apply(exp_data,1,function(x){
+#		t.test(x[evens],x[odds],paired=T)$p.value
+#		})
+#		print(p_vals_test)
+#		print(p_vals)
 	} else
 	{
 		#error!  did not specify the test type
