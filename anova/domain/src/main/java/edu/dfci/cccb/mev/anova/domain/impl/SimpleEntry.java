@@ -1,5 +1,7 @@
 package edu.dfci.cccb.mev.anova.domain.impl;
 
+import java.util.Map;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ public class SimpleEntry implements Entry{
   
   private @Getter final double pValue;
   private @Getter final String geneId;
+  private @Getter final Map<String, Double> logFoldChanges;
     
 }
 

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 import edu.dfci.cccb.mev.anova.domain.contract.Anova.Entry;
+import edu.dfci.cccb.mev.anova.domain.prototype.AbstractAnovaBuilder;
 
 
 public class EntryJsonSerializer extends JsonSerializer<Entry>{
@@ -26,6 +27,16 @@ public class EntryJsonSerializer extends JsonSerializer<Entry>{
     jgen.writeStartObject ();
     jgen.writeStringField ("id", value.geneId ());
     jgen.writeNumberField ("pValue", value.pValue ());
+    jgen.writeArrayFieldStart ("pairwise_log_fold_change");
+    for(String pairing:value.logFoldChanges ().keySet ()){
+      String[] partners=pairing.split (AbstractAnovaBuilder.PAIRING_DELIMITER);
+      jgen.writeStartObject ();
+      jgen.writeStringField ("partnerA", partners[0]);
+      jgen.writeStringField ("partnerB", partners[1]);
+      jgen.writeNumberField ("ratio", value.logFoldChanges ().get(pairing));
+      jgen.writeEndObject ();
+    }
+    jgen.writeEndArray ();
     jgen.writeEndObject ();
 }
 

@@ -78,6 +78,7 @@ public class FileBackedAnovaBuilder extends AbstractAnovaBuilder {
           printScript.println ("INFILE=\"" + datasetFile.getAbsolutePath () + "\"");
           printScript.println ("SAMPLE_FILE=\"" + configFile.getAbsolutePath () + "\"");
           printScript.println ("OUTFILE=\"" + fullOutputFile.getAbsolutePath () + "\"");
+          printScript.println ("DELIMITER=\"" + PAIRING_DELIMITER + "\"");
           if (multipleTestCorrectionFlag ()) {
             printScript.println (CORRECT_FOR_MULTIPLE_TESTING + "=TRUE");
 

@@ -30,9 +30,18 @@ public class AnovaTsvMessageConverter extends AbstractTsvHttpMessageConverter<An
   @Override
   protected void writeInternal (Anova anova, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
     try (PrintStream out = new PrintStream (outputMessage.getBody ())) {
-      out.println ("Gene\tp-value");
-      for (Entry e : anova.fullResults ())
-        out.println (e.geneId () + "\t" + e.pValue ());
+      String headerLine="Gene\tp-value";
+      for (String pair:anova.logFoldChangePairings ()){
+        headerLine+="\t"+pair;
+      }
+      out.println (headerLine);
+      for (Entry e : anova.fullResults ()){
+        String s=e.geneId () + "\t" + e.pValue ();
+        for (double d:e.logFoldChanges ().values ()){
+          s+="\t"+d;
+        }
+        out.println (s);
+      }
     }    
   }
 

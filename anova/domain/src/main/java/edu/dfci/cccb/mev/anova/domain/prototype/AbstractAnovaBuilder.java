@@ -35,5 +35,6 @@ public abstract class AbstractAnovaBuilder extends AbstractAnalysisBuilder<Anova
   public static final String CONFIGURATION_FILENAME = "config.tsv";
   public static final String FULL_FILENAME = "output.tsv";
   public static final String CORRECT_FOR_MULTIPLE_TESTING = "CORRECT_FOR_MULTIPLE_TESTING";
+  public static final String PAIRING_DELIMITER="|";
 
 }
