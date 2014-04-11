@@ -156,7 +156,9 @@ define(['jquery','angular'], function(jquery, angular){
 				$scope.$apply(function(){
 					
 					if(item.dimension.toLowerCase()=="column"){
+						//remove selection if already present
 						$scope.heatmapData.column.selections = jquery.grep($scope.heatmapData.column.selections, function(e, i){return e.name==item.name;}, true);
+						//re-add the updated selection
 						$scope.heatmapData.column.selections.push(item);
 					}else{
 						$scope.heatmapData.row.selections = jquery.grep($scope.heatmapData.row.selections, function(e, i){return e.name==item.name;}, true);

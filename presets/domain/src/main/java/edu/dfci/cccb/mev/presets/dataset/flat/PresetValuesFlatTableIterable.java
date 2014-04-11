@@ -68,7 +68,12 @@ public class PresetValuesFlatTableIterable implements PresetValues, Iterable<Val
   private final Field<String> fieldRowId = fieldByName (String.class, "COLUMN0");
 
   private final PresetValuesQueryHelper queryHelper;
+  //TODO: change scale to enum
   public PresetValuesFlatTableIterable (DSLContext context, String tableName, Dimension columns, Dimension rows) {
+    this(context, tableName, columns, rows, "");
+  }
+  
+  public PresetValuesFlatTableIterable (DSLContext context, String tableName, Dimension columns, Dimension rows, String scale) {
     log.debug ("*** ValueStore Iterable ***");
     
     CACHE = newBuilder ().expireAfterAccess (DURATION, DURATION_UNIT)
@@ -262,8 +267,9 @@ public class PresetValuesFlatTableIterable implements PresetValues, Iterable<Val
         return NaN;
       else if (value==null)
         return NaN;
-      else
-        return Double.parseDouble (value);
+      else{
+        return Double.parseDouble (value);        
+      }
       
     } catch (RuntimeException e) {
       throw new RuntimeException (" Failed to fetch row " + row + ", column " + column + " from " + table, e);

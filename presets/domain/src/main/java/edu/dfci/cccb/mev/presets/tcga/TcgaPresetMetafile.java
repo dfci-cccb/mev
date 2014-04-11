@@ -35,6 +35,7 @@ public class TcgaPresetMetafile extends AbstractTcgaPreset {
   @JsonProperty(value="platform") private @Getter String platform;
   @JsonProperty(value="platformName") private @Getter String platformName;
   @JsonProperty("dataLevel") private @Getter String dataLevel;
+  private @Getter String scale;
   //@Getter(onMethod = @_ (@JsonProperty (value="platformName")) 
   @JsonIgnore private @Getter PresetDescriptor descriptor;
   
@@ -49,11 +50,12 @@ public class TcgaPresetMetafile extends AbstractTcgaPreset {
           (String)values[3],
           (String)values[4],
           (String)values[5],
-          (String)values[6]
+          (String)values[6],
+          (String)values[7]
         );
   }
   
-  public Preset init(String filename, String path, String disease, String diseaseName, String platform, String platformName, String dataLevel) throws PresetException{
+  public Preset init(String filename, String path, String disease, String diseaseName, String platform, String platformName, String dataLevel, String scale) throws PresetException{
     this.filename=filename;
     this.path=path;
     this.name=filename;
@@ -62,6 +64,7 @@ public class TcgaPresetMetafile extends AbstractTcgaPreset {
     this.platform=platform;
     this.platformName=platformName;
     this.dataLevel=dataLevel;
+    this.scale=scale;
     this.descriptor = new SimplePresetDescriptor ("PRESET-"+name,tcgaPresetRoot, getDataUrlSpec (), getColumnUrlSpec (), rowAnnotationsRoot, getRowUrlSpec ()); 
     return this;
   }

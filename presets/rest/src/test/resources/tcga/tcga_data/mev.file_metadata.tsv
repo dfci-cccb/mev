@@ -1,3 +1,3 @@
-filename	path	disease	disease name	platform	platform name	data level
-ACC.IlluminaHiSeq_miRNASeq.Level_3.Expression-miRNA.readsPerMillionMapped.tsv	ACC/Level_3	ACC	Adrenocortical carcinoma	IlluminaHiSeq_miRNASeq	Illumina HiSeq 2000 miRNA Sequencing	Level_3
-BRCA.IlluminaHiSeq_RNASeq.Level_3.Expression-Gene.RPKM.tsv	BRCA/Level_3	BRCA	Breast invasive carcinoma	IlluminaHiSeq_RNASeq	Illumina HiSeq 2000 RNA Sequencing	Level_3
+filename	path	disease	disease name	platform	platform name	data level	scale
+ACC.IlluminaHiSeq_miRNASeq.Level_3.Expression-miRNA.readsPerMillionMapped.tsv	ACC/Level_3	ACC	Adrenocortical carcinoma	IlluminaHiSeq_miRNASeq	Illumina HiSeq 2000 miRNA Sequencing	Level_3	normal
+BRCA.IlluminaHiSeq_RNASeq.Level_3.Expression-Gene.RPKM.tsv	BRCA/Level_3	BRCA	Breast invasive carcinoma	IlluminaHiSeq_RNASeq	Illumina HiSeq 2000 RNA Sequencing	Level_3	normal

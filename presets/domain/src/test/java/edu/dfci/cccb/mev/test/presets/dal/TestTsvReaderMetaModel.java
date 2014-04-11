@@ -34,18 +34,18 @@ public class TestTsvReaderMetaModel {
 
   @Test
   public void testGetColumnCount () {
-    assertEquals (7, tsvReader.getColumnCount ());
+    assertEquals (8, tsvReader.getColumnCount ());
   }
 
   @Test
   public void testGetColumnNames () {
-    String[] expected = {"filename", "path", "disease", "disease name", "platform", "platform name", "data level"};
+    String[] expected = {"filename", "path", "disease", "disease name", "platform", "platform name", "data level", "scale"};
     assertArrayEquals (expected, tsvReader.getColumnNames ());;
   }
 
   @Test
   public void testReadAll(){
-    String[] row1 = {"BRCA.MDA_RPPA_Core.Level_3.tsv","BRCA/Level_3","BRCA","Breast invasive carcinoma","MDA_RPPA_Core","M.D. Anderson Reverse Phase Protein Array Core","Level_3"};
+    String[] row1 = {"BRCA.MDA_RPPA_Core.Level_3.tsv","BRCA/Level_3","BRCA","Breast invasive carcinoma","MDA_RPPA_Core","M.D. Anderson Reverse Phase Protein Array Core","Level_3", "normal"};
     //String[] rowLast = {"BRCA.IlluminaHiSeq_RNASeq.Level_3.Expression-Gene.RPKM.tsv","BRCA/Level_2","BRCA","Breast invasive carcinoma","AgilentG4502A_07_3","Agilent 244K Custom Gene Expression G4502A-07-3","Level_2"};
     List<Object[]> result = tsvReader.readAll ();
     assertEquals (result.size (), 8);

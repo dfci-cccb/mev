@@ -7,6 +7,6 @@ public interface TcgaPreset extends Preset{
   public String diseaseName ();
   public String platform ();
   public String platformName ();
-  public String dataLevel ();
+  public String dataLevel ();  
 
 }

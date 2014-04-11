@@ -36,7 +36,7 @@ public class TestTcgaPresetMetafile {
   @Test
   public void testGetDescriptor () throws PresetException, MalformedURLException  {
     
-    Preset preset = builder.createPreset (new Object[]{"filename.tsv", "path/of/file", "NS", "Nothing Serious", "HS", "HiSeq", "Level2"});
+    Preset preset = builder.createPreset (new Object[]{"filename.tsv", "path/of/file", "NS", "Nothing Serious", "HS", "HiSeq", "Level2", "log"});
      
     PresetDescriptor descriptor = preset.descriptor ();
     

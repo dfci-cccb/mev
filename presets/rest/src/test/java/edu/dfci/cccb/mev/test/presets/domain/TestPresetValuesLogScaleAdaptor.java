@@ -21,12 +21,11 @@ import edu.dfci.cccb.mev.dataset.domain.contract.InvalidCoordinateException;
 import edu.dfci.cccb.mev.dataset.domain.contract.Values;
 import edu.dfci.cccb.mev.presets.contract.PresetDatasetBuilder;
 import edu.dfci.cccb.mev.presets.dataset.flat.PresetValuesFlatTable;
-import edu.dfci.cccb.mev.presets.dataset.flat.PresetValuesLogScaleAdapter;
 import edu.dfci.cccb.mev.test.presets.rest.configuration.PresetsRestConfigurationTest;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={PresetsRestConfigurationTest.class})
-public class TestPresetValuesFlatTable {
+public class TestPresetValuesLogScaleAdaptor {
 
   @Inject @Named("presets-datasource") DataSource dataSource;
   @Inject PresetDatasetBuilder presetDatasetBuilder;
@@ -38,10 +37,10 @@ public class TestPresetValuesFlatTable {
   
   @Test
   public void testGet () throws InvalidCoordinateException {
-    Values values = new PresetValuesLogScaleAdapter (new PresetValuesFlatTable (context, "TEST_PRESET_VALUES_FLAT_TABLE"));
+    Values values = new PresetValuesFlatTable (context, "TEST_PRESET_VALUES_FLAT_TABLE");
     double g1s1 = values.get ("g1", "SAMPLE1");    
-    assertThat(g1s1, is(Math.log(0.1)));
+    assertThat(g1s1, is(0.1));
     double g4s2 = values.get ("g4", "sAmple2");
-    assertThat(g4s2, is(Math.log(0.42)));
+    assertThat(g4s2, is(0.42));
   }  
 }

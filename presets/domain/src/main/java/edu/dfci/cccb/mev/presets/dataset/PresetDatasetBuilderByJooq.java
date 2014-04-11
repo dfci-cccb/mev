@@ -19,6 +19,7 @@ import edu.dfci.cccb.mev.dataset.domain.prototype.AbstractDatasetBuilder;
 import edu.dfci.cccb.mev.dataset.domain.simple.SimpleDataset;
 import edu.dfci.cccb.mev.dataset.domain.simple.SimpleDimension;
 import edu.dfci.cccb.mev.dataset.domain.tsv.UrlTsvInput;
+import edu.dfci.cccb.mev.presets.contract.Preset;
 import edu.dfci.cccb.mev.presets.contract.PresetDatasetBuilder;
 import edu.dfci.cccb.mev.presets.contract.PresetDescriptor;
 import edu.dfci.cccb.mev.presets.contract.PresetValuesStoreBuilderFactory;
@@ -72,6 +73,11 @@ public class PresetDatasetBuilderByJooq extends AbstractDatasetBuilder implement
     
   }
 
+  @Override
+  public Dataset build (Preset preset, String datasetName, Selection columnSelection, Selection rowSelection) throws PresetException {
+    return build(preset.descriptor (), datasetName, columnSelection, rowSelection);
+  }
+  
   @Override
   protected Dataset aggregate (String name, Values values, Analyses analyses, Dimension... dimensions) throws DatasetBuilderException,
                                                                                                       InvalidDatasetNameException {    

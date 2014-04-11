@@ -186,6 +186,7 @@ public class AnnotationController extends WebApplicationObjectSupport {
     if (presetName != null && presetName.equals ("") == false) {
       Preset preset = presets.get (presetName);
       wrappedRequest.setAttribute ("descriptor", preset.descriptor ());
+      wrappedRequest.setAttribute ("preset", preset);
     }
     this.refineServlet.service (wrappedRequest, response);
   }
