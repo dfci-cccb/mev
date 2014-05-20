@@ -48,7 +48,6 @@ public class FlatFileValues extends AbstractValues implements Closeable {
   private final Map<String, Integer> columns;
   private final List<MappedByteBuffer> mappings = new ArrayList<> ();
 
-  
   public FlatFileValues (File file, Map<String, Integer> rows, Map<String, Integer> columns, int height, int width) throws FileNotFoundException,
                                                                                                                    IOException {
     this.file = file;
@@ -80,8 +79,8 @@ public class FlatFileValues extends AbstractValues implements Closeable {
   @Override
   public void close () throws IOException {
     mappings.clear (); // gc will do the closing
-    if (file instanceof Closeable){
-      log.debug ("Colsing file"+file.getAbsolutePath ());
+    if (file instanceof Closeable) {
+      log.debug ("Colsing file" + file.getAbsolutePath ());
       ((Closeable) file).close ();
     }
   }

@@ -24,10 +24,6 @@ import org.junit.Test;
 
 import edu.dfci.cccb.mev.dataset.domain.contract.Values;
 
-/**
- * @author levk
- * 
- */
 public class FlatFileValuesTest {
 
   @Test
@@ -44,6 +40,7 @@ public class FlatFileValuesTest {
       Map<String, Integer> rowKeys = new LinkedHashMap<String, Integer> (2);
       rowKeys.put ("r1", 0);
       rowKeys.put ("r2", 1);
+      rowKeys.put ("r3", 2);
       
       Map<String, Integer> columnKeys = new LinkedHashMap<String, Integer> (2);
       columnKeys.put ("c1", 0);
