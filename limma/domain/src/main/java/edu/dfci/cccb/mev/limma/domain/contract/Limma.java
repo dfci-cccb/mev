@@ -35,9 +35,41 @@ public interface Limma extends Analysis {
     double qValue ();
   }
 
+  public enum Species {
+    HUMAN,
+    MOUSE,
+    RAT;
+
+    public String toString () {
+      return super.toString ().toLowerCase ();
+    }
+  }
+
+  public interface GoEntry {
+    String id ();
+
+    String term ();
+
+    String annotated ();
+
+    String significant ();
+
+    String expected ();
+
+    double pValue ();
+  }
+
   Iterable<Entry> full ();
+
+  Iterable<GoEntry> topGo ();
 
   Selection control ();
 
   Selection experiment ();
+
+  Species species ();
+
+  String go ();
+
+  String test ();
 }

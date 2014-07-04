@@ -123,9 +123,9 @@ public class CliRScriptEngine extends AbstractScriptEngine {
                 for (int c; (c = code.read ()) >= 0; debug.write (c));
                 debug.write ("\nStandard output:\n");
                 for (int c; (c = output.read ()) >= 0; debug.write (c));
-                debug.write ("\nStandard error:\n");
-                for (int c; (c = error.read ()) >= 0; debug.write (c));
               }
+              debug.write ("\nStandard error:\n");
+              for (int c; (c = error.read ()) >= 0; debug.write (c));
               debug.flush ();
               log.debug (buffer.toString ());
             } catch (Exception e) {

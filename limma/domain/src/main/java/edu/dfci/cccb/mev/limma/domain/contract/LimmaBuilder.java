@@ -16,6 +16,7 @@ package edu.dfci.cccb.mev.limma.domain.contract;
 
 import edu.dfci.cccb.mev.dataset.domain.contract.AnalysisBuilder;
 import edu.dfci.cccb.mev.dataset.domain.contract.Selection;
+import edu.dfci.cccb.mev.limma.domain.contract.Limma.Species;
 
 /**
  * @author levk
@@ -26,4 +27,10 @@ public interface LimmaBuilder extends AnalysisBuilder<LimmaBuilder, Limma> {
   LimmaBuilder control (Selection selection);
 
   LimmaBuilder experiment (Selection selection);
+
+  LimmaBuilder species (Species species);
+
+  LimmaBuilder go (String go);
+
+  LimmaBuilder test (String test);
 }

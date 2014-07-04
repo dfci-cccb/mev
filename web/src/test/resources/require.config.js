@@ -19,7 +19,8 @@
     fileSaver : [ "fileSaver/FileSaver" ],
     qtip : [ "/webjars/qtip2/2.1.1/jquery.qtip" ],
     "css-loader" : ["css-test"] ,
-    "console":["console"]
+    "console":["console"],
+    'log4js' : [ '/webjars/log4javascript/1.4.5/log4javascript' ]
       // Added an empty file to point to since there is no head and css
       // can"t actually load from css/styles container
   },
@@ -76,8 +77,10 @@
     "qtip": {
       deps : ["jquery", "imagesloaded"],
       exports : "qtip"
+    },
+    'log4js' : {
+      exports : 'log4javascript'
     }
-
   },
   packages : [ {
     name : "mainmenu",

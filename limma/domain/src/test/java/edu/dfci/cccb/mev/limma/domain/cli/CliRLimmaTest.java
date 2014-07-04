@@ -17,15 +17,19 @@ package edu.dfci.cccb.mev.limma.domain.cli;
 
 import static edu.dfci.cccb.mev.dataset.domain.contract.Dimension.Type.COLUMN;
 import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.Matchers.any;
+import static org.hamcrest.Matchers.closeTo;
 import static org.junit.Assert.assertThat;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.Properties;
 
 import javax.script.ScriptEngineManager;
 
 import lombok.extern.log4j.Log4j;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import edu.dfci.cccb.mev.dataset.domain.contract.Dataset;
@@ -38,6 +42,8 @@ import edu.dfci.cccb.mev.dataset.domain.supercsv.SuperCsvComposerFactory;
 import edu.dfci.cccb.mev.dataset.domain.supercsv.SuperCsvParserFactory;
 import edu.dfci.cccb.mev.limma.domain.contract.Limma;
 import edu.dfci.cccb.mev.limma.domain.contract.Limma.Entry;
+import edu.dfci.cccb.mev.limma.domain.contract.Limma.GoEntry;
+import edu.dfci.cccb.mev.limma.domain.contract.Limma.Species;
 import edu.dfci.cccb.mev.limma.domain.simple.StatelessScriptEngineFileBackedLimmaBuilder;
 
 /**
@@ -49,30 +55,34 @@ public class CliRLimmaTest {
 
   @Test
   public void test () throws Exception {
-    Dataset dataset =
-                      new SimpleDatasetBuilder ().setParserFactories (asList (new SuperCsvParserFactory ()))
-                                                 .setValueStoreBuilder (new MapBackedValueStoreBuilder ())
-                                                 .build (new MockTsvInput ("mock",
-                                                                           "id\tsa\tsb\tsc\tsd\tse\tsf\n"
-                                                                                   +
-                                                                                   "g1\t9.991\t.11\t9.99111\t9.9991111\t.11111\t.111111\n"
-                                                                                   +
-                                                                                   "g3\t9.991\t.11\t9.99111\t9.9991111\t.11111\t.111\n"
-                                                                                   +
-                                                                                   "g2\t9.991\t.11\t9.99111\t9.9991111\t.11111\t.11111"));
-    Selection experiment = new SimpleSelection ("experiment", new Properties (), asList ("sa", "sc", "sd"));
-    Selection control = new SimpleSelection ("control", new Properties (), asList ("sb", "se", "sf"));
-    dataset.dimension (COLUMN).selections ().put (experiment);
-    dataset.dimension (COLUMN).selections ().put (control);
-    Limma result =
-                   new StatelessScriptEngineFileBackedLimmaBuilder ().r (new ScriptEngineManager ().getEngineByName ("CliR"))
-                                                                     .composerFactory (new SuperCsvComposerFactory ())
-                                                                     .dataset (dataset)
-                                                                     .control (control)
-                                                                     .experiment (experiment)
-                                                                     .build ();
-    for (Entry e : result.full ())
-      log.debug ("Full limma entry: " + e);
-    assertThat (result.full ().iterator ().next ().pValue (), lessThanOrEqualTo (6.16863080605545E-37));
+    try (InputStream inp = getClass ().getResourceAsStream ("/mouse_test_data.tsv");
+         ByteArrayOutputStream copy = new ByteArrayOutputStream ()) {
+      IOUtils.copy (inp, copy);
+      Dataset dataset = new SimpleDatasetBuilder ().setParserFactories (asList (new SuperCsvParserFactory ()))
+                                                   .setValueStoreBuilder (new MapBackedValueStoreBuilder ())
+                                                   .build (new MockTsvInput ("mock",
+                                                                             copy.toString ()));
+      Selection experiment = new SimpleSelection ("experiment", new Properties (), asList ("A", "B", "C"));
+      Selection control = new SimpleSelection ("control", new Properties (), asList ("D", "E", "F"));
+      dataset.dimension (COLUMN).selections ().put (experiment);
+      dataset.dimension (COLUMN).selections ().put (control);
+      Limma result =
+                     new StatelessScriptEngineFileBackedLimmaBuilder ().r (new ScriptEngineManager ().getEngineByName ("CliR"))
+                                                                       .composerFactory (new SuperCsvComposerFactory ())
+                                                                       .dataset (dataset)
+                                                                       .control (control)
+                                                                       .experiment (experiment)
+                                                                       .species (Species.MOUSE)
+                                                                       .go ("BP")
+                                                                       .test ("Fisher test")
+                                                                       .build ();
+      for (Entry e : result.full ())
+        log.debug ("Full limma entry: " + e);
+      for (GoEntry e : result.topGo ())
+        log.debug ("topGo entry: " + e);
+
+      assertThat (result.full ().iterator ().next ().averageExpression (), closeTo (12.985, 0.001));
+      assertThat (result.topGo ().iterator ().next ().pValue (), any (Double.class));
+    }
   }
 }

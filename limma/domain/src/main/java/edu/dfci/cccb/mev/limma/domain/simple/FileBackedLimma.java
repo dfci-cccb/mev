@@ -15,6 +15,7 @@
 package edu.dfci.cccb.mev.limma.domain.simple;
 
 import static edu.dfci.cccb.mev.limma.domain.simple.StatelessScriptEngineFileBackedLimmaBuilder.FULL_FILENAME;
+import static edu.dfci.cccb.mev.limma.domain.simple.StatelessScriptEngineFileBackedLimmaBuilder.TOPGO_FILENAME;
 import static java.lang.Double.parseDouble;
 
 import java.io.BufferedReader;
@@ -38,11 +39,13 @@ import edu.dfci.cccb.mev.limma.domain.prototype.AbstractLimma;
 public class FileBackedLimma extends AbstractLimma implements AutoCloseable {
 
   private @Getter final File full;
+  private @Getter final File topGo;
   private @Getter final TemporaryFolder limma;
 
   public FileBackedLimma (TemporaryFolder limma) {
     this.limma = limma;
     this.full = new File (limma, FULL_FILENAME);
+    this.topGo = new File (limma, TOPGO_FILENAME);
   }
 
   /* (non-Javadoc)
@@ -50,6 +53,87 @@ public class FileBackedLimma extends AbstractLimma implements AutoCloseable {
   @Override
   public Iterable<Entry> full () {
     return iterateEntries (full);
+  }
+
+  public Iterable<GoEntry> topGo () {
+    return new Iterable<GoEntry> () {
+      /* (non-Javadoc)
+       * @see java.lang.Iterable#iterator() */
+      @Override
+      @SneakyThrows (IOException.class)
+      public Iterator<GoEntry> iterator () {
+        return new Iterator<GoEntry> () {
+          private final BufferedReader reader = new BufferedReader (new FileReader (topGo));
+          private String current = null;
+
+          /* (non-Javadoc)
+           * @see java.util.Iterator#hasNext() */
+          @Override
+          @SneakyThrows (IOException.class)
+          public boolean hasNext () {
+            return current == null ? (current = reader.readLine ()) != null : true;
+          }
+
+          /* (non-Javadoc)
+           * @see java.util.Iterator#next() */
+          @Override
+          public GoEntry next () {
+            hasNext ();
+            final String[] split = current.split ("\t");
+            GoEntry result = new GoEntry () {
+
+              @Override
+              public String term () {
+                return string (1, split);
+              }
+
+              @Override
+              public String significant () {
+                return string (3, split);
+              }
+
+              @Override
+              public double pValue () {
+                return number (5, split);
+              }
+
+              @Override
+              public String id () {
+                return string (0, split);
+              }
+
+              @Override
+              public String expected () {
+                return string (4, split);
+              }
+
+              @Override
+              public String annotated () {
+                return string (2, split);
+              }
+
+              /* (non-Javadoc)
+               * @see java.lang.Object#toString() */
+              @Override
+              public String toString () {
+                return "{id:"
+                       + id () + ", term:" + term () + ", annotated:" + annotated () + ", significant:"
+                       + significant () + ", expected:" + expected () + ", pValue:" + pValue () + "}";
+              }
+            };
+            current = null;
+            return result;
+          }
+
+          /* (non-Javadoc)
+           * @see java.util.Iterator#remove() */
+          @Override
+          public void remove () {
+            throw new UnsupportedOperationException ();
+          }
+        };
+      }
+    };
   }
 
   private Iterable<Entry> iterateEntries (final File file) {

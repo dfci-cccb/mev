@@ -30,4 +30,7 @@ public abstract class AbstractLimma extends AbstractAnalysis<AbstractLimma> impl
 
   private @Getter @Setter Selection control;
   private @Getter @Setter Selection experiment;
+  private @Getter @Setter Species species;
+  private @Getter @Setter String go;
+  private @Getter @Setter String test;
 }

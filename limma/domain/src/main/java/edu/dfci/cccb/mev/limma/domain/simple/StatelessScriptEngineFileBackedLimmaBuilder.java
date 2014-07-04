@@ -56,6 +56,7 @@ public class StatelessScriptEngineFileBackedLimmaBuilder extends AbstractLimmaBu
 
   public static final String FULL_FILENAME = "output.tsv";
   public static final String RNK_FILENAME = "rnk.out";
+  public static final String TOPGO_FILENAME = "topgo.tsv";
 
   /* (non-Javadoc)
    * @see edu.dfci.cccb.mev.dataset.domain.contract.AnalysisBuilder#build() */
@@ -98,6 +99,8 @@ public class StatelessScriptEngineFileBackedLimmaBuilder extends AbstractLimmaBu
 
         File fullOutputFile = new File (limma, FULL_FILENAME);
         File rnkOutputFile = new File (limma, RNK_FILENAME);
+        File topGoOutputFile = new File (limma, TOPGO_FILENAME);
+        topGoOutputFile.createNewFile ();
 
         try (ByteArrayOutputStream script = new ByteArrayOutputStream ();
              PrintStream printScript = new PrintStream (script)) {
@@ -105,6 +108,11 @@ public class StatelessScriptEngineFileBackedLimmaBuilder extends AbstractLimmaBu
           printScript.println ("SAMPLE_FILE=\"" + configFile.getAbsolutePath () + "\"");
           printScript.println ("RESULT_OUT=\"" + fullOutputFile.getAbsolutePath () + "\"");
           printScript.println ("RNK_OUT=\"" + rnkOutputFile.getAbsolutePath () + "\"");
+          printScript.println ("SPECIES=\"" + species ().toString () + "\"");
+          printScript.println ("GO_TYPE=\"" + go () + "\"");
+          printScript.println ("THRES=0.05");
+          printScript.println ("TEST_TYPE=\"" + test () + "\"");
+          printScript.println ("TOPGO_OUT=\"" + topGoOutputFile.getAbsolutePath () + "\"");
 
           try (InputStream limmaScript = getClass ().getResourceAsStream ("/limma.R")) {
             for (int c; (c = limmaScript.read ()) >= 0; printScript.write (c));

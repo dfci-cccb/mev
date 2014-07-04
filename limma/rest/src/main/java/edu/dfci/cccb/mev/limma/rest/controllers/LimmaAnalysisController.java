@@ -14,8 +14,8 @@
  */
 package edu.dfci.cccb.mev.limma.rest.controllers;
 
+import static edu.dfci.cccb.mev.dataset.domain.contract.Dimension.Type.COLUMN;
 import static edu.dfci.cccb.mev.dataset.rest.resolvers.DatasetPathVariableMethodArgumentResolver.DATASET_URL_ELEMENT;
-import static edu.dfci.cccb.mev.dataset.rest.resolvers.DimensionPathVariableMethodArgumentResolver.DIMENSION_URL_ELEMENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.context.WebApplicationContext.SCOPE_REQUEST;
@@ -28,12 +28,13 @@ import lombok.Setter;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.dfci.cccb.mev.dataset.domain.contract.Dataset;
 import edu.dfci.cccb.mev.dataset.domain.contract.DatasetException;
-import edu.dfci.cccb.mev.dataset.domain.contract.Selection;
+import edu.dfci.cccb.mev.limma.domain.contract.Limma.Species;
 import edu.dfci.cccb.mev.limma.domain.contract.LimmaBuilder;
 
 /**
@@ -45,20 +46,25 @@ import edu.dfci.cccb.mev.limma.domain.contract.LimmaBuilder;
 @Scope (SCOPE_REQUEST)
 public class LimmaAnalysisController {
 
-  private @Getter @Setter (onMethod = @_ (@Inject)) Dataset dataset;
-  private @Getter @Setter (onMethod = @_ (@Inject)) LimmaBuilder limma;
+  private @Getter @Setter @Inject Dataset dataset;
+  private @Getter @Setter @Inject LimmaBuilder limma;
 
-  @RequestMapping (value = "/analyze/limma/{name}(dimension="
-                           + DIMENSION_URL_ELEMENT + ",experiment={experiment},control={control})",
+  @RequestMapping (value = "/analyze/limma",
                    method = POST)
   @ResponseStatus (OK)
-  public void start (final @PathVariable ("name") String name,
-                     final @PathVariable ("experiment") Selection experiment,
-                     final @PathVariable ("control") Selection control) throws DatasetException {
+  public void start (final @RequestParam ("name") String name,
+                     final @RequestParam ("experiment") String experiment,
+                     final @RequestParam ("control") String control,
+                     final @RequestParam ("species") String species,
+                     final @RequestParam ("go") String go,
+                     final @RequestParam ("test") String test) throws DatasetException {
     dataset.analyses ().put (limma.name (name)
                                   .dataset (dataset)
-                                  .experiment (experiment)
-                                  .control (control)
+                                  .experiment (dataset.dimension (COLUMN).selections ().get (experiment))
+                                  .control (dataset.dimension (COLUMN).selections ().get (control))
+                                  .species (Species.valueOf (species.toUpperCase ()))
+                                  .go (go)
+                                  .test (test)
                                   .build ());
   }
 }

@@ -26,6 +26,7 @@ import edu.dfci.cccb.mev.dataset.domain.contract.ComposerFactory;
 import edu.dfci.cccb.mev.dataset.domain.contract.Selection;
 import edu.dfci.cccb.mev.dataset.domain.prototype.AbstractAnalysisBuilder;
 import edu.dfci.cccb.mev.limma.domain.contract.Limma;
+import edu.dfci.cccb.mev.limma.domain.contract.Limma.Species;
 import edu.dfci.cccb.mev.limma.domain.contract.LimmaBuilder;
 
 /**
@@ -40,6 +41,9 @@ public abstract class AbstractLimmaBuilder extends AbstractAnalysisBuilder<Limma
   private @Getter @Setter Selection experiment;
   private @Getter @Setter @Resource (name = "R") ScriptEngine r;
   private @Getter @Setter @Inject ComposerFactory composerFactory;
+  private @Getter @Setter Species species;
+  private @Getter @Setter String go;
+  private @Getter @Setter String test;
 
   /**
    */

@@ -102,6 +102,59 @@ result[,"Average Expression"]=if(min.val<0){result[,"Average Expression"]-(min.v
 gsea_rnk <-result[,c("ID", "t")]
 write.table(gsea_rnk, file=RNK_OUT, quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
 
+#################################
+## topGO implementation
+## Lan Hu, 07/01/2014
+#################################
+tryCatch ({
+## input variables from MeV:
+# SPECIES
+# GO_TYPE
+# THRES
+# TEST_TYPE
+
+## output file
+# TOPGO_OUT
+
+library(topGO)
+library(org.Hs.eg.db)
+library(org.Mm.eg.db)
+library(org.Rn.eg.db)
+
+## assign the proper annotation db
+if (SPECIES=='human')
+    anno.db = 'org.Hs.eg.db'
+if (SPECIES=='mouse')
+    anno.db = 'org.Mm.eg.db'
+if (SPECIES=='rat')
+    anno.db = 'org.Hs.eg.db'
+
+## create a topGOdata object
+myGenes = rep(0,nrow(result)) # from limma
+myGenes[result[,'P-value']<THRES] = 1 # mark 'significant ones'
+names(myGenes) = as.vector(result[,'ID']) # ID must be gene symbols
+myGenes = factor(myGenes)
+
+myGOdata = new('topGOdata', ontology=GO_TYPE, description='topGO analysis', nodeSize=10,
+  annot=annFUN.org, mapping=anno.db, ID='symbol', allGenes=myGenes)
+
+## run the enrichment test
+if (TEST_TYPE=='Fisher test')
+    topGO.stat <- new('classicCount', testStatistic=GOFisherTest, name=TEST_TYPE)
+if (TEST_TYPE=='KS test')
+    topGO.stat <- new('classicScore', testStatistic=GOKSTest, name=TEST_TYPE)
+topGO.result <- getSigGroups(myGOdata, topGO.stat)
+
+## summarize the top 100 GO terms and write to the file
+topGO.table = GenTable(myGOdata, topGO.result, topNodes=40)
+colnames(topGO.table) = c('GO ID','GO Term','Annotated Genes','Significant Genes','Expected','P-value')
+
+write.table(file=TOPGO_OUT, topGO.table, sep='\t', quote=FALSE, row.names=FALSE, col.names=FALSE)
+}, error=function(cond) {}, warning=function (cond) {}, finally={})
+#################################
+## End topGO
+#################################
+
 ##
 ## write full result file
 result=result[result[,"P-value"]<0.05,]

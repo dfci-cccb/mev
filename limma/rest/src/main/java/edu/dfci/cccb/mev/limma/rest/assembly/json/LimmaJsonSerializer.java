@@ -52,6 +52,7 @@ public class LimmaJsonSerializer extends AbstractAnalysisJsonSerializer<Limma> {
     for (Entry e : value.full ())
       provider.defaultSerializeValue (e, jgen);
     jgen.writeEndArray ();
+    provider.defaultSerializeField ("topGo", value.topGo (), jgen);
     provider.defaultSerializeField ("control", value.control (), jgen);
     provider.defaultSerializeField ("experiment", value.experiment (), jgen);
   }

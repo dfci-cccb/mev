@@ -1,8 +1,9 @@
 before_install:
     - sudo apt-get update
-    - sudo apt-get install r-base
+    - sudo apt-get install r-base r-cran-dbi
     - sudo echo "source(\"http://bioconductor.org/biocLite.R\");biocLite(\"limma\")" | sudo R --no-save
     - sudo echo "source(\"http://bioconductor.org/biocLite.R\");biocLite(\"multtest\")" | sudo R --no-save
+    - sudo echo "source(\"http://bioconductor.org/biocLite.R\");biocLite(\"topGO\");biocLite(\"org.Hs.eg.db\");biocLite(\"org.Mm.eg.db\");biocLite(\"org.Rn.eg.db\")" | sudo R --no-save
 language: java
 jdk:
     - oraclejdk7
