@@ -638,12 +638,30 @@ define(['angular', 'alertservice/AlertService'], function(angular){
                         		species : scope.available.species[0],
                         		goType: scope.available.goType[0],
                         		testType: scope.available.testType[0],
-                        		goAnalysis: true
+                        		goAnalysis: false
                         	
                         	};
+                            
+                            
 
-                            scope.testInit = function() {
+                            scope.testInit = function(goAnalysis) {
                             	
+                            	//Fail if no selections
+                            	
+                            	if (!scope.params.control || !scope.params.experiment || !scope.params.name){
+                            		
+                            		var message =  
+                                        'Undefined parameters for LIMMA.';
+
+                                    var header = "LIMMA Analysis Error";
+                                     
+                                    alertService.error(message,header);
+                                    scope.params.name = undefined;
+                    				return
+                            		
+                            		
+                            		return
+                            	}
                             	
                             	//Grab keys for each selection
                             	var controlSet = scope.dataset.selections[scope.params.dimension.value]
@@ -689,9 +707,9 @@ define(['angular', 'alertservice/AlertService'], function(angular){
                                 	dimension : scope.params.dimension.value,
                                 	experiment : scope.params.experiment.name,
                                 	control : scope.params.control.name,
-                                	species : (scope.params.goAnalysis) ? scope.params.species.value : undefined,
-                                	go : (scope.params.goAnalysis) ? scope.params.goType.value : undefined,
-                                	test : (scope.params.goAnalysis) ? scope.params.testType.value : undefined
+                                	species : (goAnalysis) ? scope.params.species.value : undefined,
+                                	go : (goAnalysis) ? scope.params.goType.value : undefined,
+                                	test : (goAnalysis) ? scope.params.testType.value : undefined
                                 };
                                 
                                 scope.dataset.analysis.post3(analysisData, {
