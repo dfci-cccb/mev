@@ -151,7 +151,6 @@ define(['jquery',
 					    }
 					});
 					
-
 					$scope.project.dataset.loadAnalyses();
 					
 				}

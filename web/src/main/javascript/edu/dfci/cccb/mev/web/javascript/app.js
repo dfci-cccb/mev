@@ -16,7 +16,9 @@ define(['angular',
         'mainmenu',
         'geods',
         'clinical',
-        'cohortanalysis/CohortAnalysis'
+        'cohortanalysis/CohortAnalysis',
+        'treemap_visualization/NG4P.Treemap_Visualization',
+        'NetworkExplorer/NetworkExplorerModule'
         ], function(angular){
 	'use strict';
 	return angular.module('myApp', [
@@ -38,7 +40,9 @@ define(['angular',
 	     'Mev.GeneBoxPlotVisualization',
 	     'Mev.GeodsModule',
 	     'Mev.ClinicalSummary',
-	     'Mev.CohortAnalysis'
+	     'Mev.CohortAnalysis',
+	     'NG4P.Treemap_Visualization',
+	     'NetworkExplorer'
 	     ])
 	.config(['$routeProvider', '$locationProvider', '$sceProvider', function($routeProvider, $locationProvider, $sceProvider) {
 		
