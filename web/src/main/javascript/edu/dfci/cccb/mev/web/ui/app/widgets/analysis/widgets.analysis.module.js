@@ -51,6 +51,10 @@ function(ng, AnalyisEventBus){
 				shortName: "nmf",
 				viewModel: "NmfVM"
 			},
+			"pca":{
+				shortName: "pca",
+				viewModel: "PcaVM"
+			},
 			reverseLookup: {
 				hcl: "Hierarchical Clustering",
 				limma: "LIMMA Differential Expression Analysis",
@@ -61,6 +65,7 @@ function(ng, AnalyisEventBus){
 				anova: "Anova Analysis",
 				deseq: "DESeq Differential Expression Analysis",
 				nmf: "Non-Negative Matrix Factorization",
+                pca: "Principal Component Analysis",
 				survival: "Survival Analysis"
 		} 
 	});	

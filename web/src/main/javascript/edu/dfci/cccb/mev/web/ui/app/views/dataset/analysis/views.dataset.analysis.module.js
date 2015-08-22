@@ -7,6 +7,7 @@ define(["ng", "lodash",
         "./limma/views.dataset.analysis.limma.module",
         "./deseq/views.dataset.analysis.deseq.module",
         "./nmf/views.dataset.analysis.nmf.module",
+        "./pca/views.dataset.analysis.pca.module",
         "./survival/views.dataset.analysis.survival.module"], function(ng, _){
 	var module = ng.module("mui.views.dataset.analysis", ["mui.widgets.analysis", 
 	                                                      "mui.views.dataset.analysis.hcl", 
@@ -17,6 +18,7 @@ define(["ng", "lodash",
 	                                                      "mui.views.dataset.analysis.limma", 
 	                                                      "mui.views.dataset.analysis.deseq",
 	                                                      "mui.views.dataset.analysis.nmf",
+	                                                      "mui.views.dataset.analysis.pca",
 	                                                      "mui.views.dataset.analysis.survival",
 	                                                      "Mev.AnalysisAccordionCollection"]);
 	module.config(["$stateProvider", "$urlRouterProvider", "AnalysisTypes", function($stateProvider, $urlRouterProvider, AnalysisTypes){				
