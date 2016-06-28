@@ -22,7 +22,7 @@ import edu.dfci.cccb.mev.dataset.domain.r.annotation.Result;
     + "CONDITIONS[1:length(experiment)]='Experiment'\n"
     + "CONDITIONS[(length(experiment)+1):length(colnames(CurrMtx))]='Control'\n"
 
-    + "cds<-DGEList(counts=dataset, group=CONDITIONS)\n"
+    + "cds<-DGEList(counts=CurrMtx, group=CONDITIONS)\n"
 
     + "cds<-estimateCommonDisp(cds)\n"
 
