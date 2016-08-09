@@ -29,6 +29,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import edu.dfci.cccb.mev.dataset.domain.contract.*;
@@ -63,7 +64,7 @@ import edu.dfci.cccb.mev.dataset.domain.r.annotation.Rserve;
 public class RDispatcher {
 
   private @Inject @Rserve Provider<InetSocketAddress> host;
-  private @Inject @Rserve ObjectMapper mapper;
+  private @Inject @Rserve @Named("RserveJsonObjectMapper") ObjectMapper mapper;
   private ProtobufSerializer protobuf = new ProtobufSerializer ();
 
   private @Inject Provider<Collection<? extends ParserFactory>> parserFactories;

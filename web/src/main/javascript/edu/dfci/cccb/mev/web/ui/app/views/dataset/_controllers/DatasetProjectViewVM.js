@@ -79,7 +79,7 @@ define(["ng", "lodash"], function(ng, _){ "use strict";
 					$state.go("root.dataset.home", {datasetId: node.nodeData.params.exportName});
 				else
 					$state.go("root.dataset.analysisType"+"."+node.nodeData.params.analysisType,
-						{datasetId: node.nodeData.params.datasetName, analysisId: node.nodeData.name});
+						{datasetId: dataset.id, analysisId: node.nodeData.name});
 			} else if(node.nodeData.type && mevAnalysisTypes.all()[node.nodeData.type]){
 				$state.go("root.dataset.analysisType"+"."+node.nodeData.type,
 					{datasetId: dataset.id, analysisId: node.nodeData.name});

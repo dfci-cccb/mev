@@ -34,6 +34,9 @@ define(["./WorkspaceList.tpl.html", "./WorkspaceList.less"], function(tempalte){
                     },
                     isSaved: function(row){
                         return row.getStatus()==="saved";
+                    },
+                    export: function(dataset){
+                        mevWorkspace.exportDataset(dataset);
                     }
                 };
                 scope.$on("mev:datasets:list:refreshed", function(){

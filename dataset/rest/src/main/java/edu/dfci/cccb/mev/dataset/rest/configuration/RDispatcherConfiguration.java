@@ -109,7 +109,7 @@ public class RDispatcherConfiguration {
     };
   }
 
-  @Bean
+  @Bean (name="RserveJsonObjectMapper")
   @Rserve
   public ObjectMapper mapper (@Rserve Collection<Module> modules) {
     return new ObjectMapper ().registerModules (modules);

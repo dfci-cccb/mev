@@ -1,4 +1,4 @@
-define(["./UploadDataset.tpl.html"], function(template){
+define(["lodash", "./UploadDataset.tpl.html"], function(_, template){
     var directive = function(DatasetResource){
 
         return {
@@ -20,7 +20,10 @@ define(["./UploadDataset.tpl.html"], function(template){
                             files.push(input.files[i]);
                             if (files.length == input.files.length) {
                                 files.map(function(file){
-                                    DatasetResource.uploadFile(file);
+                                    if(_.endsWith(file.name, ".zip"))
+                                        DatasetResource.importZip(file);
+                                    else
+                                        DatasetResource.uploadFile(file);
                                 });
                             }
                         }

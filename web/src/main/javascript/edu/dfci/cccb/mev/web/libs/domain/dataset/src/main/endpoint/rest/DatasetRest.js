@@ -1,4 +1,4 @@
-define([], function(){
+define(["lodash"], function(_){
     var DatasetRest = function ($resource, $q, $http, $rootScope, mevDb) {
         var resource = $resource('/dataset/:datasetName/data', {format: "json"},
             {
@@ -116,6 +116,73 @@ define([], function(){
                         });
                 });
         }
+        function formatDatasetName(name){
+            return _.endsWith(name, ".zip")
+                ? name.substring(0, name.length-4)
+                : name;
+        }
+        DatasetResource.importZip = function(file){
+            return mevDb.deleteDataset(formatDatasetName(file.name))
+                .then(function(){
+                    var formdata = new FormData;
+                    formdata.append('upload', file);
+                    formdata.append('name', file.name);
+                    var xhr = new XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function (e) {
+                        return;
+                    });
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState == 4 && xhr.status == 200) {
+                            DatasetResource.getAll();
+                        }
+                        ;
+                    };
+                    xhr.open("POST", "/import/zip", true);
+                    xhr.send(formdata);
+                });
+        };
+        DatasetResource.export = function(dataset){
+            return mevDb.getDataset(dataset.id)
+                .then(function(dataset){
+                    return mevDb.getAnalysesAll(dataset.id)
+                        .then(function(analyses){
+                            var formdata = new FormData();
+                            formdata.append('name', dataset.id);
+                            formdata.append('rows', dataset.row.keys);
+                            formdata.append('rowSelections', JSON.stringify(dataset.row.selections));
+                            // formdata.append('rowSelections', new Blob([JSON.parse(JSON.stringify(dataset.row.selections))],
+                            //     {
+                            //         type: "application/json"
+                            //     })
+                            // );
+                            formdata.append('columns', dataset.column.keys);
+                            formdata.append('columnSelections', JSON.stringify(dataset.column.selections));
+
+                            analyses.forEach(function(analysis){
+                                formdata.append('analyses', JSON.stringify(analysis));
+                            });
+                            var xhr = new XMLHttpRequest();
+                            xhr.upload.addEventListener("progress", function (e) {
+                                return;
+                            });
+                            xhr.onreadystatechange = function () {
+                                if (xhr.readyState == 4 && xhr.status == 200) {
+                                    $rootScope.$broadcast("mev:dataset:exported", dataset);
+                                    var blob = new Blob([xhr.response], {type: "octet/stream"});
+                                    var fileName = dataset.id+".zip";
+                                    saveAs(blob, fileName);
+                                }
+                                ;
+                            };
+
+                            xhr.open("POST", "/export/zip", true);
+                            xhr.responseType = "arraybuffer";
+                            xhr.setRequestHeader("Accept", "application/octet-stream");
+                            xhr.send(formdata);
+                        });
+                });
+        }
+
         return DatasetResource;
     }
     DatasetRest.$inject=['$resource', '$q', '$http', '$rootScope', "mevDb"];

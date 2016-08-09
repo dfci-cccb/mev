@@ -1,4 +1,4 @@
-define([],function(){
+define(["lodash"],function(_){
 	var GeodsSummaryViewModel = function(MevGeodsSummaryFactory, scope, $modal, $location){
 		//private
 		var _self=this;
@@ -29,7 +29,12 @@ define([],function(){
 				$location.path(summary.getImportedDatasetPath());
 			});
 		};
-		
+		this.recordCount = function(){
+			return _.get(_self, "results.results.uids.esearchresult.count");
+		};
+		this.showCount = function(){
+			return _.get(_self, "results.results.uids.esearchresult.retmax");
+		};
 		this.uid="";
 		this.keywords="";
 	};

@@ -101,6 +101,12 @@
 
     <dependency>
       <groupId>edu.dfci.cccb</groupId>
+      <artifactId>mev-annotation-server</artifactId>
+      <version>BAYLIE-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>edu.dfci.cccb</groupId>
       <artifactId>mev-configuration-rest</artifactId>
       <version>BAYLIE-SNAPSHOT</version>
     </dependency>

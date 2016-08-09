@@ -70,6 +70,9 @@ define(["lodash"], function(_){"use strict";
         function activateDataset(dataset){
             return DatasetResource.activate(dataset);
         }
+        function exportDataset(dataset){
+            return DatasetResource.export(dataset);
+        }
         function deleteDataset(datasetId){
             return mevDb.deleteDataset(datasetId);
         }
@@ -87,6 +90,7 @@ define(["lodash"], function(_){"use strict";
         this.activateDataset = activateDataset;
         this.deleteDataset = deleteDataset;
         this.getDataset = getDataset;
+        this.exportDataset = exportDataset;
     };
     service.$inject=["$http", "$q", "mevDb", "mevDatasetRest"];
     service.$name="mevWorkspace";

@@ -1,15 +1,15 @@
 <div class="geo_import_container">
 <input type="text" id="uid" ng-model="vm.keywords" />
 <button id="find" value="find" ng-click="vm.searchByKeyword(vm.keywords)" >find</button>
-
 <table class="mev-table-tight table table-striped" style="font-size:14px;">
 <thead>
 <tr>
 <th>Dataset Name</a></th>
 <th>Summary</th>
 <th>#Samples</th>
-<th>Platform</th>
-<th></th>
+<th colspan="2">Platform
+	<span class="pull-right" ng-if="vm.results.results">Showing {{vm.showCount()}} of {{vm.recordCount() }}</span>
+</th>
 </tr>
 </thead>
 <tbody>

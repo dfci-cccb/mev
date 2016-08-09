@@ -9,7 +9,7 @@ define([], function() {
                     displayName: "datasets",
                     views: {
                         "workspace@root.datasets": {
-                            template: "<div mev-dataset-upload></div><div mev-workspace-list></div>"
+                            template: "<div mev-workspace-list></div>"
                         }
                     },
                     sticky: true,

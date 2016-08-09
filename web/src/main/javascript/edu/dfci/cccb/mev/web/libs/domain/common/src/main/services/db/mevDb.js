@@ -23,11 +23,12 @@ define(["lodash", "pouchdb"], function(_, PouchDB){"use strict";
         function putDataset(dataset, isRetry){
             return getDataset(dataset.id)
                 .catch(function(e){
-                    if(e.status === 404)
+                    if(e.status === 404){
+                        delete dataset._rev;
                         return _.assign(dataset, {
-                          _id: dataset.id
+                            _id: dataset.id
                         });
-                    else
+                    } else
                         throw e;
                 })
                 .then(function(doc){
@@ -182,6 +183,12 @@ define(["lodash", "pouchdb"], function(_, PouchDB){"use strict";
             //         });
             //     });
         }
+        function getAnalysesAll(datasetId){
+            return getAnalyses(datasetId)
+                .then(function(analysisNames){
+                    return $q.all(analysisNames.map(getAnalysis.bind(null, datasetId)));
+                });
+        }
         function getAnalysis(datasetId, analysisId){
             if(!mevSettings.db.enabled)
                 return _rejectDisabled();
@@ -196,11 +203,12 @@ define(["lodash", "pouchdb"], function(_, PouchDB){"use strict";
 
             return getAnalysis(datasetId, analysis.name)
                 .catch(function(e){
-                    if(e.status === 404)
+                    if(e.status === 404){
+                        delete analysis._rev;
                         return _.assign(analysis, {
                             _id: formatDocId(["analysis", analysis.name], datasetId)
                         });
-                    else
+                    }else
                         throw new Error("Error putting analysis" + JSON.stringify(e));
                 })
                 .then(function(doc){
@@ -304,6 +312,7 @@ define(["lodash", "pouchdb"], function(_, PouchDB){"use strict";
             getAnalysis: getAnalysis,
             putAnalysis: putAnalysis,
             getAnalyses: getAnalyses,
+            getAnalysesAll: getAnalysesAll,
             deleteAnalysis: deleteAnalysis,
             putAnnotations: putAnnotations,
             getAnnotations: getAnnotations,

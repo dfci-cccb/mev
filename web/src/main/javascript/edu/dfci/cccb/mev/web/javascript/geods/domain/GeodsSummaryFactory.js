@@ -1,4 +1,4 @@
-define(["geods/domain/GeodsSummary", 
+define(["geods/domain/GeodsSummary",
         "geods/domain/GeodsSearchResult"], 
 function(GeodsSummary, GeodsSearchResult){
 	var GeodsSummaryFactory = function(MevGeodsSummaryResourceSrvc, MevGeodsSearchResourceSrvc, MevGeodsImportSrvc, $q){
@@ -21,7 +21,8 @@ function(GeodsSummary, GeodsSearchResult){
 			self.accumulator.summaries=null;
 			return new GeodsSearchResult(					
 					MevGeodsSearchResourceSrvc.get({
-						term: "gds[Entry Type] AND ("+keywords+")"
+						term: "gds[Entry Type] AND ("+keywords+")",
+						retmax: 100
 					}).$promise
 					.then(function(data){
 						var uids = [];

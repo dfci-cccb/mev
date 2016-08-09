@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.module.SimpleSerializers;
 import edu.dfci.cccb.mev.configuration.rest.contract.JacksonConfigurer;
 import edu.dfci.cccb.mev.web.rest.assembly.json.CalendarJsonSerializer;
 import edu.dfci.cccb.mev.web.support.JsonViewResolver;
+import org.springframework.context.annotation.Primary;
 
 /**
  * @author levk
@@ -54,7 +55,8 @@ public class RestResolverConfiguration {
     return new CalendarJsonSerializer ();
   }
 
-  @Bean
+  @Primary
+  @Bean(name = "RestJsonObjectMapper")
   public ObjectMapper jsonObjectMapper (AutowireCapableBeanFactory beanFactory, ApplicationContext context) {
     List<JsonSerializer<?>> serializers = new ArrayList<> ();
     ObjectMapper mapper = new ObjectMapper ();
