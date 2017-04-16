@@ -16,7 +16,7 @@
                   	 var analysis = {
                   		 "type": "Principal Components", 
                   		 "name":"blah",
-                  		 "dimension": "row",
+                  		 "dimension": "column",
   	                	 'data': [{
   	                		 'name':"GSM74875",
   	                		 'loadings':[
@@ -68,7 +68,88 @@
   					        ]
   	                	 },{
   					          'name':"GSM74882", 
-  				              'loadings':[{"component":"PC1","value":-3.47609381386014},{"component":"PC2","value":-0.414456624382498},{"component":"PC3","value":-0.467270143772668}]
+  				              'loadings':[
+  				                  {"component":"PC1","value":-3.47609381386014},
+  				                  {"component":"PC2","value":-0.414456624382498},
+  				                  {"component":"PC3","value":-0.467270143772668}
+  				              ]
+  	                	 },{
+  					          'name':"GSM74883", 
+  				              'loadings':[
+  				                  {"component":"PC1","value":-1.27328296766838},
+  				                  {"component":"PC2","value":-0.260004429052355},
+  				                  {"component":"PC3","value":5.80215190950443}
+  				              ]
+  	                	 },{
+  					          'name':"GSM74884", 
+  				              'loadings':[
+  				                  {"component":"PC1","value":-2.78191358630203},
+  				                  {"component":"PC2","value":-0.133281607645152},
+  				                  {"component":"PC3","value":-0.0797505224325964}
+  				              ]
+  	                	 },{
+  					          'name':"GSM74885", 
+  				              'loadings':[
+  				                  {"component":"PC1","value":-2.88608366671699},
+  				                  {"component":"PC2","value":0.408509459230724},
+  				                  {"component":"PC3","value":-0.664432222919673}
+  				              ]
+  	                	 },{
+  					          'name':"GSM74886", 
+  				              'loadings':[
+  				                  {"component":"PC1","value":-3.08286656750136	},
+  				                  {"component":"PC2","value":0.00787304312534814},
+  				                  {"component":"PC3","value":-0.667415341281304}
+  				              ]
+  	                	 },{
+  					          'name':"GSM74887", 
+  				              'loadings':[
+  				                  {"component":"PC1","value":-2.96974743579303},
+  				                  {"component":"PC2","value":-0.0251302969464261},
+  				                  {"component":"PC3","value":-0.567014441355642}
+  				              ]
+  	                	 },{
+  					          'name':"GSM74888", 
+  				              'loadings':[
+  				                  {"component":"PC1","value":7.15796259120083},
+  				                  {"component":"PC2","value":-7.77488052481726},
+  				                  {"component":"PC3","value":1.00201102490504}
+  				              ]
+  	                	 },{
+  					          'name':"GSM74889", 
+  				              'loadings':[
+  				                  {"component":"PC1","value":5.18018497296154},
+  				                  {"component":"PC2","value":-6.17629468954715},
+  				                  {"component":"PC3","value":-1.05967039538184}
+  				              ]
+  	                	 },{
+  					          'name':"GSM74890", 
+  				              'loadings':[
+  				                  {"component":"PC1","value":5.0739769703575},
+  				                  {"component":"PC2","value":5.40882704304901},
+  				                  {"component":"PC3","value":0.558354650005061}
+  				              ]
+  	                	 },{
+  					          'name':"GSM74891", 
+  				              'loadings':[
+  				                  {"component":"PC1","value":7.12971078058349},
+  				                  {"component":"PC2","value":8.37598901961317},
+  				                  {"component":"PC3","value":0.666384293151479}
+  				              ]
+  	                	 },{
+  					          'name':"GSM74892", 
+  				              'loadings':[
+  				                  {"component":"PC1","value":5.91552392041355},
+  				                  {"component":"PC2","value":0.0318662169722301},
+  				                  {"component":"PC3","value":-1.31253142531795}
+  				              ]
+  	                	 },{
+  					          'name':"GSM74893", 
+  				              'loadings':[
+  				                  {"component":"PC1","value":5.84547324600768},
+  				                  {"component":"PC2","value":-0.153734387782931},
+  				                  {"component":"PC3","value":-1.42696442120898}
+  				              ]
   	                	 }],
   	                	 'variances':[{'name':"PC1", 'value':4.28743917531459}, 
   	                	              {'name':"PC2", 'value':3.34996602217847}, 
@@ -78,32 +159,35 @@
   	                		 name:"S1", 
   	                		 color:"#b4aa84", 
   	                		 elements:[
-  	                		     "200016_x_at", 
-	            	             "200080_s_at",
-	            	             "200050_at",
-	            	             "200051_at",
-	            	             "200052_s_at",
-	            	             "200053_at",
-	            	             "200054_at",
-	            	             "200055_at"
-	            	             ]
+  	                		     "GSM74875",
+  	                		     "GSM74876",
+  	                		     "GSM74877",
+	                		     "GSM74878",
+	                		     "GSM74879",
+  	                		     "GSM74880",
+  	                		     "GSM74881",
+	                		     "GSM74882",
+	                		     "GSM74883",
+	                		     "GSM74884",
+	            	         ]
   	                	 },{ 
   	                		 name:"S12", 
   	                		 color:"#ef3a84", 
   	                		 elements:[
-  	                		     "200698_at",
-  	                		     "200700_s_at",
-  	                		     "200706_s_at",
-  	                		     "200697_at",
-	            	             ]
+								"GSM74885",
+								"GSM74886",
+								"GSM74887",
+								"GSM74888",
+								"GSM74889",
+								"GSM74890",
+								"GSM74891",
+								"GSM74892",
+								"GSM74893",
+	            	         ]
   	                	 }]
-  	                	 
-                  	 }
+                  	 };
 
-                     analysis.transformedData = transform(analysis)
-                     analysis.componentSpace = generatePCA(analysis, scope.project.dataset.expression.retrieve)
-                     
-                     scope.analysis = analysis
+                     scope.analysis = analysis;
                   	 
                    }
           	   }
@@ -205,25 +289,35 @@
                                  'points': undefined
                         	 }
                 		 
-                		 console.log(scope.analysis.componentSpace)
                         	 
-                         data.points = scope.analysis.componentSpace
+                         data.points = scope.analysis.data
                          .map(function(sample, index){
                         	 
-                        	 var x = sample.components.filter(function(comp){ 
+                        	 var x = sample.loadings.filter(function(comp){ 
                         		 return comp.component == scope.selectionParams.dimension.x.name
                         	 })[0].value
                         	 
-                        	 var y = sample.components.filter(function(comp){ 
+                        	 var y = sample.loadings.filter(function(comp){ 
                         		 return comp.component == scope.selectionParams.dimension.y.name 
                     		 })[0].value
+                    		 
+                    		 var fill = scope.analysis.selections.filter(function(selection){
+                    			 
+                        		 var present = selection.elements
+                        		 .filter(function(element){
+                        			 return element == sample.name
+                        		 }).length > 0
+                        		 
+                        		 return present
+                        		 
+                        	 })[0].color
                     		 
                     		 
                              return {
                             	 x:  x, 
                             	 y: y, 
                             	 id: sample.name, 
-                            	 fill: sample.color
+                            	 fill: fill
                              }
                          })
                          
